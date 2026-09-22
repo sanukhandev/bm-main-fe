@@ -42,6 +42,10 @@ export interface PettyCashDaybookResponse {
   meta: { opening_balance: string; total_in: string; total_out: string; closing_balance: string };
 }
 
+export interface DailyMovement { date: string; inward: string; outward: string; net: string; }
+export interface PaymentModeSummary { payment_mode: PaymentMode; direction: AccountDirection; count: number; amount: string; }
+export interface PettyCashRequest { transaction_date: string; direction: AccountDirection; amount: number; particulars: string; category?: string; remarks?: string; }
+
 @Injectable({ providedIn: 'root' })
 export class AccountsApiService {
   private http = inject(HttpClient);
@@ -61,5 +65,17 @@ export class AccountsApiService {
 
   getPettyCash(): Observable<PettyCashDaybookResponse> {
     return this.http.get<PettyCashDaybookResponse>(`${this.baseUrl}/petty-cash/daybook`);
+  }
+
+  createPettyCash(payload: PettyCashRequest): Observable<ApiResponse<AccountTransaction>> {
+    return this.http.post<ApiResponse<AccountTransaction>>(`${this.baseUrl}/petty-cash`, payload);
+  }
+
+  getDailyMovement(): Observable<ApiResponse<DailyMovement[]>> {
+    return this.http.get<ApiResponse<DailyMovement[]>>(`${this.baseUrl}/reports/daily-movement`);
+  }
+
+  getPaymentModeSummary(): Observable<ApiResponse<PaymentModeSummary[]>> {
+    return this.http.get<ApiResponse<PaymentModeSummary[]>>(`${this.baseUrl}/reports/payment-modes`);
   }
 }

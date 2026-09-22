@@ -48,6 +48,6 @@ export class OwnerAgreementsApiService {
   transition(id: number, status: 'approved' | 'commenced' | 'on_hold' | 'terminated', reason?: string): Observable<ApiResponse<OwnerAgreement>> { return this.http.patch<ApiResponse<OwnerAgreement>>(`${this.baseUrl}/${id}/status`, { status, reason }); }
   raiseDispute(id: number, subject: string, description: string): Observable<ApiResponse<unknown>> { return this.http.post<ApiResponse<unknown>>(`${this.baseUrl}/${id}/disputes`, { subject, description }); }
   addDisputeComment(id: number, comment: string): Observable<ApiResponse<unknown>> { return this.http.post<ApiResponse<unknown>>(`/api/v1/agreement-disputes/${id}/comments`, { comment }); }
-  addAdditionalPayment(id: number, payload: { direction: 'inward' | 'outward'; category: string; amount: number; terms?: string }): Observable<ApiResponse<unknown>> { return this.http.post<ApiResponse<unknown>>(`${this.baseUrl}/${id}/additional-payments`, payload); }
+  addAdditionalPayment(id: number, payload: { direction: 'inward' | 'outward'; category: string; particulars: string; amount: number; due_date: string; payment_mode: 'cash' | 'cheque' | 'bank_transfer'; terms?: string }): Observable<ApiResponse<unknown>> { return this.http.post<ApiResponse<unknown>>(`${this.baseUrl}/${id}/additional-payments`, payload); }
 
 }

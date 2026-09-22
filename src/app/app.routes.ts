@@ -188,6 +188,10 @@ export const routes: Routes = [
         path: 'accounts/reports',
         loadComponent: () => import('./features/accounts/accounts-reports.component').then((m) => m.AccountsReportsComponent),
       },
+      { path: 'maintenance/work-orders', data: { section: 'work-orders', title: 'Work Orders' }, loadComponent: () => import('./features/maintenance/maintenance.component').then((m) => m.MaintenanceComponent) },
+      { path: 'maintenance/work-orders/:id', loadComponent: () => import('./features/maintenance/work-order-detail.component').then((m) => m.WorkOrderDetailComponent) },
+      { path: 'maintenance/vendors', data: { section: 'vendors', title: 'Vendors' }, loadComponent: () => import('./features/maintenance/maintenance.component').then((m) => m.MaintenanceComponent) },
+      { path: 'maintenance/inventory', data: { section: 'inventory', title: 'Inventory' }, loadComponent: () => import('./features/maintenance/maintenance.component').then((m) => m.MaintenanceComponent) },
       // Administration
       {
         path: 'administration/branches',

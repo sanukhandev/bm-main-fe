@@ -7,9 +7,11 @@ import { BmLoadingStateComponent } from '../../shared/components/bm-loading-stat
 import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm-error-state.component';
 import { BmEmptyStateComponent } from '../../shared/components/bm-empty-state/bm-empty-state.component';
 
+import { BmStatusBadgeComponent } from '../../shared/components/bm-status-badge/bm-status-badge.component';
+
 @Component({
   selector: 'bm-account-transactions-list', standalone: true,
-  imports: [CommonModule, RouterLink, BmPageHeaderComponent, BmLoadingStateComponent, BmErrorStateComponent, BmEmptyStateComponent],
+  imports: [CommonModule, RouterLink, BmPageHeaderComponent, BmLoadingStateComponent, BmErrorStateComponent, BmEmptyStateComponent, BmStatusBadgeComponent],
   template: `
     <bm-page-header [title]="direction() === 'inward' ? 'Inward Receipts' : 'Outward Payments'" subtitle="Branch-scoped posted financial documents">
       <a routerLink="/app/accounts/dashboard" class="bm-btn bm-btn-secondary text-xs">Accounts Dashboard</a>
@@ -19,8 +21,8 @@ import { BmEmptyStateComponent } from '../../shared/components/bm-empty-state/bm
     @else if (!rows().length) { <bm-empty-state title="No transactions found" description="No financial documents match this branch." ></bm-empty-state> }
     @else {
       <div class="bm-card overflow-hidden overflow-x-auto"><table class="w-full text-left text-xs">
-        <thead><tr class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase"><th class="p-4">Document</th><th class="p-4">Date</th><th class="p-4">Party</th><th class="p-4">Mode</th><th class="p-4">Amount</th><th class="p-4">Status</th></tr></thead>
-        <tbody class="divide-y divide-slate-100">@for (row of rows(); track row.id) { <tr><td class="p-4 font-semibold">{{ row.document_no }}</td><td class="p-4">{{ row.transaction_date }}</td><td class="p-4">{{ row.party?.display_name || 'Miscellaneous' }}</td><td class="p-4 capitalize">{{ row.payment_mode.replace('_', ' ') }}</td><td class="p-4 font-semibold tabular-nums">AED {{ row.amount }}</td><td class="p-4 capitalize">{{ row.status }}</td></tr> }</tbody>
+        <thead><tr class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase"><th class="p-4">Document</th><th class="p-4">Date</th><th class="p-4">Party</th><th class="p-4">Particulars</th><th class="p-4">Mode</th><th class="p-4">Amount</th><th class="p-4">Status</th></tr></thead>
+        <tbody class="divide-y divide-slate-100">@for (row of rows(); track row.id) { <tr><td class="p-4 font-semibold">{{ row.document_no }}</td><td class="p-4">{{ row.transaction_date }}</td><td class="p-4">{{ row.party?.display_name || 'Miscellaneous' }}</td><td class="p-4">{{ row.remarks || '—' }}</td><td class="p-4"><bm-status-badge [status]="row.payment_mode"></bm-status-badge></td><td class="p-4 font-semibold tabular-nums">AED {{ row.amount }}</td><td class="p-4"><bm-status-badge [status]="row.status"></bm-status-badge></td></tr> }</tbody>
       </table></div>
     }
   `,

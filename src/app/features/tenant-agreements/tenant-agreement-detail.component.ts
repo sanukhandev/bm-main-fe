@@ -64,7 +64,7 @@ import { TenantAgreement, AgreementInstallment } from '../../shared/models/agree
                 </button>
               }
               @if (agreement()!.status === 'commenced') {
-                <button type="button" (click)="transition('on_hold')" [disabled]="isActioning()" class="bm-btn bm-btn-secondary text-xs font-semibold px-4 py-2 rounded-xl border border-slate-200">
+                  <button type="button" (click)="openHoldModal()" [disabled]="isActioning()" class="bm-btn bm-btn-secondary text-xs font-semibold px-4 py-2 rounded-xl border border-slate-200">
                   Put On Hold
                 </button>
               }
@@ -91,7 +91,7 @@ import { TenantAgreement, AgreementInstallment } from '../../shared/models/agree
                   <div class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-200/90 py-1.5 z-30 text-xs">
                     <button
                       type="button"
-                      (click)="raiseDispute(); showMoreMenu.set(false)"
+                      (click)="openDisputeModal(); showMoreMenu.set(false)"
                       class="w-full text-left px-4 py-2 hover:bg-slate-50 text-slate-700 flex items-center gap-2 font-medium"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -297,15 +297,21 @@ import { TenantAgreement, AgreementInstallment } from '../../shared/models/agree
             </div>
           </div>
 
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+            <div class="rounded-xl bg-slate-50 border border-slate-200 px-4 py-3"><div class="text-[11px] uppercase tracking-wide text-slate-500">Scheduled</div><div class="text-lg font-bold text-slate-900 tabular-nums mt-1">AED {{ formatAmount(getScheduleTotal(agreement()!.installments)) }}</div></div>
+            <div class="rounded-xl bg-emerald-50/70 border border-emerald-100 px-4 py-3"><div class="text-[11px] uppercase tracking-wide text-emerald-700">Paid</div><div class="text-lg font-bold text-emerald-800 tabular-nums mt-1">AED {{ formatAmount(getPaidTotal(agreement()!.installments)) }}</div></div>
+            <div class="rounded-xl bg-amber-50/70 border border-amber-100 px-4 py-3"><div class="text-[11px] uppercase tracking-wide text-amber-700">Outstanding</div><div class="text-lg font-bold text-amber-900 tabular-nums mt-1">AED {{ formatAmount(getOutstandingTotal(agreement()!.installments)) }}</div></div>
+          </div>
+
           <!-- Desktop & Tablet Table -->
           <div class="hidden md:block overflow-x-auto border border-slate-200/90 rounded-2xl">
             <table class="w-full text-left text-xs border-collapse">
               <thead class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
                 <tr>
-                  <th class="py-3.5 px-4 w-12">#</th>
-                  <th class="py-3.5 px-4 w-32">Due Date</th>
+                  <th class="py-3.5 px-4 w-16">Payment</th>
+                  <th class="py-3.5 px-4 w-32">Due</th>
                   <th class="py-3.5 px-4">Particulars</th>
-                  <th class="py-3.5 px-4 w-28">Mode</th>
+                  <th class="py-3.5 px-4 w-28">Method</th>
                   <th class="py-3.5 px-4 w-32 text-right">Scheduled</th>
                   <th class="py-3.5 px-4 w-32 text-right">Paid</th>
                   <th class="py-3.5 px-4 w-32 text-right">Balance</th>
@@ -317,7 +323,7 @@ import { TenantAgreement, AgreementInstallment } from '../../shared/models/agree
                 @for (item of agreement()!.installments || []; track item.id) {
                   <tr class="hover:bg-slate-50/60 transition-colors" [class.bg-rose-50/30]="item.status === 'defaulted'">
                     <td class="py-3.5 px-4 font-semibold text-slate-700 tabular-nums">
-                      {{ item.installment_no }}
+                      <span class="block">#{{ item.installment_no }}</span><span class="text-[10px] font-normal text-slate-400">{{ item.is_extra ? 'Additional' : 'Rent' }}</span>
                     </td>
                     <td class="py-3.5 px-4 whitespace-nowrap font-medium text-slate-800 tabular-nums">
                       {{ formatDate(item.due_date) }}
@@ -325,8 +331,8 @@ import { TenantAgreement, AgreementInstallment } from '../../shared/models/agree
                     <td class="py-3.5 px-4 text-slate-700">
                       {{ item.notes || 'Rent installment' }}
                     </td>
-                    <td class="py-3.5 px-4 capitalize text-slate-600">
-                      {{ (item.payment_mode || '').replace('_', ' ') }}
+                    <td class="py-3.5 px-4">
+                      <span class="inline-flex rounded-lg bg-slate-100 px-2 py-1 text-[11px] font-semibold text-slate-700 capitalize">{{ (item.payment_mode || '').replace('_', ' ') }}</span>
                     </td>
                     <td class="py-3.5 px-4 text-right whitespace-nowrap tabular-nums font-medium text-slate-900">
                       <span class="text-[11px] text-slate-400 mr-1">AED</span>{{ formatAmount(item.amount) }}
@@ -391,12 +397,12 @@ import { TenantAgreement, AgreementInstallment } from '../../shared/models/agree
                     {{ item.status.replace('_', ' ') }}
                   </span>
                 </div>
-                <div class="grid grid-cols-2 gap-2 text-slate-600">
+                <div class="text-slate-600"><div class="font-medium text-slate-900 mb-2">{{ item.notes || 'Rent installment' }}</div><div class="grid grid-cols-2 gap-2">
                   <div>Due: <span class="font-medium text-slate-900 tabular-nums">{{ formatDate(item.due_date) }}</span></div>
                   <div>Mode: <span class="font-medium text-slate-900 capitalize">{{ (item.payment_mode || '').replace('_', ' ') }}</span></div>
                   <div>Scheduled: <span class="font-semibold text-slate-900 tabular-nums">AED {{ formatAmount(item.amount) }}</span></div>
                   <div>Balance: <span class="font-semibold text-slate-900 tabular-nums">AED {{ formatAmount(item.balance) }}</span></div>
-                </div>
+                  <div>Paid: <span class="font-semibold text-emerald-700 tabular-nums">AED {{ formatAmount(item.paid_amount) }}</span></div></div></div>
                 <div class="pt-2 border-t border-slate-100 flex items-center justify-end gap-2">
                   <button
                     type="button"
@@ -440,7 +446,15 @@ import { TenantAgreement, AgreementInstallment } from '../../shared/models/agree
                       <span class="px-2 py-0.5 rounded text-[10px] bg-amber-100 text-amber-900 capitalize">{{ dispute.status }}</span>
                     </div>
                     <p class="text-slate-700">{{ dispute.description }}</p>
-                    <button type="button" class="text-xs font-semibold text-emerald-700 hover:underline pt-1" (click)="commentDispute(dispute.id)">
+                    @if ((dispute.comments || []).length > 0) {
+                      <div class="mt-3 pt-3 border-t border-amber-200/70 space-y-2">
+                        <div class="text-[10px] font-semibold uppercase tracking-wide text-amber-800">Updates</div>
+                        @for (comment of dispute.comments || []; track $index) {
+                          <div class="rounded-lg bg-white/70 border border-amber-100 px-3 py-2 text-slate-700"><div>{{ comment.comment }}</div><div class="text-[10px] text-slate-500 mt-1">{{ formatDate(comment.created_at) }}</div></div>
+                        }
+                      </div>
+                    }
+                    <button type="button" class="text-xs font-semibold text-emerald-700 hover:underline pt-1" (click)="openCommentModal(dispute.id)">
                       + Add Comment
                     </button>
                   </div>
@@ -503,6 +517,36 @@ import { TenantAgreement, AgreementInstallment } from '../../shared/models/agree
           </div>
         }
 
+        @if (holdModalOpen()) {
+          <div class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+            <form class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 border border-slate-200" (ngSubmit)="submitHold()">
+              <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100"><h2 class="text-lg font-semibold text-slate-900">Put Agreement On Hold</h2><button type="button" (click)="holdModalOpen.set(false)" class="text-slate-400 text-xl">×</button></div>
+              <label class="block text-xs font-semibold text-slate-700">Reason for hold<textarea [(ngModel)]="holdReason" name="holdReason" required rows="4" class="bm-input mt-1 !h-auto p-2.5" placeholder="Explain why this agreement is being put on hold"></textarea></label>
+              <div class="flex justify-end gap-3 mt-6"><button type="button" (click)="holdModalOpen.set(false)" class="bm-btn bm-btn-secondary text-xs">Cancel</button><button type="submit" [disabled]="!holdReason.trim() || isActioning()" class="bm-btn bm-btn-primary text-xs">{{ isActioning() ? 'Saving…' : 'Put On Hold' }}</button></div>
+            </form>
+          </div>
+        }
+
+        @if (disputeModalOpen()) {
+          <div class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+            <form class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 border border-slate-200" (ngSubmit)="submitDispute()">
+              <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100"><h2 class="text-lg font-semibold text-slate-900">Raise Dispute</h2><button type="button" (click)="disputeModalOpen.set(false)" class="text-slate-400 text-xl">×</button></div>
+              <div class="space-y-4"><label class="block text-xs font-semibold text-slate-700">Subject<input [(ngModel)]="disputeSubject" name="disputeSubject" required class="bm-input mt-1" placeholder="Dispute subject"></label><label class="block text-xs font-semibold text-slate-700">Details<textarea [(ngModel)]="disputeDescription" name="disputeDescription" required rows="4" class="bm-input mt-1 !h-auto p-2.5" placeholder="Describe the dispute"></textarea></label></div>
+              <div class="flex justify-end gap-3 mt-6"><button type="button" (click)="disputeModalOpen.set(false)" class="bm-btn bm-btn-secondary text-xs">Cancel</button><button type="submit" [disabled]="!disputeSubject.trim() || !disputeDescription.trim()" class="bm-btn bm-btn-primary text-xs">Raise Dispute</button></div>
+            </form>
+          </div>
+        }
+
+        @if (commentModalOpen()) {
+          <div class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+            <form class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 border border-slate-200" (ngSubmit)="submitComment()">
+              <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100"><h2 class="text-lg font-semibold text-slate-900">Add Dispute Comment</h2><button type="button" (click)="commentModalOpen.set(false)" class="text-slate-400 text-xl">×</button></div>
+              <label class="block text-xs font-semibold text-slate-700">Update<textarea [(ngModel)]="disputeComment" name="disputeComment" required rows="4" class="bm-input mt-1 !h-auto p-2.5" placeholder="Record the latest update"></textarea></label>
+              <div class="flex justify-end gap-3 mt-6"><button type="button" (click)="commentModalOpen.set(false)" class="bm-btn bm-btn-secondary text-xs">Cancel</button><button type="submit" [disabled]="!disputeComment.trim()" class="bm-btn bm-btn-primary text-xs">Add Comment</button></div>
+            </form>
+          </div>
+        }
+
         <!-- Terminate Confirmation Dialog -->
         <bm-confirm-dialog
           [isOpen]="confirmTerminateDialog()"
@@ -528,6 +572,14 @@ export class TenantAgreementDetailComponent implements OnInit {
   showMoreMenu = signal(false);
   installmentProcessingId = signal<number | string | null>(null);
   paymentLineOpen = signal(false);
+  holdModalOpen = signal(false);
+  disputeModalOpen = signal(false);
+  commentModalOpen = signal(false);
+  commentDisputeId: number | null = null;
+  holdReason = '';
+  disputeSubject = '';
+  disputeDescription = '';
+  disputeComment = '';
   paymentLine = {
     direction: 'inward' as 'inward' | 'outward',
     category: '',
@@ -607,7 +659,7 @@ export class TenantAgreementDetailComponent implements OnInit {
       },
       error: (err) => {
         this.isActioning.set(false);
-        alert(err.message || 'Failed to terminate tenant agreement.');
+        this.error.set(err.message || 'Failed to terminate tenant agreement.');
       },
     });
   }
@@ -627,14 +679,21 @@ export class TenantAgreementDetailComponent implements OnInit {
       },
       error: (err) => {
         this.installmentProcessingId.set(null);
-        alert(err.message || 'Unable to update installment.');
+        this.error.set(err.message || 'Unable to update installment.');
       },
     });
   }
 
-  transition(status: 'approved' | 'commenced' | 'on_hold'): void {
-    const reason = status === 'on_hold' ? prompt('Reason for hold') || '' : '';
-    if (status === 'on_hold' && !reason) return;
+  openHoldModal(): void { this.holdReason = ''; this.holdModalOpen.set(true); }
+
+  submitHold(): void {
+    const reason = this.holdReason.trim();
+    if (!reason) return;
+    this.holdModalOpen.set(false);
+    this.transition('on_hold', reason);
+  }
+
+  transition(status: 'approved' | 'commenced' | 'on_hold', reason = ''): void {
     const id = this.agreement()?.id;
     if (!id) return;
     this.isActioning.set(true);
@@ -645,28 +704,33 @@ export class TenantAgreementDetailComponent implements OnInit {
       },
       error: (err) => {
         this.isActioning.set(false);
-        alert(err.message || 'Unable to transition agreement.');
+        this.error.set(err.message || 'Unable to transition agreement.');
       },
     });
   }
 
-  raiseDispute(): void {
+  openDisputeModal(): void { this.disputeSubject = ''; this.disputeDescription = ''; this.disputeModalOpen.set(true); }
+
+  submitDispute(): void {
     const id = this.agreement()?.id;
-    const subject = prompt('Dispute subject');
-    const description = subject ? prompt('Dispute details') : null;
+    const subject = this.disputeSubject.trim();
+    const description = this.disputeDescription.trim();
     if (!id || !subject || !description) return;
     this.api.raiseDispute(id, subject, description).subscribe({
-      next: () => this.loadAgreement(),
-      error: (err) => alert(err.message || 'Unable to raise dispute.'),
+      next: () => { this.disputeModalOpen.set(false); this.loadAgreement(); },
+      error: (err) => this.error.set(err.message || 'Unable to raise dispute.'),
     });
   }
 
-  commentDispute(id: number): void {
-    const comment = prompt('Add dispute update');
-    if (!comment) return;
+  openCommentModal(id: number): void { this.commentDisputeId = id; this.disputeComment = ''; this.commentModalOpen.set(true); }
+
+  submitComment(): void {
+    const id = this.commentDisputeId;
+    const comment = this.disputeComment.trim();
+    if (!id || !comment) return;
     this.api.addDisputeComment(id, comment).subscribe({
-      next: () => this.loadAgreement(),
-      error: (err) => alert(err.message || 'Unable to add comment.'),
+      next: () => { this.commentModalOpen.set(false); this.loadAgreement(); },
+      error: (err) => this.error.set(err.message || 'Unable to add comment.'),
     });
   }
 
@@ -682,7 +746,7 @@ export class TenantAgreementDetailComponent implements OnInit {
         this.paymentLineOpen.set(false);
         this.loadAgreement();
       },
-      error: (err) => alert(err.message || 'Unable to add payment line.'),
+      error: (err) => this.error.set(err.message || 'Unable to add payment line.'),
     });
   }
 
@@ -747,6 +811,10 @@ export class TenantAgreementDetailComponent implements OnInit {
   getPaidTotal(installments?: AgreementInstallment[]): number {
     if (!installments || !installments.length) return 0;
     return installments.reduce((sum, item) => sum + Number(item.paid_amount || 0), 0);
+  }
+
+  getScheduleTotal(installments?: AgreementInstallment[]): number {
+    return (installments || []).reduce((total, item) => total + Number(item.amount || 0), 0);
   }
 
   getOutstandingTotal(installments?: AgreementInstallment[]): number {

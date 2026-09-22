@@ -45,7 +45,9 @@ import { Customer } from '../../shared/models/customer.models';
             <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-xs">
               <div>
                 <div class="text-slate-400 font-medium">Customer Type</div>
-                <div class="font-semibold text-slate-800 capitalize mt-1">{{ customer()!.customer_type }}</div>
+                <div class="mt-1">
+                  <bm-status-badge [status]="customer()!.customer_type"></bm-status-badge>
+                </div>
               </div>
 
               <div>
@@ -62,11 +64,9 @@ import { Customer } from '../../shared/models/customer.models';
 
               <div>
                 <div class="text-slate-400 font-medium">Business Roles</div>
-                <div class="flex gap-1.5 mt-1">
+                <div class="flex gap-1.5 mt-1 flex-wrap">
                   @for (r of customer()!.roles || []; track r) {
-                    <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 uppercase">
-                      {{ r }}
-                    </span>
+                    <bm-status-badge [status]="r"></bm-status-badge>
                   }
                 </div>
               </div>

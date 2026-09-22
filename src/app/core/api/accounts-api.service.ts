@@ -35,6 +35,12 @@ export interface AccountsDashboardSnapshot {
   owner_outstanding_payable: string;
   pending_cheque_inward: string;
   pending_cheque_outward: string;
+  recent_transactions: RecentAccountTransaction[];
+}
+
+export interface RecentAccountTransaction {
+  id: number; document_no: string; direction: AccountDirection; transaction_date: string;
+  payment_mode: PaymentMode; amount: string; status: string; party: string | null;
 }
 
 export interface PettyCashDaybookResponse {

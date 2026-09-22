@@ -41,8 +41,4 @@ export class OwnerAgreementsApiService {
     });
   }
 
-  // Lifecycle status updates (submit, approve, etc.)
-  updateStatus(id: number, status: string, reason?: string): Observable<ApiResponse<OwnerAgreement>> {
-    return this.http.patch<ApiResponse<OwnerAgreement>>(`${this.baseUrl}/${id}/status`, { status, reason });
-  }
 }

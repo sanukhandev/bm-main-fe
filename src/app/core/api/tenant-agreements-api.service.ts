@@ -41,7 +41,4 @@ export class TenantAgreementsApiService {
     });
   }
 
-  updateStatus(id: number, status: string, reason?: string): Observable<ApiResponse<TenantAgreement>> {
-    return this.http.patch<ApiResponse<TenantAgreement>>(`${this.baseUrl}/${id}/status`, { status, reason });
-  }
 }

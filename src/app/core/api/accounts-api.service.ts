@@ -40,7 +40,7 @@ export interface AccountsDashboardSnapshot {
 
 export interface RecentAccountTransaction {
   id: number; document_no: string; direction: AccountDirection; transaction_date: string;
-  payment_mode: PaymentMode; amount: string; status: string; party: string | null;
+  payment_mode: PaymentMode; amount: string; status: string; party: string | null; particulars: string | null;
 }
 
 export interface PettyCashDaybookResponse {

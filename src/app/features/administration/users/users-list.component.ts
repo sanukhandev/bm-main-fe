@@ -57,9 +57,7 @@ import { UserAdmin } from '../../../shared/models/admin.models';
                   <td class="py-3.5 px-4">
                     <div class="flex items-center gap-1 flex-wrap">
                       @for (r of u.roles; track r) {
-                        <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 uppercase">
-                          {{ r }}
-                        </span>
+                        <bm-status-badge [status]="r"></bm-status-badge>
                       }
                     </div>
                   </td>

@@ -36,7 +36,7 @@ export interface OwnerAgreement {
   created_at?: string;
   updated_at?: string;
   installments?: AgreementInstallment[];
-  disputes?: Array<{ id: number; subject: string; description: string; status: string; comments?: Array<{ comment: string }> }>;
+  disputes?: Array<{ id: number; subject: string; description: string; status: string; comments?: Array<{ comment: string; created_at?: string }> }>;
   additional_payments?: Array<{ category: string; particulars: string; direction: string; amount: string | number; due_date: string; payment_mode: string; terms?: string }>;
 }
 
@@ -69,7 +69,7 @@ export interface TenantAgreement {
   created_at?: string;
   updated_at?: string;
   installments?: AgreementInstallment[];
-  disputes?: Array<{ id: number; subject: string; description: string; status: string; comments?: Array<{ comment: string }> }>;
+  disputes?: Array<{ id: number; subject: string; description: string; status: string; comments?: Array<{ comment: string; created_at?: string }> }>;
   additional_payments?: Array<{ category: string; particulars: string; direction: string; amount: string | number; due_date: string; payment_mode: string; terms?: string }>;
 }
 

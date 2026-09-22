@@ -84,6 +84,11 @@ import { BmBranchSwitcherComponent } from '../../shared/components/bm-branch-swi
           <a routerLink="/app/accounts/petty-cash" routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"><span class="h-4 w-4 text-[#90a955]">₿</span><span>Petty Cash Daybook</span></a>
           <a routerLink="/app/accounts/reports" routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"><span class="h-4 w-4 text-[#90a955]">▤</span><span>Reports</span></a>
 
+          <div class="pt-4 px-3 py-2 text-[11px] font-semibold text-[#a0cc9b] uppercase tracking-wider">Maintenance</div>
+          <a routerLink="/app/maintenance/work-orders" routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"><span class="h-4 w-4 text-[#90a955]">W</span><span>Work Orders</span></a>
+          <a routerLink="/app/maintenance/vendors" routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"><span class="h-4 w-4 text-[#90a955]">V</span><span>Vendors</span></a>
+          <a routerLink="/app/maintenance/inventory" routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"><span class="h-4 w-4 text-[#90a955]">I</span><span>Inventory</span></a>
+
           <div class="pt-4 px-3 py-2 text-[11px] font-semibold text-[#a0cc9b] uppercase tracking-wider">
             Leasing & Contracts
           </div>

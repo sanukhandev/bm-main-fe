@@ -113,21 +113,13 @@ import { PaginationMeta } from '../../core/api/api.models';
                       {{ cust.display_name }}
                     </a>
                   </td>
-                  <td class="py-3.5 px-4 capitalize text-slate-600">
-                    {{ cust.customer_type }}
+                  <td class="py-3.5 px-4">
+                    <bm-status-badge [status]="cust.customer_type"></bm-status-badge>
                   </td>
                   <td class="py-3.5 px-4">
                     <div class="flex items-center gap-1 flex-wrap">
                       @for (r of cust.roles || []; track r) {
-                        <span
-                          class="px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide"
-                          [class.bg-emerald-100]="r === 'owner'"
-                          [class.text-emerald-800]="r === 'owner'"
-                          [class.bg-blue-100]="r === 'tenant'"
-                          [class.text-blue-800]="r === 'tenant'"
-                        >
-                          {{ r }}
-                        </span>
+                        <bm-status-badge [status]="r"></bm-status-badge>
                       }
                     </div>
                   </td>

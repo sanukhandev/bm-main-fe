@@ -116,8 +116,8 @@ import { PaginationMeta } from '../../core/api/api.models';
                   <td class="py-3.5 px-4 font-semibold text-slate-900 tabular-nums">
                     {{ agr.currency_code }} {{ agr.total_amount | number:'1.2-2' }}
                   </td>
-                  <td class="py-3.5 px-4 uppercase text-[11px] font-medium text-slate-600">
-                    {{ (agr.payment_mode || '').replace('_', ' ') }}
+                  <td class="py-3.5 px-4">
+                    <bm-status-badge [status]="agr.payment_mode"></bm-status-badge>
                   </td>
                   <td class="py-3.5 px-4">
                     <bm-status-badge [status]="agr.status"></bm-status-badge>
@@ -322,7 +322,7 @@ export class OwnerAgreementsListComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.isTerminating.set(false);
-        alert(err.message || 'Failed to terminate agreement.');
+        this.error.set(err.message || 'Failed to terminate agreement.');
       },
     });
   }

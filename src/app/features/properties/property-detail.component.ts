@@ -55,7 +55,9 @@ import { Property } from '../../shared/models/property.models';
 
               <div>
                 <div class="text-slate-400 font-medium">Property Classification</div>
-                <div class="font-semibold text-slate-800 capitalize mt-1">{{ formatType(property()!.property_type) }}</div>
+                <div class="mt-1">
+                  <bm-status-badge [status]="property()!.property_type"></bm-status-badge>
+                </div>
               </div>
 
               <div>

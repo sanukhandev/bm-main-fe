@@ -124,8 +124,8 @@ import { PaginationMeta } from '../../core/api/api.models';
                       <div class="text-[11px] text-slate-400">{{ prop.building_name }}</div>
                     }
                   </td>
-                  <td class="py-3.5 px-4 capitalize text-slate-600">
-                    {{ formatType(prop.property_type) }}
+                  <td class="py-3.5 px-4">
+                    <bm-status-badge [status]="prop.property_type"></bm-status-badge>
                   </td>
                   <td class="py-3.5 px-4 font-medium text-slate-800">
                     {{ getOwnerName(prop) }}

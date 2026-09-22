@@ -46,6 +46,11 @@ import { OwnerAgreement } from '../../shared/models/agreement.models';
             Terminate
           </button>
         }
+        @if (agreement()!.status === 'draft') { <button type="button" (click)="transition('approved')" class="bm-btn bm-btn-primary text-xs">Approve</button> }
+        @if (agreement()!.status === 'approved') { <button type="button" (click)="transition('commenced')" class="bm-btn bm-btn-primary text-xs">Commence</button> }
+        @if (agreement()!.status === 'commenced') { <button type="button" (click)="transition('on_hold')" class="bm-btn bm-btn-secondary text-xs">Put On Hold</button> }
+        @if (agreement()!.status === 'on_hold') { <button type="button" (click)="transition('commenced')" class="bm-btn bm-btn-primary text-xs">Resume</button> }
+        @if (agreement()!.status !== 'terminated') { <button type="button" (click)="raiseDispute()" class="bm-btn bm-btn-secondary text-xs">Raise Dispute</button><button type="button" (click)="addExtraPayment()" class="bm-btn bm-btn-secondary text-xs">Add Payment Line</button> }
       </bm-page-header>
 
       <div class="bm-card p-8 md:p-12 max-w-4xl mx-auto space-y-8 bg-white border border-[#DDE3DF]">
@@ -96,6 +101,8 @@ import { OwnerAgreement } from '../../shared/models/agreement.models';
             }
           </div>
         </div>
+
+        @if ((agreement()!.disputes || []).length > 0) { <div><h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Dispute Updates</h3>@for (dispute of agreement()!.disputes || []; track dispute.id) { <div class="p-4 rounded-xl border border-amber-200 bg-amber-50 mb-3"><div class="font-semibold">{{ dispute.subject }} <span class="text-xs font-normal capitalize">({{ dispute.status }})</span></div><p class="text-xs mt-1">{{ dispute.description }}</p><button type="button" class="text-xs text-emerald-700 mt-2" (click)="commentDispute(dispute.id)">Add Comment</button></div> }</div> }
 
         <div>
           <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Commercial Terms & Financials</h3>
@@ -236,4 +243,9 @@ export class OwnerAgreementDetailComponent implements OnInit {
     this.installmentProcessingId.set(id);
     this.api.updateInstallmentStatus(agreement.id, id, status).subscribe({ next: () => { this.installmentProcessingId.set(null); this.loadAgreement(); }, error: (err) => { this.installmentProcessingId.set(null); alert(err.message || 'Unable to update installment.'); } });
   }
+
+  transition(status: 'approved' | 'commenced' | 'on_hold'): void { const reason = status === 'on_hold' ? prompt('Reason for hold') || '' : ''; if (status === 'on_hold' && !reason) return; const id = this.agreement()?.id; if (!id) return; this.isActioning.set(true); this.api.transition(id, status, reason).subscribe({ next: (res) => { this.agreement.set(res.data); this.isActioning.set(false); }, error: (err) => { this.isActioning.set(false); alert(err.message || 'Unable to transition agreement.'); } }); }
+  raiseDispute(): void { const id = this.agreement()?.id; const subject = prompt('Dispute subject'); const description = subject ? prompt('Dispute details') : null; if (!id || !subject || !description) return; this.api.raiseDispute(id, subject, description).subscribe({ next: () => this.loadAgreement(), error: (err) => alert(err.message || 'Unable to raise dispute.') }); }
+  commentDispute(id: number): void { const comment = prompt('Add dispute update'); if (!comment) return; this.api.addDisputeComment(id, comment).subscribe({ next: () => this.loadAgreement(), error: (err) => alert(err.message || 'Unable to add comment.') }); }
+  addExtraPayment(): void { const id = this.agreement()?.id; const category = prompt('Payment line category (commission/security)'); const amount = category ? Number(prompt('Amount') || 0) : 0; if (!id || !category || amount <= 0) return; this.api.addAdditionalPayment(id, { direction: 'outward', category, amount }).subscribe({ next: () => this.loadAgreement(), error: (err) => alert(err.message || 'Unable to add payment line.') }); }
 }

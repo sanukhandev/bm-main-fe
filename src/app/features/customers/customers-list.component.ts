@@ -206,8 +206,8 @@ export class CustomersListComponent implements OnInit, OnDestroy {
   private branchSub?: Subscription;
 
   ngOnInit(): void {
-    const routeRole = this.route.snapshot.routeConfig?.path;
-    this.role.set(routeRole === 'owners' || routeRole === 'tenants' ? routeRole.slice(0, -1) as 'owner' | 'tenant' : null);
+    const routePath = this.router.url.split('?')[0];
+    this.role.set(routePath.includes('/customers/owners') ? 'owner' : routePath.includes('/customers/tenants') ? 'tenant' : null);
     this.route.queryParams.subscribe((queryParams) => {
       this.searchQuery.set(queryParams['search'] || '');
       this.selectedType.set(queryParams['customer_type'] || '');

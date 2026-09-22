@@ -9,37 +9,41 @@ import { AuthService } from '../../core/auth/auth.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   template: `
-    <div class="min-h-screen bg-[#B7C4B9] flex items-center justify-center p-4">
-      <div class="max-w-4xl w-full bg-white rounded-[28px] shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2 min-h-[540px]">
+    <div class="min-h-screen w-full bg-[#132a13] flex items-center justify-center p-4 md:p-8 relative overflow-hidden">
+      <!-- Subtle Background Glows -->
+      <div class="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-[#31572c]/30 blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-[#4f772d]/25 blur-3xl pointer-events-none"></div>
+
+      <div class="max-w-4xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2 min-h-[540px] z-10 border border-[#31572c]/30">
         
         <!-- Left Branding Panel -->
         <div class="bm-gradient-card p-8 md:p-12 flex flex-col justify-between relative overflow-hidden">
           <div class="z-10">
-            <div class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center font-bold text-white text-xl mb-8">
+            <div class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center font-bold text-[#ecf39e] text-xl mb-8 shadow-inner">
               BM
             </div>
             <h1 class="text-3xl font-semibold text-white tracking-tight leading-snug mb-3">
               Baithul Madeena
             </h1>
-            <p class="text-emerald-100 text-sm font-light leading-relaxed">
+            <p class="text-[#d0e6cd] text-sm font-light leading-relaxed">
               Multi-branch real estate ERP workspace with precise asset leasing, traceability, and operations.
             </p>
           </div>
 
-          <div class="z-10 text-xs text-emerald-200/80 font-medium">
+          <div class="z-10 text-xs text-[#a0cc9b] font-medium">
             &copy; 2026 Baithul Madeena Real Estate. All rights reserved.
           </div>
 
           <!-- Subtle Background CSS Glow Shapes -->
-          <div class="absolute -bottom-16 -right-16 w-64 h-64 rounded-full bg-emerald-500/20 blur-2xl pointer-events-none"></div>
-          <div class="absolute -top-16 -left-16 w-64 h-64 rounded-full bg-[#DFFF62]/10 blur-2xl pointer-events-none"></div>
+          <div class="absolute -bottom-16 -right-16 w-64 h-64 rounded-full bg-[#4f772d]/20 blur-2xl pointer-events-none"></div>
+          <div class="absolute -top-16 -left-16 w-64 h-64 rounded-full bg-[#ecf39e]/15 blur-2xl pointer-events-none"></div>
         </div>
 
         <!-- Right Login Form Panel -->
         <div class="p-8 md:p-12 flex flex-col justify-center bg-white">
           <div class="mb-8">
-            <h2 class="text-2xl font-semibold text-[#101214] tracking-tight">Sign In</h2>
-            <p class="text-xs text-[#64748B] mt-1">Access your operational branch context</p>
+            <h2 class="text-2xl font-semibold text-[#0b190b] tracking-tight">Sign In</h2>
+            <p class="text-xs text-[#576633] mt-1">Access your operational branch context</p>
           </div>
 
           @if (errorMessage()) {

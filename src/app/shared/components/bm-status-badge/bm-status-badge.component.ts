@@ -22,24 +22,24 @@ export class BmStatusBadgeComponent {
     const s = (this.status || '').toLowerCase();
     switch (s) {
       case 'draft':
-        return 'bg-slate-100 text-slate-700 border-slate-200';
+        return 'bg-[#f8fad9] text-[#1e351b] border-[#d3ddbb]';
       case 'pending_approval':
-        return 'bg-amber-50 text-amber-700 border-amber-200';
+        return 'bg-[#f4f8c6] text-[#424809] border-[#deea58]';
       case 'approved':
-        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+        return 'bg-[#d0e6cd] text-[#132a13] border-[#a0cc9b]';
       case 'commenced':
-        return 'bg-emerald-100 text-emerald-900 border-emerald-300 font-semibold';
+        return 'bg-[#e9eedd] text-[#132a13] border-[#90a955] font-semibold';
       case 'expired':
         return 'bg-slate-100 text-slate-600 border-slate-200';
       case 'terminated':
       case 'inactive':
         return 'bg-rose-50 text-rose-700 border-rose-200';
       case 'active':
-        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+        return 'bg-[#d0e6cd] text-[#132a13] border-[#a0cc9b]';
       case 'archived':
-        return 'bg-amber-50 text-amber-800 border-amber-200';
+        return 'bg-[#f4f8c6] text-[#424809] border-[#deea58]';
       default:
-        return 'bg-slate-100 text-slate-700 border-slate-200';
+        return 'bg-[#f8fad9] text-[#1e351b] border-[#d3ddbb]';
     }
   });
 
@@ -47,24 +47,24 @@ export class BmStatusBadgeComponent {
     const s = (this.status || '').toLowerCase();
     switch (s) {
       case 'draft':
-        return 'bg-slate-400';
+        return 'bg-[#90a955]';
       case 'pending_approval':
-        return 'bg-amber-500';
+        return 'bg-[#858f12]';
       case 'approved':
-        return 'bg-emerald-500';
+        return 'bg-[#31572c]';
       case 'commenced':
-        return 'bg-emerald-600';
+        return 'bg-[#4f772d]';
       case 'expired':
         return 'bg-slate-400';
       case 'terminated':
       case 'inactive':
         return 'bg-rose-500';
       case 'active':
-        return 'bg-emerald-500';
+        return 'bg-[#31572c]';
       case 'archived':
-        return 'bg-amber-600';
+        return 'bg-[#858f12]';
       default:
-        return 'bg-slate-400';
+        return 'bg-[#90a955]';
     }
   });
 

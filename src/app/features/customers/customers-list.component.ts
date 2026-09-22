@@ -31,9 +31,9 @@ import { PaginationMeta } from '../../core/api/api.models';
     BmConfirmDialogComponent,
   ],
   template: `
-    <bm-page-header title="Customers" subtitle="Unified master directory for owners and tenants">
-      <a routerLink="/app/customers/new" class="bm-btn bm-btn-primary text-xs">
-        + Create Customer
+    <bm-page-header [title]="role() ? (role() === 'owner' ? 'Owners' : 'Tenants') : 'Customers'" subtitle="Branch-scoped customer directory">
+      <a [routerLink]="role() ? ['/app/customers', role(), 'new'] : ['/app/customers/new']" class="bm-btn bm-btn-primary text-xs">
+        + Create {{ role() === 'owner' ? 'Owner' : role() === 'tenant' ? 'Tenant' : 'Customer' }}
       </a>
     </bm-page-header>
 
@@ -196,6 +196,7 @@ export class CustomersListComponent implements OnInit, OnDestroy {
   searchQuery = signal('');
   selectedType = signal('');
   selectedStatus = signal('');
+  role = signal<'owner' | 'tenant' | null>(null);
   currentPage = signal(1);
 
   archiveDialogOpen = signal(false);
@@ -205,6 +206,8 @@ export class CustomersListComponent implements OnInit, OnDestroy {
   private branchSub?: Subscription;
 
   ngOnInit(): void {
+    const routeRole = this.route.snapshot.routeConfig?.path;
+    this.role.set(routeRole === 'owners' || routeRole === 'tenants' ? routeRole.slice(0, -1) as 'owner' | 'tenant' : null);
     this.route.queryParams.subscribe((queryParams) => {
       this.searchQuery.set(queryParams['search'] || '');
       this.selectedType.set(queryParams['customer_type'] || '');
@@ -229,6 +232,7 @@ export class CustomersListComponent implements OnInit, OnDestroy {
         search: this.searchQuery(),
         customer_type: this.selectedType(),
         status: this.selectedStatus(),
+        role: this.role() || undefined,
       })
       .subscribe({
         next: (res) => {
@@ -294,7 +298,7 @@ export class CustomersListComponent implements OnInit, OnDestroy {
   }
 
   navigateToCreate(): void {
-    this.router.navigate(['/app/customers/new']);
+    this.router.navigate(this.role() ? ['/app/customers', `${this.role()}s`, 'new'] : ['/app/customers/new']);
   }
 
   confirmArchive(cust: Customer): void {

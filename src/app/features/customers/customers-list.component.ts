@@ -146,7 +146,7 @@ import { PaginationMeta } from '../../core/api/api.models';
                       View
                     </a>
                     <a
-                      [routerLink]="['/app/customers', cust.id, 'edit']"
+                      [routerLink]="role() ? ['/app/customers', role() === 'owner' ? 'owners' : 'tenants', cust.id, 'edit'] : ['/app/customers', cust.id, 'edit']"
                       class="text-slate-600 hover:text-slate-900 font-medium text-xs"
                     >
                       Edit

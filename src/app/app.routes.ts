@@ -44,11 +44,19 @@ export const routes: Routes = [
         loadComponent: () => import('./features/customers/customer-form.component').then((m) => m.CustomerFormComponent),
       },
       {
+        path: 'customers/owners/:id/edit',
+        loadComponent: () => import('./features/customers/customer-form.component').then((m) => m.CustomerFormComponent),
+      },
+      {
         path: 'customers/tenants',
         loadComponent: () => import('./features/customers/customers-list.component').then((m) => m.CustomersListComponent),
       },
       {
         path: 'customers/tenants/new',
+        loadComponent: () => import('./features/customers/customer-form.component').then((m) => m.CustomerFormComponent),
+      },
+      {
+        path: 'customers/tenants/:id/edit',
         loadComponent: () => import('./features/customers/customer-form.component').then((m) => m.CustomerFormComponent),
       },
       {

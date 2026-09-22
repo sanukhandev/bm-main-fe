@@ -32,7 +32,7 @@ import { PaginationMeta } from '../../core/api/api.models';
   ],
   template: `
     <bm-page-header [title]="role() ? (role() === 'owner' ? 'Owners' : 'Tenants') : 'Customers'" subtitle="Branch-scoped customer directory">
-      <a [routerLink]="role() ? ['/app/customers', role(), 'new'] : ['/app/customers/new']" class="bm-btn bm-btn-primary text-xs">
+      <a [routerLink]="role() ? ['/app/customers', role() === 'owner' ? 'owners' : 'tenants', 'new'] : ['/app/customers/new']" class="bm-btn bm-btn-primary text-xs">
         + Create {{ role() === 'owner' ? 'Owner' : role() === 'tenant' ? 'Tenant' : 'Customer' }}
       </a>
     </bm-page-header>

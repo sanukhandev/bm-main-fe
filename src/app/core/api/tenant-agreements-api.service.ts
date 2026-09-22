@@ -49,5 +49,6 @@ export class TenantAgreementsApiService {
   raiseDispute(id: number, subject: string, description: string): Observable<ApiResponse<unknown>> { return this.http.post<ApiResponse<unknown>>(`${this.baseUrl}/${id}/disputes`, { subject, description }); }
   addDisputeComment(id: number, comment: string): Observable<ApiResponse<unknown>> { return this.http.post<ApiResponse<unknown>>(`/api/v1/agreement-disputes/${id}/comments`, { comment }); }
   addAdditionalPayment(id: number, payload: { direction: 'inward' | 'outward'; category: string; particulars: string; amount: number; due_date: string; payment_mode: 'cash' | 'cheque' | 'bank_transfer'; terms?: string }): Observable<ApiResponse<unknown>> { return this.http.post<ApiResponse<unknown>>(`${this.baseUrl}/${id}/additional-payments`, payload); }
+  updateAdditionalPaymentStatus(agreementId: number, paymentId: number, status: 'paid' | 'defaulted'): Observable<ApiResponse<unknown>> { return this.http.patch<ApiResponse<unknown>>(`${this.baseUrl}/${agreementId}/additional-payments/${paymentId}/status`, { status }); }
 
 }

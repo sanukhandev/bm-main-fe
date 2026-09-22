@@ -29,7 +29,6 @@ export interface OwnerAgreement {
   payment_mode: PaymentMode;
   terms_text?: string | null;
   notes?: string | null;
-  is_extra?: boolean;
   status: AgreementStatus;
   lock_version?: number;
   terminated_at?: string | null;
@@ -82,13 +81,15 @@ export interface InstallmentItem {
 }
 
 export interface AgreementInstallment {
-  id: number;
-  installment_no: number;
+  id: number | string;
+  installment_no: number | string;
   due_date: string;
   amount: string | number;
   paid_amount: string | number;
   balance: string | number;
   payment_mode: PaymentMode;
+  direction: 'inward' | 'outward';
   status: string;
   notes?: string | null;
+  is_extra?: boolean;
 }

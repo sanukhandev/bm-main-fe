@@ -2,6 +2,7 @@ import { ApplicationConfig, provideAppInitializer, inject } from '@angular/core'
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
+import { loadingInterceptor } from './core/interceptors/loading.interceptor';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { branchInterceptor } from './core/interceptors/branch.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
@@ -11,7 +12,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideHttpClient(
-      withInterceptors([authInterceptor, branchInterceptor, errorInterceptor])
+      withInterceptors([loadingInterceptor, authInterceptor, branchInterceptor, errorInterceptor])
     ),
     provideAppInitializer(() => {
       const authService = inject(AuthService);

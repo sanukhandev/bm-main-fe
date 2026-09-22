@@ -21,7 +21,7 @@ import { TenantAgreement, AgreementInstallment } from '../../shared/models/agree
   ],
   template: `
     @if (isLoading()) {
-      <bm-loading-state></bm-loading-state>
+      <bm-loading-state type="detail"></bm-loading-state>
     } @else if (error()) {
       <bm-error-state [message]="error()!" (retry)="loadAgreement()"></bm-error-state>
     } @else if (agreement()) {

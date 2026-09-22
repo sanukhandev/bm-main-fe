@@ -38,7 +38,7 @@ describe('BranchContextService', () => {
 
     service.setActiveBranch(mockBranches[1]);
     expect(service.activeBranch()?.id).toBe(2);
-    expect(emittedBranch?.id).toBe(2);
+    expect((emittedBranch as Branch | null)?.id).toBe(2);
     expect(localStorage.getItem('bm_active_branch_id')).toBe('2');
   });
 

@@ -35,7 +35,7 @@ export class BmStatusBadgeComponent {
       case 'owner':
         return 'bg-emerald-50 text-emerald-700 border-emerald-200/80';
 
-      // Amber Triage (Draft, Pending Approval, Pending, In Progress, Open, Assigned, Cheque, Medium, Normal)
+      // Amber Triage (Draft, Pending Approval, Pending, In Progress, Open, Assigned, Cheque, Medium, Normal, Partially Paid)
       case 'draft':
       case 'pending_approval':
       case 'pending':
@@ -45,9 +45,10 @@ export class BmStatusBadgeComponent {
       case 'cheque':
       case 'medium':
       case 'normal':
+      case 'partially_paid':
         return 'bg-amber-50 text-amber-700 border-amber-200/80';
 
-      // Rose Triage (Terminated, Inactive, Overdue, Defaulted, Cancelled, Urgent, High, Outward, Debit, Under Maintenance)
+      // Rose Triage (Terminated, Inactive, Overdue, Defaulted, Cancelled, Urgent, High, Outward, Debit, Under Maintenance, Unpaid, Void)
       case 'terminated':
       case 'inactive':
       case 'overdue':
@@ -58,9 +59,11 @@ export class BmStatusBadgeComponent {
       case 'outward':
       case 'debit':
       case 'under_maintenance':
+      case 'unpaid':
+      case 'void':
         return 'bg-rose-50 text-rose-700 border-rose-200/80';
 
-      // Blue Triage (Tenant, Residential, Individual, Monthly, Quarterly, Bank Transfer, Low, Apartment, Villa)
+      // Blue Triage (Tenant, Residential, Individual, Monthly, Quarterly, Bank Transfer, Low, Apartment, Villa, Sent)
       case 'tenant':
       case 'residential':
       case 'individual':
@@ -70,9 +73,10 @@ export class BmStatusBadgeComponent {
       case 'apartment':
       case 'villa':
       case 'low':
+      case 'sent':
         return 'bg-blue-50 text-blue-700 border-blue-200/80';
 
-      // Purple Triage (Commercial, Organization, Semi Annual, Annual, Shop, Office, Warehouse, Space, Labor Camp, Land)
+      // Purple Triage (Commercial, Organization, Semi Annual, Annual, Shop, Office, Warehouse, Space, Labor Camp, Land, Converted)
       case 'commercial':
       case 'organization':
       case 'semi_annual':
@@ -83,6 +87,7 @@ export class BmStatusBadgeComponent {
       case 'space':
       case 'labor_camp':
       case 'land':
+      case 'converted':
         return 'bg-purple-50 text-purple-700 border-purple-200/80';
 
       // Slate Triage (Expired, Archived, Vacant, Closed, Cash, Service, Inventory)

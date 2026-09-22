@@ -1,15 +1,24 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationStart, NavigationEnd, NavigationCancel, NavigationError } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
+import { BmLoadingService } from '../services/bm-loading.service';
 import { BmBranchSwitcherComponent } from '../../shared/components/bm-branch-switcher/bm-branch-switcher.component';
+import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.component';
 
 @Component({
   selector: 'bm-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, BmBranchSwitcherComponent],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, BmBranchSwitcherComponent, BmFooterComponent],
   template: `
-    <div class="h-screen w-screen flex flex-col md:flex-row overflow-hidden bg-[#F8FAFC]">
+    <div class="h-screen w-screen flex flex-col md:flex-row overflow-hidden bg-[#F8FAFC] relative">
+      <!-- Global Top Loading Progress Bar -->
+      @if (loadingService.isLoading()) {
+        <div class="fixed top-0 left-0 right-0 z-50 h-1 bg-slate-200/50 overflow-hidden">
+          <div class="h-full bg-gradient-to-r from-emerald-600 via-teal-400 to-lime-400 animate-pulse shadow-[0_0_12px_rgba(16,185,129,0.8)] w-full"></div>
+        </div>
+      }
+
       <!-- Sidebar Navigation Rail -->
       <aside
         class="w-full md:w-64 bg-[#132a13] text-white flex flex-col shrink-0 h-full border-r border-[#0b190b] z-20 transition-all duration-300 shadow-xl"
@@ -89,6 +98,10 @@ import { BmBranchSwitcherComponent } from '../../shared/components/bm-branch-swi
           <a routerLink="/app/maintenance/vendors" routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"><span class="h-4 w-4 text-[#90a955]">V</span><span>Vendors</span></a>
           <a routerLink="/app/maintenance/inventory" routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"><span class="h-4 w-4 text-[#90a955]">I</span><span>Inventory</span></a>
 
+          <div class="pt-4 px-3 py-2 text-[11px] font-semibold text-[#a0cc9b] uppercase tracking-wider">Billing</div>
+          <a routerLink="/app/billing/quotations" routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"><span class="h-4 w-4 text-[#90a955]">Q</span><span>Quotations</span></a>
+          <a routerLink="/app/billing/invoices" routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"><span class="h-4 w-4 text-[#90a955]">I</span><span>Invoices</span></a>
+
           <div class="pt-4 px-3 py-2 text-[11px] font-semibold text-[#a0cc9b] uppercase tracking-wider">
             Leasing & Contracts
           </div>
@@ -117,46 +130,48 @@ import { BmBranchSwitcherComponent } from '../../shared/components/bm-branch-swi
             <span>Tenant Agreements</span>
           </a>
 
-          <!-- System Administration -->
-          <div class="pt-4 px-3 py-2 text-[11px] font-semibold text-[#a0cc9b] uppercase tracking-wider">
-            Administration
-          </div>
+          <!-- System Administration (Super Admin Only) -->
+          @if (isSuperAdmin()) {
+            <div class="pt-4 px-3 py-2 text-[11px] font-semibold text-[#a0cc9b] uppercase tracking-wider">
+              Administration
+            </div>
 
-          <a
-            routerLink="/app/administration/branches"
-            routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]"
-            (click)="closeMobileMenu()"
-            class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#90a955] group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-            </svg>
-            <span>Branches</span>
-          </a>
+            <a
+              routerLink="/app/administration/branches"
+              routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]"
+              (click)="closeMobileMenu()"
+              class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#90a955] group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+              <span>Branches</span>
+            </a>
 
-          <a
-            routerLink="/app/administration/users"
-            routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]"
-            (click)="closeMobileMenu()"
-            class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#90a955] group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-            <span>Users</span>
-          </a>
+            <a
+              routerLink="/app/administration/users"
+              routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]"
+              (click)="closeMobileMenu()"
+              class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#90a955] group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+              <span>Users</span>
+            </a>
 
-          <a
-            routerLink="/app/administration/roles"
-            routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]"
-            (click)="closeMobileMenu()"
-            class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#90a955] group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
-            <span>Roles</span>
-          </a>
+            <a
+              routerLink="/app/administration/roles"
+              routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]"
+              (click)="closeMobileMenu()"
+              class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#90a955] group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              <span>Roles</span>
+            </a>
+          }
         </nav>
 
         <!-- User Footer Info -->
@@ -198,8 +213,15 @@ import { BmBranchSwitcherComponent } from '../../shared/components/bm-branch-swi
         </header>
 
         <!-- Route Content Slot -->
-        <div class="p-6 md:p-8 xl:p-10 flex-1 overflow-y-auto">
-          <router-outlet></router-outlet>
+        <div class="p-6 md:p-8 xl:p-10 flex-1 overflow-y-auto flex flex-col justify-between">
+          <div class="flex-1">
+            <router-outlet></router-outlet>
+          </div>
+
+          <!-- Application Common Footer -->
+          <div class="mt-8 pt-4 border-t border-slate-200/80">
+            <bm-footer></bm-footer>
+          </div>
         </div>
       </main>
     </div>
@@ -207,9 +229,27 @@ import { BmBranchSwitcherComponent } from '../../shared/components/bm-branch-swi
 })
 export class LayoutComponent {
   private authService = inject(AuthService);
+  private router = inject(Router);
+  loadingService = inject(BmLoadingService);
+
   user = this.authService.currentUser;
+  isSuperAdmin = this.authService.isSuperAdmin;
 
   mobileMenuOpen = signal(false);
+
+  constructor() {
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationStart) {
+        this.loadingService.setRouteLoading(true);
+      } else if (
+        event instanceof NavigationEnd ||
+        event instanceof NavigationCancel ||
+        event instanceof NavigationError
+      ) {
+        this.loadingService.setRouteLoading(false);
+      }
+    });
+  }
 
   userInitials(): string {
     const name = this.user()?.name || '';

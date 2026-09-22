@@ -4,10 +4,12 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 
+import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.component';
+
 @Component({
   selector: 'bm-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, BmFooterComponent],
   template: `
     <div
       class="min-h-dvh min-h-screen w-full bg-[#101827] bg-[radial-gradient(circle_at_85%_85%,rgba(6,78,59,0.22),transparent_40%)] flex items-center justify-center p-4 sm:p-6 lg:p-12 relative overflow-hidden"
@@ -356,6 +358,11 @@ import { AuthService } from '../../core/auth/auth.service';
                 />
               </svg>
               <span>Encrypted & secure branch workspace</span>
+            </div>
+
+            <!-- Application Common Footer -->
+            <div class="mt-4 pt-4 border-t border-slate-100">
+              <bm-footer></bm-footer>
             </div>
           </div>
         </div>

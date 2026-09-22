@@ -9,8 +9,98 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Inline styles for instantaneous app boot preloader */
+    .bm-boot-splash {
+      position: fixed;
+      inset: 0;
+      background: #0b190b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      font-family: 'Poppins', system-ui, sans-serif;
+      color: #ffffff;
+    }
+    .bm-boot-logo {
+      width: 72px;
+      height: 72px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #132a13 0%, #31572c 50%, #4f772d 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px -5px rgba(49, 87, 44, 0.5), 0 0 0 1px rgba(255,255,255,0.1);
+      margin-bottom: 24px;
+      position: relative;
+      animation: bmPulseRing 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    .bm-boot-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #ffffff;
+      margin: 0 0 6px 0;
+    }
+    .bm-boot-subtitle {
+      font-size: 12px;
+      font-weight: 500;
+      color: #90a955;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+    }
+    .bm-boot-bar-track {
+      width: 180px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+    .bm-boot-bar-fill {
+      position: absolute;
+      top: 0;
+      left: -50%;
+      height: 100%;
+      width: 50%;
+      background: linear-gradient(90deg, #4f772d, #ecf39e, #4f772d);
+      border-radius: 999px;
+      animation: bmIndeterminate 1.5s infinite ease-in-out;
+    }
+    @keyframes bmPulseRing {
+      0%, 100% { transform: scale(1); box-shadow: 0 10px 25px -5px rgba(49, 87, 44, 0.5); }
+      50% { transform: scale(1.05); box-shadow: 0 15px 35px -2px rgba(236, 243, 158, 0.3); }
+    }
+    @keyframes bmIndeterminate {
+      0% { left: -50%; width: 30%; }
+      50% { left: 35%; width: 40%; }
+      100% { left: 100%; width: 30%; }
+    }
+  </style>
 </head>
 <body>
-  <app-root></app-root>
+  <app-root>
+    <div class="bm-boot-splash">
+      <div class="bm-boot-logo">
+        <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#ecf39e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 21h18"/>
+          <path d="M3 10h18"/>
+          <path d="M5 6l7-3 7 3"/>
+          <path d="M4 10v11"/>
+          <path d="M20 10v11"/>
+          <path d="M8 14v3"/>
+          <path d="M12 14v3"/>
+          <path d="M16 14v3"/>
+        </svg>
+      </div>
+      <h1 class="bm-boot-title">BAITHUL MADEENA</h1>
+      <p class="bm-boot-subtitle">PROPERTY ERP SYSTEM</p>
+      <div class="bm-boot-bar-track">
+        <div class="bm-boot-bar-fill"></div>
+      </div>
+    </div>
+  </app-root>
 </body>
 </html>

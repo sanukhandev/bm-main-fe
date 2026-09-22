@@ -34,6 +34,7 @@ export interface OwnerAgreement {
   termination_reason?: string | null;
   created_at?: string;
   updated_at?: string;
+  installments?: AgreementInstallment[];
 }
 
 export interface TenantAgreementPropertyItem {
@@ -64,6 +65,7 @@ export interface TenantAgreement {
   termination_reason?: string | null;
   created_at?: string;
   updated_at?: string;
+  installments?: AgreementInstallment[];
 }
 
 export interface InstallmentItem {
@@ -71,4 +73,16 @@ export interface InstallmentItem {
   due_date: string;
   amount: number;
   status: string;
+}
+
+export interface AgreementInstallment {
+  id: number;
+  installment_no: number;
+  due_date: string;
+  amount: string | number;
+  paid_amount: string | number;
+  balance: string | number;
+  payment_mode: PaymentMode;
+  status: string;
+  notes?: string | null;
 }

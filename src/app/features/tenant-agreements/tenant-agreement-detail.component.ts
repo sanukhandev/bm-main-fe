@@ -140,6 +140,11 @@ import { TenantAgreement } from '../../shared/models/agreement.models';
             <p class="text-slate-700 italic">{{ agreement()!.notes }}</p>
           </div>
         }
+
+        <div>
+          <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Payment Schedule</h3>
+          <div class="overflow-x-auto border border-slate-200 rounded-xl"><table class="w-full text-left text-xs"><thead class="bg-slate-50 text-slate-500 uppercase"><tr><th class="p-3">#</th><th class="p-3">Due Date</th><th class="p-3">Scheduled</th><th class="p-3">Paid</th><th class="p-3">Balance</th><th class="p-3">Status</th><th class="p-3">Action</th></tr></thead><tbody class="divide-y divide-slate-100">@for (item of agreement()!.installments || []; track item.id) { <tr><td class="p-3">{{ item.installment_no }}</td><td class="p-3">{{ item.due_date }}</td><td class="p-3">AED {{ item.amount }}</td><td class="p-3">AED {{ item.paid_amount }}</td><td class="p-3 font-semibold">AED {{ item.balance }}</td><td class="p-3 capitalize">{{ item.status.replace('_', ' ') }}</td><td class="p-3 whitespace-nowrap"><button type="button" class="text-emerald-700 mr-3 disabled:opacity-40" [disabled]="installmentProcessingId() === item.id || item.status === 'paid'" (click)="setInstallmentStatus(item.id, 'paid')">Mark Paid</button><button type="button" class="text-rose-700 disabled:opacity-40" [disabled]="installmentProcessingId() === item.id || item.status === 'paid' || item.status === 'defaulted'" (click)="setInstallmentStatus(item.id, 'defaulted')">Mark Defaulted</button></td></tr> } @empty { <tr><td colspan="7" class="p-5 text-center text-slate-500">No payment schedule found.</td></tr> }</tbody></table></div>
+        </div>
       </div>
 
       <bm-confirm-dialog
@@ -162,6 +167,7 @@ export class TenantAgreementDetailComponent implements OnInit {
   agreement = signal<TenantAgreement | null>(null);
   isLoading = signal(true);
   isActioning = signal(false);
+  installmentProcessingId = signal<number | null>(null);
   error = signal<string | null>(null);
 
   confirmTerminateDialog = signal(false);
@@ -223,5 +229,12 @@ export class TenantAgreementDetailComponent implements OnInit {
         alert(err.message || 'Failed to terminate tenant agreement.');
       },
     });
+  }
+
+  setInstallmentStatus(id: number, status: 'paid' | 'defaulted'): void {
+    const agreement = this.agreement();
+    if (!agreement) return;
+    this.installmentProcessingId.set(id);
+    this.api.updateInstallmentStatus(agreement.id, id, status).subscribe({ next: () => { this.installmentProcessingId.set(null); this.loadAgreement(); }, error: (err) => { this.installmentProcessingId.set(null); alert(err.message || 'Unable to update installment.'); } });
   }
 }

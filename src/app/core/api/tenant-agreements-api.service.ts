@@ -41,4 +41,8 @@ export class TenantAgreementsApiService {
     });
   }
 
+  updateInstallmentStatus(agreementId: number, installmentId: number, status: 'paid' | 'defaulted'): Observable<ApiResponse<unknown>> {
+    return this.http.patch<ApiResponse<unknown>>(`${this.baseUrl}/${agreementId}/installments/${installmentId}/status`, { status });
+  }
+
 }

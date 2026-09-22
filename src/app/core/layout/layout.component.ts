@@ -75,24 +75,14 @@ import { BmBranchSwitcherComponent } from '../../shared/components/bm-branch-swi
           </a>
           <a routerLink="/app/customers/tenants" routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"><span class="h-4 w-4 text-[#90a955]">T</span><span>Tenants</span></a>
 
+          <a routerLink="/app/properties" routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"><span class="h-4 w-4 text-[#90a955]">P</span><span>Properties</span></a>
+
           <div class="pt-4 px-3 py-2 text-[11px] font-semibold text-[#a0cc9b] uppercase tracking-wider">Accounts</div>
           <a routerLink="/app/accounts/dashboard" routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"><span class="h-4 w-4 text-[#90a955] font-bold">¤</span><span>Dashboard</span></a>
           <a routerLink="/app/accounts/inward" routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"><span class="h-4 w-4 text-[#90a955]">↓</span><span>Inward Receipts</span></a>
           <a routerLink="/app/accounts/outward" routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"><span class="h-4 w-4 text-[#90a955]">↑</span><span>Outward Vouchers</span></a>
           <a routerLink="/app/accounts/petty-cash" routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"><span class="h-4 w-4 text-[#90a955]">₿</span><span>Petty Cash Daybook</span></a>
           <a routerLink="/app/accounts/reports" routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"><span class="h-4 w-4 text-[#90a955]">▤</span><span>Reports</span></a>
-
-          <a
-            routerLink="/app/properties"
-            routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]"
-            (click)="closeMobileMenu()"
-            class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#90a955] group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-            </svg>
-            <span>Properties</span>
-          </a>
 
           <div class="pt-4 px-3 py-2 text-[11px] font-semibold text-[#a0cc9b] uppercase tracking-wider">
             Leasing & Contracts

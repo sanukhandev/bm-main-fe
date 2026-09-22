@@ -9,97 +9,356 @@ import { AuthService } from '../../core/auth/auth.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   template: `
-    <div class="min-h-screen w-full bg-[#132a13] flex items-center justify-center p-4 md:p-8 relative overflow-hidden">
-      <!-- Subtle Background Glows -->
-      <div class="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-[#31572c]/30 blur-3xl pointer-events-none"></div>
-      <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-[#4f772d]/25 blur-3xl pointer-events-none"></div>
+    <div
+      class="min-h-dvh min-h-screen w-full bg-[#101827] bg-[radial-gradient(circle_at_85%_85%,rgba(6,78,59,0.22),transparent_40%)] flex items-center justify-center p-4 sm:p-6 lg:p-12 relative overflow-hidden"
+    >
+      <!-- Background Ambient Accents -->
+      <div
+        class="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-[#047857]/15 blur-3xl pointer-events-none"
+      ></div>
+      <div
+        class="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-[#064E3B]/25 blur-3xl pointer-events-none"
+      ></div>
 
-      <div class="max-w-4xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden grid grid-cols-1 md:grid-cols-2 min-h-[540px] z-10 border border-[#31572c]/30">
-        
-        <!-- Left Branding Panel -->
-        <div class="bm-gradient-card p-8 md:p-12 flex flex-col justify-between relative overflow-hidden">
-          <div class="z-10">
-            <div class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center font-bold text-[#ecf39e] text-xl mb-8 shadow-inner">
+      <!-- Main Login Container Panel -->
+      <div
+        class="max-w-[1120px] w-full min-h-[660px] bg-white rounded-[28px] border border-white/10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] z-10"
+      >
+        <!-- Left Branding Panel (Desktop & Tablet) -->
+        <div
+          class="hidden lg:flex p-10 xl:p-14 flex-col justify-between relative overflow-hidden bg-[linear-gradient(145deg,#0A2E1F_0%,#0D3B29_45%,#14532D_100%)] text-white select-none"
+        >
+          <!-- Faint Structural Grid Overlay & Radial Highlight -->
+          <div
+            class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(52,211,153,0.15),transparent_50%)] pointer-events-none"
+          ></div>
+          <div
+            class="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none"
+          ></div>
+
+          <!-- Top Brand Monogram -->
+          <div class="z-10 flex items-center gap-3.5">
+            <div
+              class="w-[50px] h-[50px] rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center justify-center font-bold text-white text-xl tracking-wider shadow-inner shrink-0"
+            >
               BM
             </div>
-            <h1 class="text-3xl font-semibold text-white tracking-tight leading-snug mb-3">
-              Baithul Madeena
-            </h1>
-            <p class="text-[#d0e6cd] text-sm font-light leading-relaxed">
-              Multi-branch real estate ERP workspace with precise asset leasing, traceability, and operations.
-            </p>
-          </div>
-
-          <div class="z-10 text-xs text-[#a0cc9b] font-medium">
-            &copy; 2026 Baithul Madeena Real Estate. All rights reserved.
-          </div>
-
-          <!-- Subtle Background CSS Glow Shapes -->
-          <div class="absolute -bottom-16 -right-16 w-64 h-64 rounded-full bg-[#4f772d]/20 blur-2xl pointer-events-none"></div>
-          <div class="absolute -top-16 -left-16 w-64 h-64 rounded-full bg-[#ecf39e]/15 blur-2xl pointer-events-none"></div>
-        </div>
-
-        <!-- Right Login Form Panel -->
-        <div class="p-8 md:p-12 flex flex-col justify-center bg-white">
-          <div class="mb-8">
-            <h2 class="text-2xl font-semibold text-[#0b190b] tracking-tight">Sign In</h2>
-            <p class="text-xs text-[#576633] mt-1">Access your operational branch context</p>
-          </div>
-
-          @if (errorMessage()) {
-            <div class="mb-6 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-700 flex items-start gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-rose-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>{{ errorMessage() }}</span>
-            </div>
-          }
-
-          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1.5">Email Address</label>
-              <input
-                type="email"
-                formControlName="email"
-                placeholder="name@company.com"
-                class="bm-input"
-                [class.border-rose-300]="isFieldInvalid('email')"
-              />
-              @if (isFieldInvalid('email')) {
-                <span class="text-[11px] text-rose-600 mt-1 block">Valid email is required</span>
-              }
+              <div class="font-bold text-white text-base tracking-wide leading-tight">
+                Baithul Madeena
+              </div>
+              <div class="text-[11px] text-emerald-300/90 font-medium uppercase tracking-widest mt-0.5">
+                Real Estate ERP
+              </div>
             </div>
+          </div>
 
-            <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1.5">Password</label>
-              <input
-                type="password"
-                formControlName="password"
-                placeholder="••••••••"
-                class="bm-input"
-                [class.border-rose-300]="isFieldInvalid('password')"
-              />
-              @if (isFieldInvalid('password')) {
-                <span class="text-[11px] text-rose-600 mt-1 block">Password is required</span>
-              }
-            </div>
-
-            <button
-              type="submit"
-              [disabled]="isSubmitting()"
-              class="bm-btn bm-btn-primary w-full mt-2"
+          <!-- Middle Value Proposition -->
+          <div class="z-10 my-auto py-8">
+            <h1
+              class="text-[34px] leading-[1.15] font-semibold text-white tracking-[-0.025em] mb-4"
             >
-              @if (isSubmitting()) {
-                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-              }
-              Sign In to ERP
-            </button>
-          </form>
+              Multi-branch real estate operations.
+            </h1>
+            <p
+              class="text-emerald-100/80 text-sm leading-relaxed max-w-[380px] font-normal"
+            >
+              Manage properties, agreements, customers, and financial operations with secure verified branch-level isolation.
+            </p>
+
+            <!-- Subtle Feature Tags -->
+            <div class="mt-8 flex flex-wrap gap-2.5">
+              <span
+                class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-xs font-medium text-emerald-100 backdrop-blur-sm"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                Multi-branch Isolation
+              </span>
+              <span
+                class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-xs font-medium text-emerald-100 backdrop-blur-sm"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                Secure ERP Workspace
+              </span>
+            </div>
+          </div>
+
+          <!-- Bottom Footer Info -->
+          <div
+            class="z-10 pt-6 border-t border-white/10 flex items-center justify-between text-xs text-emerald-100/60 font-medium"
+          >
+            <span>&copy; 2026 Baithul Madeena Real Estate</span>
+            <span>Enterprise v2.4</span>
+          </div>
         </div>
 
+        <!-- Right Form Panel -->
+        <div class="p-8 sm:p-12 lg:p-14 flex flex-col justify-center bg-white relative">
+          <!-- Mobile Top Header Badge (Shown on small screens) -->
+          <div class="lg:hidden flex items-center gap-3 mb-8 pb-6 border-b border-slate-100">
+            <div
+              class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#064E3B] to-[#047857] flex items-center justify-center font-bold text-white text-base shadow-sm shrink-0"
+            >
+              BM
+            </div>
+            <div>
+              <div class="font-semibold text-slate-900 text-sm">Baithul Madeena</div>
+              <div class="text-[11px] text-emerald-700 font-medium uppercase tracking-wider">Real Estate ERP</div>
+            </div>
+          </div>
+
+          <!-- Form Inner Wrapper -->
+          <div class="max-w-[400px] w-full mx-auto">
+            <!-- Header Block -->
+            <div class="mb-8">
+              <h2
+                class="text-[32px] font-semibold text-slate-900 tracking-[-0.025em] leading-tight"
+              >
+                Sign In
+              </h2>
+              <p class="text-sm text-slate-500 mt-2 font-normal">
+                Access your Baithul Madeena workspace.
+              </p>
+            </div>
+
+            <!-- Inline Auth Error Banner -->
+            @if (errorMessage()) {
+              <div
+                role="alert"
+                aria-live="assertive"
+                class="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200/80 text-xs text-rose-800 flex items-start gap-3 animate-fade-in"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5 text-rose-600 shrink-0 mt-0.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
+                <div>
+                  <div class="font-semibold text-rose-900 mb-0.5">
+                    Unable to sign in
+                  </div>
+                  <div class="text-rose-700/90 leading-relaxed">
+                    {{ errorMessage() }}
+                  </div>
+                </div>
+              </div>
+            }
+
+            <!-- Form Body -->
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
+              <!-- Email Input Field Group -->
+              <div>
+                <label
+                  for="email-input"
+                  class="block text-[13px] font-medium text-slate-700 mb-2"
+                >
+                  Email address
+                </label>
+                <div class="relative">
+                  <div
+                    class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.75"
+                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </div>
+                  <input
+                    id="email-input"
+                    type="email"
+                    formControlName="email"
+                    placeholder="name@company.com"
+                    autocomplete="email"
+                    aria-required="true"
+                    [attr.aria-invalid]="isFieldInvalid('email')"
+                    [attr.aria-describedby]="isFieldInvalid('email') ? 'email-error' : null"
+                    class="w-full h-[50px] pl-11 pr-4 rounded-[14px] bg-[#FAFBFA] border border-[#DDE3DF] text-sm text-slate-900 placeholder:text-[#98A2A0] transition-all duration-180 focus:bg-white focus:border-[#047857] focus:ring-4 focus:ring-[#047857]/10 focus:outline-none"
+                    [class.border-rose-300]="isFieldInvalid('email')"
+                    [class.bg-rose-50\/30]="isFieldInvalid('email')"
+                  />
+                </div>
+                @if (isFieldInvalid('email')) {
+                  <span
+                    id="email-error"
+                    class="text-[12px] font-medium text-rose-600 mt-1.5 block flex items-center gap-1"
+                  >
+                    Please enter a valid email address.
+                  </span>
+                }
+              </div>
+
+              <!-- Password Input Field Group -->
+              <div>
+                <label
+                  for="password-input"
+                  class="block text-[13px] font-medium text-slate-700 mb-2"
+                >
+                  Password
+                </label>
+                <div class="relative">
+                  <div
+                    class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.75"
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                      />
+                    </svg>
+                  </div>
+                  <input
+                    id="password-input"
+                    [type]="showPassword() ? 'text' : 'password'"
+                    formControlName="password"
+                    placeholder="••••••••"
+                    autocomplete="current-password"
+                    aria-required="true"
+                    [attr.aria-invalid]="isFieldInvalid('password')"
+                    [attr.aria-describedby]="isFieldInvalid('password') ? 'password-error' : null"
+                    class="w-full h-[50px] pl-11 pr-12 rounded-[14px] bg-[#FAFBFA] border border-[#DDE3DF] text-sm text-slate-900 placeholder:text-[#98A2A0] transition-all duration-180 focus:bg-white focus:border-[#047857] focus:ring-4 focus:ring-[#047857]/10 focus:outline-none"
+                    [class.border-rose-300]="isFieldInvalid('password')"
+                    [class.bg-rose-50\/30]="isFieldInvalid('password')"
+                  />
+
+                  <!-- Password Show/Hide Toggle Button -->
+                  <button
+                    type="button"
+                    (click)="togglePasswordVisibility()"
+                    aria-label="Toggle password visibility"
+                    class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 focus:text-emerald-700 focus:outline-none transition-colors"
+                  >
+                    @if (showPassword()) {
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="1.75"
+                          d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908a10.124 10.124 0 012.122-.363c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21M3 3l18 18"
+                        />
+                      </svg>
+                    } @else {
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="1.75"
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="1.75"
+                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                        />
+                      </svg>
+                    }
+                  </button>
+                </div>
+                @if (isFieldInvalid('password')) {
+                  <span
+                    id="password-error"
+                    class="text-[12px] font-medium text-rose-600 mt-1.5 block flex items-center gap-1"
+                  >
+                    Please enter your password.
+                  </span>
+                }
+              </div>
+
+              <!-- Primary Submit Button -->
+              <button
+                type="submit"
+                [disabled]="isSubmitting()"
+                class="w-full h-[50px] rounded-[14px] bg-gradient-to-r from-[#064E3B] to-[#047857] hover:brightness-110 active:scale-[0.99] font-semibold text-sm text-white shadow-md hover:shadow-lg focus:ring-4 focus:ring-[#047857]/20 focus:outline-none transition-all duration-180 flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-65 disabled:cursor-not-allowed disabled:transform-none mt-7"
+              >
+                @if (isSubmitting()) {
+                  <svg
+                    class="animate-spin h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      class="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="4"
+                    ></circle>
+                    <path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  <span>Signing in…</span>
+                } @else {
+                  <span>Sign In</span>
+                }
+              </button>
+            </form>
+
+            <!-- Bottom Security Note -->
+            <div
+              class="mt-8 pt-6 border-t border-slate-100 flex items-center justify-center gap-2 text-xs text-slate-400 font-medium select-none"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4 text-emerald-700/80"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                />
+              </svg>
+              <span>Encrypted & secure branch workspace</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   `,
@@ -111,6 +370,7 @@ export class LoginComponent {
 
   isSubmitting = signal(false);
   errorMessage = signal<string | null>(null);
+  showPassword = signal(false);
 
   loginForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -120,6 +380,10 @@ export class LoginComponent {
   isFieldInvalid(field: string): boolean {
     const control = this.loginForm.get(field);
     return !!(control && control.invalid && (control.dirty || control.touched));
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword.update((v) => !v);
   }
 
   onSubmit(): void {
@@ -149,3 +413,4 @@ export class LoginComponent {
       });
   }
 }
+

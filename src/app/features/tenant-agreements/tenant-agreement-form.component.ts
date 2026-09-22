@@ -48,16 +48,14 @@ import { forkJoin } from 'rxjs';
         <bm-card title="Step 1 — Agreement Identity & Tenant Selection">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1.5">Agreement Number *</label>
+              <label class="block text-xs font-semibold text-slate-700 mb-1.5">Agreement Number (generated)</label>
               <input
                 type="text"
                 formControlName="agreement_no"
-                placeholder="e.g. TA-2026-001"
+                placeholder="Assigned by server on save"
+                readonly
                 class="bm-input"
               />
-              @if (isFieldInvalid('agreement_no')) {
-                <span class="text-[11px] text-rose-600 mt-1 block">Agreement number is required</span>
-              }
             </div>
 
             <div>
@@ -264,7 +262,7 @@ export class TenantAgreementFormComponent implements OnInit {
   serverError = signal<string | null>(null);
 
   agreementForm = this.fb.group({
-    agreement_no: ['', Validators.required],
+    agreement_no: [''],
     tenant_customer_id: ['', Validators.required],
     start_date: ['', Validators.required],
     end_date: ['', Validators.required],
@@ -420,7 +418,7 @@ export class TenantAgreementFormComponent implements OnInit {
     }
 
     const payload = {
-      agreement_no: val.agreement_no!,
+      ...(this.isEditMode() && val.agreement_no ? { agreement_no: val.agreement_no } : {}),
       tenant_customer_id: Number(val.tenant_customer_id),
       properties: [
         {

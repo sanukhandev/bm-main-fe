@@ -46,16 +46,14 @@ import { InstallmentItem, PaymentMode } from '../../shared/models/agreement.mode
         <bm-card title="Section 1 — Agreement Identity & Owner">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1.5">Agreement Number *</label>
+              <label class="block text-xs font-semibold text-slate-700 mb-1.5">Agreement Number (generated)</label>
               <input
                 type="text"
                 formControlName="agreement_no"
-                placeholder="e.g. OA-2026-001"
+                placeholder="Assigned by server on save"
+                readonly
                 class="bm-input"
               />
-              @if (isFieldInvalid('agreement_no')) {
-                <span class="text-[11px] text-rose-600 mt-1 block">Agreement number is required</span>
-              }
             </div>
 
             <div>
@@ -278,7 +276,7 @@ export class OwnerAgreementFormComponent implements OnInit {
   serverError = signal<string | null>(null);
 
   agreementForm = this.fb.group({
-    agreement_no: ['', Validators.required],
+    agreement_no: [''],
     owner_customer_id: ['', Validators.required],
     start_date: ['', Validators.required],
     end_date: ['', Validators.required],
@@ -420,7 +418,7 @@ export class OwnerAgreementFormComponent implements OnInit {
 
     const val = this.agreementForm.value;
     const payload = {
-      agreement_no: val.agreement_no!,
+      ...(this.isEditMode() && val.agreement_no ? { agreement_no: val.agreement_no } : {}),
       owner_customer_id: Number(val.owner_customer_id),
       property_ids: this.selectedPropertyIds(),
       start_date: val.start_date!,

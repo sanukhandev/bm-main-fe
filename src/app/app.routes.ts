@@ -36,6 +36,22 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'customers/owners',
+        loadComponent: () => import('./features/customers/customers-list.component').then((m) => m.CustomersListComponent),
+      },
+      {
+        path: 'customers/owners/new',
+        loadComponent: () => import('./features/customers/customer-form.component').then((m) => m.CustomerFormComponent),
+      },
+      {
+        path: 'customers/tenants',
+        loadComponent: () => import('./features/customers/customers-list.component').then((m) => m.CustomersListComponent),
+      },
+      {
+        path: 'customers/tenants/new',
+        loadComponent: () => import('./features/customers/customer-form.component').then((m) => m.CustomerFormComponent),
+      },
+      {
         path: 'customers/new',
         loadComponent: () =>
           import('./features/customers/customer-form.component').then(
@@ -142,6 +158,23 @@ export const routes: Routes = [
           import('./features/tenant-agreements/tenant-agreement-form.component').then(
             (m) => m.TenantAgreementFormComponent
           ),
+      },
+      // Accounts
+      {
+        path: 'accounts/dashboard',
+        loadComponent: () => import('./features/accounts/accounts-dashboard.component').then((m) => m.AccountsDashboardComponent),
+      },
+      {
+        path: 'accounts/inward', data: { direction: 'inward' },
+        loadComponent: () => import('./features/accounts/account-transactions-list.component').then((m) => m.AccountTransactionsListComponent),
+      },
+      {
+        path: 'accounts/outward', data: { direction: 'outward' },
+        loadComponent: () => import('./features/accounts/account-transactions-list.component').then((m) => m.AccountTransactionsListComponent),
+      },
+      {
+        path: 'accounts/petty-cash',
+        loadComponent: () => import('./features/accounts/petty-cash.component').then((m) => m.PettyCashComponent),
       },
       // Administration
       {

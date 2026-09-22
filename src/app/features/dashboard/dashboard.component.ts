@@ -9,6 +9,7 @@ import { BmLoadingStateComponent } from '../../shared/components/bm-loading-stat
 import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm-error-state.component';
 import { DashboardApiService, DashboardMetrics } from '../../core/api/dashboard-api.service';
 import { BranchContextService } from '../../core/branch-context/branch-context.service';
+import { AccountsApiService, AccountsDashboardSnapshot } from '../../core/api/accounts-api.service';
 
 @Component({
   selector: 'bm-dashboard',
@@ -119,7 +120,7 @@ import { BranchContextService } from '../../core/branch-context/branch-context.s
             <div class="space-y-3">
               <a
                 routerLink="/app/customers/new"
-                class="flex items-center justify-between p-3 rounded-xl bg-[#f8fad9] hover:bg-[#ecf39e] text-xs font-medium text-[#0b190b] transition-colors border border-[#d3ddbb]/50"
+                class="flex items-center justify-between p-3 rounded-xl bg-[#F8FAFC] hover:bg-[#F1F5F9] text-xs font-medium text-[#0b190b] transition-colors border border-slate-200/80"
               >
                 <div class="flex items-center gap-3">
                   <span class="w-8 h-8 rounded-lg bg-[#d0e6cd] text-[#132a13] flex items-center justify-center font-bold">+</span>
@@ -132,7 +133,7 @@ import { BranchContextService } from '../../core/branch-context/branch-context.s
 
               <a
                 routerLink="/app/properties/new"
-                class="flex items-center justify-between p-3 rounded-xl bg-[#f8fad9] hover:bg-[#ecf39e] text-xs font-medium text-[#0b190b] transition-colors border border-[#d3ddbb]/50"
+                class="flex items-center justify-between p-3 rounded-xl bg-[#F8FAFC] hover:bg-[#F1F5F9] text-xs font-medium text-[#0b190b] transition-colors border border-slate-200/80"
               >
                 <div class="flex items-center gap-3">
                   <span class="w-8 h-8 rounded-lg bg-[#d0e6cd] text-[#132a13] flex items-center justify-center font-bold">+</span>
@@ -145,7 +146,7 @@ import { BranchContextService } from '../../core/branch-context/branch-context.s
 
               <a
                 routerLink="/app/owner-agreements/new"
-                class="flex items-center justify-between p-3 rounded-xl bg-[#f8fad9] hover:bg-[#ecf39e] text-xs font-medium text-[#0b190b] transition-colors border border-[#d3ddbb]/50"
+                class="flex items-center justify-between p-3 rounded-xl bg-[#F8FAFC] hover:bg-[#F1F5F9] text-xs font-medium text-[#0b190b] transition-colors border border-slate-200/80"
               >
                 <div class="flex items-center gap-3">
                   <span class="w-8 h-8 rounded-lg bg-[#d0e6cd] text-[#132a13] flex items-center justify-center font-bold">+</span>
@@ -159,25 +160,50 @@ import { BranchContextService } from '../../core/branch-context/branch-context.s
           </bm-card>
         </div>
       </div>
+
+      @if (accountsSnapshot()) {
+        <div class="mt-8">
+          <div class="flex items-center justify-between mb-4"><h3 class="text-lg font-semibold text-slate-900">Accounts Snapshot</h3><a routerLink="/app/accounts/dashboard" class="text-xs font-semibold text-emerald-700">View Accounts →</a></div>
+          <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+            <bm-kpi-card label="Today's Inward" [value]="money(accountsSnapshot()?.today_inward)" subtext="Posted receipts"></bm-kpi-card>
+            <bm-kpi-card label="Today's Outward" [value]="money(accountsSnapshot()?.today_outward)" subtext="Posted payments"></bm-kpi-card>
+            <bm-kpi-card label="Petty Cash" [value]="money(accountsSnapshot()?.petty_cash_balance)" subtext="Current balance"></bm-kpi-card>
+            <bm-kpi-card label="Tenant Outstanding" [value]="money(accountsSnapshot()?.tenant_outstanding_receivable)" subtext="Receivable"></bm-kpi-card>
+            <bm-kpi-card label="Owner Payable" [value]="money(accountsSnapshot()?.owner_outstanding_payable)" subtext="Payable"></bm-kpi-card>
+          </div>
+        </div>
+      }
     }
   `,
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   private dashboardApi = inject(DashboardApiService);
+  private accountsApi = inject(AccountsApiService);
   private branchContext = inject(BranchContextService);
 
   activeBranch = this.branchContext.activeBranch;
   metrics = signal<DashboardMetrics | null>(null);
   isLoading = signal(true);
   error = signal<string | null>(null);
+  accountsSnapshot = signal<AccountsDashboardSnapshot | null>(null);
 
   private branchSub?: Subscription;
 
   ngOnInit(): void {
     this.loadData();
+    this.loadAccounts();
     this.branchSub = this.branchContext.branchChanged$.subscribe(() => {
       this.loadData();
+      this.loadAccounts();
     });
+  }
+
+  loadAccounts(): void {
+    this.accountsApi.getDashboard().subscribe({ next: (res) => this.accountsSnapshot.set(res.data), error: () => this.accountsSnapshot.set(null) });
+  }
+
+  money(value: string | undefined): string {
+    return `AED ${Number(value || 0).toLocaleString('en-AE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   }
 
   loadData(): void {

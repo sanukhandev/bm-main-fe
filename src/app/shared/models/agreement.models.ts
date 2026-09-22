@@ -77,7 +77,7 @@ export interface InstallmentItem {
   installment_number: number;
   due_date: string;
   amount: number;
-  status: string;
+  status?: string;
 }
 
 export interface AgreementInstallment {

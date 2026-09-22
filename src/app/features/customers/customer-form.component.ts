@@ -32,7 +32,7 @@ import { CustomerRole, CustomerType } from '../../shared/models/customer.models'
       </bm-page-header>
 
       @if (isLoading()) {
-        <bm-loading-state></bm-loading-state>
+        <bm-loading-state type="form"></bm-loading-state>
       } @else if (error()) {
         <bm-error-state [message]="error()!" (retry)="loadCustomer()"></bm-error-state>
       } @else {

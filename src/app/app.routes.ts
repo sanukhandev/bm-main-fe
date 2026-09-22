@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
+import { superAdminGuard } from './core/guards/super-admin.guard';
 
 export const routes: Routes = [
   {
@@ -188,13 +189,23 @@ export const routes: Routes = [
         path: 'accounts/reports',
         loadComponent: () => import('./features/accounts/accounts-reports.component').then((m) => m.AccountsReportsComponent),
       },
-      { path: 'maintenance/work-orders', data: { section: 'work-orders', title: 'Work Orders' }, loadComponent: () => import('./features/maintenance/maintenance.component').then((m) => m.MaintenanceComponent) },
+      { path: 'maintenance/work-orders/new', loadComponent: () => import('./features/maintenance/work-order-form.component').then((m) => m.WorkOrderFormComponent) },
       { path: 'maintenance/work-orders/:id', loadComponent: () => import('./features/maintenance/work-order-detail.component').then((m) => m.WorkOrderDetailComponent) },
+      { path: 'maintenance/work-orders', data: { section: 'work-orders', title: 'Work Orders' }, loadComponent: () => import('./features/maintenance/maintenance.component').then((m) => m.MaintenanceComponent) },
       { path: 'maintenance/vendors', data: { section: 'vendors', title: 'Vendors' }, loadComponent: () => import('./features/maintenance/maintenance.component').then((m) => m.MaintenanceComponent) },
       { path: 'maintenance/inventory', data: { section: 'inventory', title: 'Inventory' }, loadComponent: () => import('./features/maintenance/maintenance.component').then((m) => m.MaintenanceComponent) },
-      // Administration
+      { path: 'billing/quotations/new', data: { type: 'quotations' }, loadComponent: () => import('./features/billing/billing-form.component').then((m) => m.BillingFormComponent) },
+      { path: 'billing/quotations/:id/edit', data: { type: 'quotations' }, loadComponent: () => import('./features/billing/billing-form.component').then((m) => m.BillingFormComponent) },
+      { path: 'billing/quotations/:id', data: { type: 'quotations' }, loadComponent: () => import('./features/billing/billing-detail.component').then((m) => m.BillingDetailComponent) },
+      { path: 'billing/quotations', data: { type: 'quotations' }, loadComponent: () => import('./features/billing/billing.component').then((m) => m.BillingComponent) },
+      { path: 'billing/invoices/new', data: { type: 'invoices' }, loadComponent: () => import('./features/billing/billing-form.component').then((m) => m.BillingFormComponent) },
+      { path: 'billing/invoices/:id/edit', data: { type: 'invoices' }, loadComponent: () => import('./features/billing/billing-form.component').then((m) => m.BillingFormComponent) },
+      { path: 'billing/invoices/:id', data: { type: 'invoices' }, loadComponent: () => import('./features/billing/billing-detail.component').then((m) => m.BillingDetailComponent) },
+      { path: 'billing/invoices', data: { type: 'invoices' }, loadComponent: () => import('./features/billing/billing.component').then((m) => m.BillingComponent) },
+      // Administration (Super Admin Only)
       {
         path: 'administration/branches',
+        canActivate: [superAdminGuard],
         loadComponent: () =>
           import('./features/administration/branches/branches-list.component').then(
             (m) => m.BranchesListComponent
@@ -202,6 +213,7 @@ export const routes: Routes = [
       },
       {
         path: 'administration/users',
+        canActivate: [superAdminGuard],
         loadComponent: () =>
           import('./features/administration/users/users-list.component').then(
             (m) => m.UsersListComponent
@@ -209,6 +221,7 @@ export const routes: Routes = [
       },
       {
         path: 'administration/roles',
+        canActivate: [superAdminGuard],
         loadComponent: () =>
           import('./features/administration/roles/roles-list.component').then(
             (m) => m.RolesListComponent

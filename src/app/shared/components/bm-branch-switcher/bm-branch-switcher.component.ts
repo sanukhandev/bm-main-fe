@@ -79,7 +79,13 @@ export class BmBranchSwitcherComponent {
   }
 
   selectBranch(branch: Branch): void {
+    if (branch.id === this.activeBranch()?.id) {
+      this.isOpen.set(false);
+      return;
+    }
+
     this.branchContext.setActiveBranch(branch);
     this.isOpen.set(false);
+    window.location.reload();
   }
 }

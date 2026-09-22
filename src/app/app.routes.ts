@@ -176,6 +176,10 @@ export const routes: Routes = [
         path: 'accounts/petty-cash',
         loadComponent: () => import('./features/accounts/petty-cash.component').then((m) => m.PettyCashComponent),
       },
+      {
+        path: 'accounts/reports',
+        loadComponent: () => import('./features/accounts/accounts-reports.component').then((m) => m.AccountsReportsComponent),
+      },
       // Administration
       {
         path: 'administration/branches',

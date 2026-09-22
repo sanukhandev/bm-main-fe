@@ -61,6 +61,7 @@ import { BmBranchSwitcherComponent } from '../../shared/components/bm-branch-swi
             <span>Dashboard</span>
           </a>
 
+          <div class="pt-4 px-3 py-2 text-[11px] font-semibold text-[#a0cc9b] uppercase tracking-wider">Assets</div>
           <a
             routerLink="/app/customers/owners"
             routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]"
@@ -70,12 +71,16 @@ import { BmBranchSwitcherComponent } from '../../shared/components/bm-branch-swi
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#90a955] group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
-            <span>Owners / Tenants</span>
+            <span>Owners</span>
           </a>
+          <a routerLink="/app/customers/tenants" routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"><span class="h-4 w-4 text-[#90a955]">T</span><span>Tenants</span></a>
 
-          <a routerLink="/app/accounts/dashboard" routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group">
-            <span class="h-4 w-4 text-[#90a955] font-bold">¤</span><span>Accounts</span>
-          </a>
+          <div class="pt-4 px-3 py-2 text-[11px] font-semibold text-[#a0cc9b] uppercase tracking-wider">Accounts</div>
+          <a routerLink="/app/accounts/dashboard" routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"><span class="h-4 w-4 text-[#90a955] font-bold">¤</span><span>Dashboard</span></a>
+          <a routerLink="/app/accounts/inward" routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"><span class="h-4 w-4 text-[#90a955]">↓</span><span>Inward Receipts</span></a>
+          <a routerLink="/app/accounts/outward" routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"><span class="h-4 w-4 text-[#90a955]">↑</span><span>Outward Vouchers</span></a>
+          <a routerLink="/app/accounts/petty-cash" routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"><span class="h-4 w-4 text-[#90a955]">₿</span><span>Petty Cash Daybook</span></a>
+          <a routerLink="/app/accounts/reports" routerLinkActive="bg-[#31572c] text-white font-semibold border-l-4 border-[#ecf39e]" (click)="closeMobileMenu()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium text-[#d3ddbb] hover:bg-[#1e351b]/80 hover:text-white transition-all group"><span class="h-4 w-4 text-[#90a955]">▤</span><span>Reports</span></a>
 
           <a
             routerLink="/app/properties"

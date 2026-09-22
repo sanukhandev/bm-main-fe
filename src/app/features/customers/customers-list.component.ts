@@ -84,7 +84,7 @@ import { PaginationMeta } from '../../core/api/api.models';
       <bm-empty-state
         title="No customers found"
         description="No customer records match your filter criteria."
-        actionLabel="+ Create Customer"
+        [actionLabel]="'+ Create ' + (role() === 'owner' ? 'Owner' : role() === 'tenant' ? 'Tenant' : 'Customer')"
         (action)="navigateToCreate()"
       ></bm-empty-state>
     } @else {

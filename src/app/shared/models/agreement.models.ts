@@ -6,6 +6,7 @@ export type AgreementStatus =
   | 'pending_approval'
   | 'approved'
   | 'commenced'
+  | 'on_hold'
   | 'expired'
   | 'terminated';
 
@@ -35,6 +36,8 @@ export interface OwnerAgreement {
   created_at?: string;
   updated_at?: string;
   installments?: AgreementInstallment[];
+  disputes?: Array<{ id: number; subject: string; description: string; status: string; comments?: Array<{ comment: string }> }>;
+  additional_payments?: Array<{ category: string; direction: string; amount: string | number; terms?: string }>;
 }
 
 export interface TenantAgreementPropertyItem {
@@ -66,6 +69,8 @@ export interface TenantAgreement {
   created_at?: string;
   updated_at?: string;
   installments?: AgreementInstallment[];
+  disputes?: Array<{ id: number; subject: string; description: string; status: string; comments?: Array<{ comment: string }> }>;
+  additional_payments?: Array<{ category: string; direction: string; amount: string | number; terms?: string }>;
 }
 
 export interface InstallmentItem {

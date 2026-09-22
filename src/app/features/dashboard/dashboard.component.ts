@@ -85,27 +85,27 @@ import { BranchContextService } from '../../core/branch-context/branch-context.s
         <div class="lg:col-span-2">
           <bm-card variant="gradient">
             <div class="p-2">
-              <div class="text-xs font-semibold text-emerald-200 uppercase tracking-wider mb-2">
+              <div class="text-xs font-semibold text-[#ecf39e] uppercase tracking-wider mb-2">
                 Active Branch Portfolio
               </div>
               <h3 class="text-2xl font-semibold text-white tracking-tight mb-2">
                 {{ activeBranch()?.name || 'Default Branch' }} Scope
               </h3>
-              <p class="text-sm text-emerald-100 font-light max-w-xl mb-6 leading-relaxed">
+              <p class="text-sm text-[#d0e6cd] font-light max-w-xl mb-6 leading-relaxed">
                 All property leasing, owner agreements, tenant collection schedules, and maintenance operations reflect strict verified branch-level isolation.
               </p>
 
-              <div class="grid grid-cols-3 gap-4 border-t border-emerald-700/60 pt-4 text-xs">
+              <div class="grid grid-cols-3 gap-4 border-t border-[#31572c]/60 pt-4 text-xs">
                 <div>
-                  <div class="text-emerald-200 font-medium">Branch Code</div>
+                  <div class="text-[#a0cc9b] font-medium">Branch Code</div>
                   <div class="text-white font-semibold text-base mt-0.5">{{ activeBranch()?.code || 'N/A' }}</div>
                 </div>
                 <div>
-                  <div class="text-emerald-200 font-medium">Currency</div>
+                  <div class="text-[#a0cc9b] font-medium">Currency</div>
                   <div class="text-white font-semibold text-base mt-0.5">{{ activeBranch()?.currency_code || 'AED' }}</div>
                 </div>
                 <div>
-                  <div class="text-emerald-200 font-medium">Timezone</div>
+                  <div class="text-[#a0cc9b] font-medium">Timezone</div>
                   <div class="text-white font-semibold text-base mt-0.5 truncate">{{ activeBranch()?.timezone || 'Asia/Dubai' }}</div>
                 </div>
               </div>
@@ -119,39 +119,39 @@ import { BranchContextService } from '../../core/branch-context/branch-context.s
             <div class="space-y-3">
               <a
                 routerLink="/app/customers/new"
-                class="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-emerald-50 text-xs font-medium text-slate-800 transition-colors"
+                class="flex items-center justify-between p-3 rounded-xl bg-[#f8fad9] hover:bg-[#ecf39e] text-xs font-medium text-[#0b190b] transition-colors border border-[#d3ddbb]/50"
               >
                 <div class="flex items-center gap-3">
-                  <span class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">+</span>
+                  <span class="w-8 h-8 rounded-lg bg-[#d0e6cd] text-[#132a13] flex items-center justify-center font-bold">+</span>
                   <span>Register New Customer</span>
                 </div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#576633]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
               </a>
 
               <a
                 routerLink="/app/properties/new"
-                class="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-emerald-50 text-xs font-medium text-slate-800 transition-colors"
+                class="flex items-center justify-between p-3 rounded-xl bg-[#f8fad9] hover:bg-[#ecf39e] text-xs font-medium text-[#0b190b] transition-colors border border-[#d3ddbb]/50"
               >
                 <div class="flex items-center gap-3">
-                  <span class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">+</span>
+                  <span class="w-8 h-8 rounded-lg bg-[#d0e6cd] text-[#132a13] flex items-center justify-center font-bold">+</span>
                   <span>Add Property Asset</span>
                 </div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#576633]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
               </a>
 
               <a
                 routerLink="/app/owner-agreements/new"
-                class="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-emerald-50 text-xs font-medium text-slate-800 transition-colors"
+                class="flex items-center justify-between p-3 rounded-xl bg-[#f8fad9] hover:bg-[#ecf39e] text-xs font-medium text-[#0b190b] transition-colors border border-[#d3ddbb]/50"
               >
                 <div class="flex items-center gap-3">
-                  <span class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">+</span>
+                  <span class="w-8 h-8 rounded-lg bg-[#d0e6cd] text-[#132a13] flex items-center justify-center font-bold">+</span>
                   <span>Draft Owner Agreement</span>
                 </div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-[#576633]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
               </a>

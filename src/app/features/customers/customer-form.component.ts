@@ -48,14 +48,6 @@ import { CustomerRole, CustomerType } from '../../shared/models/customer.models'
             </div>
 
             <div>
-              <label class="block text-xs font-semibold text-slate-700 mb-1.5">Customer Code *</label>
-              <input type="text" formControlName="customer_code" placeholder="e.g. CUS-DXB-001" class="bm-input" />
-              @if (isFieldInvalid('customer_code')) {
-                <span class="text-[11px] text-rose-600 mt-1 block">Customer code is required</span>
-              }
-            </div>
-
-            <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1.5">Display Name *</label>
               <input
                 type="text"
@@ -67,7 +59,6 @@ import { CustomerRole, CustomerType } from '../../shared/models/customer.models'
                 <span class="text-[11px] text-rose-600 mt-1 block">Display name is required</span>
               }
             </div>
-
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1.5">Legal Name</label>
               <input
@@ -78,6 +69,7 @@ import { CustomerRole, CustomerType } from '../../shared/models/customer.models'
               />
             </div>
 
+            @if (!workflowRole()) {
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1.5">Business Roles *</label>
               <div class="flex items-center gap-6 pt-2.5">
@@ -102,6 +94,7 @@ import { CustomerRole, CustomerType } from '../../shared/models/customer.models'
                 </label>
               </div>
             </div>
+            }
           </div>
         </bm-card>
 
@@ -245,9 +238,9 @@ export class CustomerFormComponent implements OnInit {
   serverError = signal<string | null>(null);
 
   selectedRoles = signal<CustomerRole[]>(['tenant']);
+  workflowRole = signal<CustomerRole | null>(null);
 
   customerForm = this.fb.group({
-    customer_code: ['', Validators.required],
     customer_type: ['individual' as CustomerType, Validators.required],
     display_name: ['', Validators.required],
     legal_name: [''],
@@ -264,6 +257,10 @@ export class CustomerFormComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    const path = this.route.snapshot.routeConfig?.path || '';
+    const workflowRole = path.includes('owners') ? 'owner' : path.includes('tenants') ? 'tenant' : null;
+    this.workflowRole.set(workflowRole);
+    if (workflowRole) this.selectedRoles.set([workflowRole]);
     const id = this.route.snapshot.paramMap.get('id');
     if (id && id !== 'new') {
       this.isEditMode.set(true);
@@ -284,7 +281,6 @@ export class CustomerFormComponent implements OnInit {
         const cust = res.data;
         this.selectedRoles.set((cust.roles as CustomerRole[]) || ['tenant']);
         this.customerForm.patchValue({
-          customer_code: cust.customer_code,
           customer_type: cust.customer_type,
           display_name: cust.display_name,
           legal_name: cust.legal_name || '',
@@ -334,6 +330,7 @@ export class CustomerFormComponent implements OnInit {
       return;
     }
 
+    if (this.workflowRole()) this.selectedRoles.set([this.workflowRole()!]);
     if (this.selectedRoles().length === 0) {
       this.serverError.set('Please select at least one business role (Owner or Tenant).');
       return;
@@ -344,7 +341,6 @@ export class CustomerFormComponent implements OnInit {
 
     const val = this.customerForm.value;
     const dto = {
-      customer_code: val.customer_code!,
       customer_type: val.customer_type as CustomerType,
       display_name: val.display_name!,
       legal_name: val.legal_name || null,

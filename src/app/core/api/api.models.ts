@@ -36,6 +36,7 @@ export interface ListQueryParams {
   per_page?: number;
   search?: string;
   status?: string;
+  role?: string;
   sort?: string;
   [key: string]: any;
 }

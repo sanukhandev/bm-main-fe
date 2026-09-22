@@ -41,24 +41,6 @@ import { TenantAgreement } from '../../shared/models/agreement.models';
           </a>
         }
 
-        @if (agreement()!.status === 'draft') {
-          <button type="button" (click)="updateStatus('pending_approval')" class="bm-btn bm-btn-primary text-xs">
-            Submit for Approval
-          </button>
-        }
-
-        @if (agreement()!.status === 'pending_approval') {
-          <button type="button" (click)="updateStatus('approved')" class="bm-btn bm-btn-primary text-xs">
-            Approve Agreement
-          </button>
-        }
-
-        @if (agreement()!.status === 'approved') {
-          <button type="button" (click)="updateStatus('commenced')" class="bm-btn bm-btn-primary text-xs">
-            Commence Lease
-          </button>
-        }
-
         @if (agreement()!.status !== 'terminated') {
           <button type="button" (click)="confirmTerminateDialog.set(true)" class="bm-btn bm-btn-danger text-xs">
             Terminate
@@ -223,23 +205,6 @@ export class TenantAgreementDetailComponent implements OnInit {
   propertiesList(): any[] {
     const a = this.agreement();
     return a && a.properties ? a.properties : [];
-  }
-
-  updateStatus(newStatus: string): void {
-    const a = this.agreement();
-    if (!a) return;
-
-    this.isActioning.set(true);
-    this.api.updateStatus(a.id, newStatus).subscribe({
-      next: (res) => {
-        this.agreement.set(res.data);
-        this.isActioning.set(false);
-      },
-      error: (err) => {
-        this.isActioning.set(false);
-        alert(err.message || 'Failed to update agreement status.');
-      },
-    });
   }
 
   executeTerminate(): void {

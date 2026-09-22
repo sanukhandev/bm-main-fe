@@ -7,11 +7,13 @@ import { BmCardComponent } from '../../shared/components/bm-card/bm-card.compone
 import { BmLoadingStateComponent } from '../../shared/components/bm-loading-state/bm-loading-state.component';
 import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm-error-state.component';
 import { TenantAgreementsApiService } from '../../core/api/tenant-agreements-api.service';
+import { OwnerAgreementsApiService } from '../../core/api/owner-agreements-api.service';
 import { CustomersApiService } from '../../core/api/customers-api.service';
 import { PropertiesApiService } from '../../core/api/properties-api.service';
 import { Customer } from '../../shared/models/customer.models';
 import { Property } from '../../shared/models/property.models';
 import { InstallmentItem, PaymentMode } from '../../shared/models/agreement.models';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'bm-tenant-agreement-form',
@@ -110,7 +112,7 @@ import { InstallmentItem, PaymentMode } from '../../shared/models/agreement.mode
         <bm-card title="Step 3 — Select Leased Property Asset">
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1.5">Property Asset *</label>
-            <select formControlName="selected_property_id" class="bm-input">
+            <select formControlName="selected_property_id" (change)="onPropertyChange()" class="bm-input">
               <option value="">Select Property Asset...</option>
               @for (prop of availableProperties(); track prop.id) {
                 <option [value]="prop.id">
@@ -243,6 +245,7 @@ import { InstallmentItem, PaymentMode } from '../../shared/models/agreement.mode
 export class TenantAgreementFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private api = inject(TenantAgreementsApiService);
+  private ownerAgreementsApi = inject(OwnerAgreementsApiService);
   private customersApi = inject(CustomersApiService);
   private propertiesApi = inject(PropertiesApiService);
   private route = inject(ActivatedRoute);
@@ -253,6 +256,7 @@ export class TenantAgreementFormComponent implements OnInit {
 
   tenants = signal<Customer[]>([]);
   availableProperties = signal<Property[]>([]);
+  sourceOwnerAgreementId = signal<number | null>(null);
 
   isLoading = signal(false);
   isSubmitting = signal(false);
@@ -319,9 +323,36 @@ export class TenantAgreementFormComponent implements OnInit {
   }
 
   loadAvailableProperties(): void {
-    this.propertiesApi.getProperties({ per_page: 100 }).subscribe({
+    forkJoin({
+      properties: this.propertiesApi.getProperties({ per_page: 100 }),
+      agreements: this.ownerAgreementsApi.getAgreements({ per_page: 100 }),
+    }).subscribe({
+      next: ({ properties, agreements }) => {
+        const sources: Record<number, number> = {};
+        for (const agreement of agreements.data) {
+          if (!['approved', 'commenced'].includes(agreement.status)) continue;
+          const covered = Array.isArray(agreement.properties) ? agreement.properties : [];
+          for (const property of covered) sources[property.id] = agreement.id;
+        }
+        this.availableProperties.set(properties.data.filter((property) => sources[property.id]));
+        const selected = Number(this.agreementForm.value.selected_property_id);
+        this.sourceOwnerAgreementId.set(sources[selected] ?? this.sourceOwnerAgreementId());
+      },
+    });
+  }
+
+  onPropertyChange(): void {
+    const propertyId = Number(this.agreementForm.value.selected_property_id);
+    this.sourceOwnerAgreementId.set(null);
+    this.ownerAgreementsApi.getAgreements({ per_page: 100 }).subscribe({
       next: (res) => {
-        this.availableProperties.set(res.data);
+        for (const agreement of res.data) {
+          const covered = Array.isArray(agreement.properties) ? agreement.properties : [];
+          if (['approved', 'commenced'].includes(agreement.status) && covered.some((property) => property.id === propertyId)) {
+            this.sourceOwnerAgreementId.set(agreement.id);
+            break;
+          }
+        }
       },
     });
   }
@@ -342,6 +373,7 @@ export class TenantAgreementFormComponent implements OnInit {
       next: (res) => {
         const agr = res.data;
         const propId = agr.properties && agr.properties[0] ? agr.properties[0].property_id : '';
+        this.sourceOwnerAgreementId.set(agr.properties?.[0]?.source_owner_agreement_id ?? null);
         this.agreementForm.patchValue({
           agreement_no: agr.agreement_no,
           tenant_customer_id: String(agr.tenant_customer_id),
@@ -379,6 +411,13 @@ export class TenantAgreementFormComponent implements OnInit {
 
     const val = this.agreementForm.value;
     const propId = Number(val.selected_property_id);
+    const sourceOwnerAgreementId = this.sourceOwnerAgreementId();
+
+    if (!sourceOwnerAgreementId) {
+      this.isSubmitting.set(false);
+      this.serverError.set('The selected property is not covered by an approved owner agreement.');
+      return;
+    }
 
     const payload = {
       agreement_no: val.agreement_no!,
@@ -386,6 +425,7 @@ export class TenantAgreementFormComponent implements OnInit {
       properties: [
         {
           property_id: propId,
+          source_owner_agreement_id: sourceOwnerAgreementId,
         },
       ],
       start_date: val.start_date!,

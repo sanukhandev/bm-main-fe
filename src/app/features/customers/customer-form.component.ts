@@ -48,6 +48,14 @@ import { CustomerRole, CustomerType } from '../../shared/models/customer.models'
             </div>
 
             <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1.5">Customer Code *</label>
+              <input type="text" formControlName="customer_code" placeholder="e.g. CUS-DXB-001" class="bm-input" />
+              @if (isFieldInvalid('customer_code')) {
+                <span class="text-[11px] text-rose-600 mt-1 block">Customer code is required</span>
+              }
+            </div>
+
+            <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1.5">Display Name *</label>
               <input
                 type="text"
@@ -239,6 +247,7 @@ export class CustomerFormComponent implements OnInit {
   selectedRoles = signal<CustomerRole[]>(['tenant']);
 
   customerForm = this.fb.group({
+    customer_code: ['', Validators.required],
     customer_type: ['individual' as CustomerType, Validators.required],
     display_name: ['', Validators.required],
     legal_name: [''],
@@ -275,6 +284,7 @@ export class CustomerFormComponent implements OnInit {
         const cust = res.data;
         this.selectedRoles.set((cust.roles as CustomerRole[]) || ['tenant']);
         this.customerForm.patchValue({
+          customer_code: cust.customer_code,
           customer_type: cust.customer_type,
           display_name: cust.display_name,
           legal_name: cust.legal_name || '',
@@ -334,6 +344,7 @@ export class CustomerFormComponent implements OnInit {
 
     const val = this.customerForm.value;
     const dto = {
+      customer_code: val.customer_code!,
       customer_type: val.customer_type as CustomerType,
       display_name: val.display_name!,
       legal_name: val.legal_name || null,

@@ -45,4 +45,9 @@ export class OwnerAgreementsApiService {
     return this.http.patch<ApiResponse<unknown>>(`${this.baseUrl}/${agreementId}/installments/${installmentId}/status`, { status });
   }
 
+  transition(id: number, status: 'approved' | 'commenced' | 'on_hold' | 'terminated', reason?: string): Observable<ApiResponse<OwnerAgreement>> { return this.http.patch<ApiResponse<OwnerAgreement>>(`${this.baseUrl}/${id}/status`, { status, reason }); }
+  raiseDispute(id: number, subject: string, description: string): Observable<ApiResponse<unknown>> { return this.http.post<ApiResponse<unknown>>(`${this.baseUrl}/${id}/disputes`, { subject, description }); }
+  addDisputeComment(id: number, comment: string): Observable<ApiResponse<unknown>> { return this.http.post<ApiResponse<unknown>>(`/api/v1/agreement-disputes/${id}/comments`, { comment }); }
+  addAdditionalPayment(id: number, payload: { direction: 'inward' | 'outward'; category: string; amount: number; terms?: string }): Observable<ApiResponse<unknown>> { return this.http.post<ApiResponse<unknown>>(`${this.baseUrl}/${id}/additional-payments`, payload); }
+
 }

@@ -1,0 +1,327 @@
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { BmPageHeaderComponent } from '../../shared/components/bm-page-header/bm-page-header.component';
+import { BmSearchInputComponent } from '../../shared/components/bm-search-input/bm-search-input.component';
+import { BmPaginationComponent } from '../../shared/components/bm-pagination/bm-pagination.component';
+import { BmStatusBadgeComponent } from '../../shared/components/bm-status-badge/bm-status-badge.component';
+import { BmEmptyStateComponent } from '../../shared/components/bm-empty-state/bm-empty-state.component';
+import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm-error-state.component';
+import { BmLoadingStateComponent } from '../../shared/components/bm-loading-state/bm-loading-state.component';
+import { BmConfirmDialogComponent } from '../../shared/components/bm-confirm-dialog/bm-confirm-dialog.component';
+import { PropertiesApiService } from '../../core/api/properties-api.service';
+import { BranchContextService } from '../../core/branch-context/branch-context.service';
+import { Property } from '../../shared/models/property.models';
+import { PaginationMeta } from '../../core/api/api.models';
+
+@Component({
+  selector: 'bm-properties-list',
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterLink,
+    BmPageHeaderComponent,
+    BmSearchInputComponent,
+    BmPaginationComponent,
+    BmStatusBadgeComponent,
+    BmEmptyStateComponent,
+    BmErrorStateComponent,
+    BmLoadingStateComponent,
+    BmConfirmDialogComponent,
+  ],
+  template: `
+    <bm-page-header title="Properties" subtitle="Master list of leasable real estate assets">
+      <a routerLink="/app/properties/new" class="bm-btn bm-btn-primary text-xs">
+        + Add Property
+      </a>
+    </bm-page-header>
+
+    <!-- Toolbar Filters -->
+    <div class="bm-card p-4 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+        <bm-search-input
+          [value]="searchQuery()"
+          placeholder="Search code, name, unit..."
+          (searchChange)="onSearchChange($event)"
+        ></bm-search-input>
+
+        <select
+          [value]="selectedType()"
+          (change)="onTypeChange($event)"
+          class="bm-input !w-auto text-xs font-medium"
+        >
+          <option value="">All Property Types</option>
+          <option value="apartment">Apartment</option>
+          <option value="villa">Villa</option>
+          <option value="shop">Shop</option>
+          <option value="office">Office</option>
+          <option value="space">Space</option>
+          <option value="labor_camp">Labor Camp</option>
+          <option value="warehouse">Warehouse</option>
+          <option value="land">Land</option>
+        </select>
+
+        <select
+          [value]="selectedStatus()"
+          (change)="onStatusChange($event)"
+          class="bm-input !w-auto text-xs font-medium"
+        >
+          <option value="">All Statuses</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+          <option value="archived">Archived</option>
+        </select>
+      </div>
+
+      @if (hasActiveFilters()) {
+        <button type="button" (click)="clearFilters()" class="text-xs text-emerald-700 hover:text-emerald-800 font-medium">
+          Clear Filters
+        </button>
+      }
+    </div>
+
+    <!-- Data Table -->
+    @if (isLoading()) {
+      <bm-loading-state type="table"></bm-loading-state>
+    } @else if (error()) {
+      <bm-error-state [message]="error()!" (retry)="loadProperties()"></bm-error-state>
+    } @else if (properties().length === 0) {
+      <bm-empty-state
+        title="No properties found"
+        description="No property records match your search criteria."
+        actionLabel="+ Add Property"
+        (action)="navigateToCreate()"
+      ></bm-empty-state>
+    } @else {
+      <div class="bm-card overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
+                <th class="py-3.5 px-4">Code / Unit</th>
+                <th class="py-3.5 px-4">Property Name</th>
+                <th class="py-3.5 px-4">Type</th>
+                <th class="py-3.5 px-4">Owner</th>
+                <th class="py-3.5 px-4">Location</th>
+                <th class="py-3.5 px-4">Area (sq ft)</th>
+                <th class="py-3.5 px-4">Status</th>
+                <th class="py-3.5 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              @for (prop of properties(); track prop.id) {
+                <tr class="hover:bg-slate-50/60 transition-colors">
+                  <td class="py-3.5 px-4 font-semibold text-slate-800 tabular-nums">
+                    <div>{{ prop.property_code }}</div>
+                    <div class="text-[11px] text-slate-400 font-normal">Unit: {{ prop.unit_number }}</div>
+                  </td>
+                  <td class="py-3.5 px-4 font-medium text-slate-900">
+                    <a [routerLink]="['/app/properties', prop.id]" class="hover:text-emerald-600 transition-colors">
+                      {{ prop.name }}
+                    </a>
+                    @if (prop.building_name) {
+                      <div class="text-[11px] text-slate-400">{{ prop.building_name }}</div>
+                    }
+                  </td>
+                  <td class="py-3.5 px-4 capitalize text-slate-600">
+                    {{ formatType(prop.property_type) }}
+                  </td>
+                  <td class="py-3.5 px-4 font-medium text-slate-800">
+                    {{ getOwnerName(prop) }}
+                  </td>
+                  <td class="py-3.5 px-4 text-slate-600">
+                    {{ prop.city || 'Dubai' }}
+                  </td>
+                  <td class="py-3.5 px-4 tabular-nums text-slate-700 font-medium">
+                    {{ prop.area ? prop.area : '—' }}
+                  </td>
+                  <td class="py-3.5 px-4">
+                    <bm-status-badge [status]="prop.status"></bm-status-badge>
+                  </td>
+                  <td class="py-3.5 px-4 text-right space-x-2">
+                    <a [routerLink]="['/app/properties', prop.id]" class="text-emerald-700 hover:text-emerald-900 font-medium text-xs">
+                      View
+                    </a>
+                    <a [routerLink]="['/app/properties', prop.id, 'edit']" class="text-slate-600 hover:text-slate-900 font-medium text-xs">
+                      Edit
+                    </a>
+                    <button type="button" (click)="confirmArchive(prop)" class="text-rose-600 hover:text-rose-800 font-medium text-xs">
+                      Archive
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <bm-pagination [meta]="paginationMeta()" (pageChange)="onPageChange($event)"></bm-pagination>
+      </div>
+    }
+
+    <bm-confirm-dialog
+      [isOpen]="archiveDialogOpen()"
+      title="Archive Property"
+      [message]="'Are you sure you want to archive property ' + selectedProperty()?.name + '?'"
+      confirmLabel="Archive Property"
+      [isDanger]="true"
+      [isSubmitting]="isArchiving()"
+      (confirm)="executeArchive()"
+      (cancel)="archiveDialogOpen.set(false)"
+    ></bm-confirm-dialog>
+  `,
+})
+export class PropertiesListComponent implements OnInit, OnDestroy {
+  private api = inject(PropertiesApiService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private branchContext = inject(BranchContextService);
+
+  properties = signal<Property[]>([]);
+  paginationMeta = signal<PaginationMeta | undefined>(undefined);
+  isLoading = signal(true);
+  error = signal<string | null>(null);
+
+  searchQuery = signal('');
+  selectedType = signal('');
+  selectedStatus = signal('');
+  currentPage = signal(1);
+
+  archiveDialogOpen = signal(false);
+  selectedProperty = signal<Property | null>(null);
+  isArchiving = signal(false);
+
+  private branchSub?: Subscription;
+
+  ngOnInit(): void {
+    this.route.queryParams.subscribe((queryParams) => {
+      this.searchQuery.set(queryParams['search'] || '');
+      this.selectedType.set(queryParams['property_type'] || '');
+      this.selectedStatus.set(queryParams['status'] || '');
+      this.currentPage.set(Number(queryParams['page']) || 1);
+      this.loadProperties();
+    });
+
+    this.branchSub = this.branchContext.branchChanged$.subscribe(() => {
+      this.loadProperties();
+    });
+  }
+
+  loadProperties(): void {
+    this.isLoading.set(true);
+    this.error.set(null);
+
+    this.api
+      .getProperties({
+        page: this.currentPage(),
+        per_page: 25,
+        search: this.searchQuery(),
+        property_type: this.selectedType(),
+        status: this.selectedStatus(),
+      })
+      .subscribe({
+        next: (res) => {
+          this.properties.set(res.data);
+          this.paginationMeta.set(res.meta);
+          this.isLoading.set(false);
+        },
+        error: (err) => {
+          this.error.set(err.message || 'Failed to load properties.');
+          this.isLoading.set(false);
+        },
+      });
+  }
+
+  updateQueryParams(): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        search: this.searchQuery() || null,
+        property_type: this.selectedType() || null,
+        status: this.selectedStatus() || null,
+        page: this.currentPage() > 1 ? this.currentPage() : null,
+      },
+      queryParamsHandling: 'merge',
+    });
+  }
+
+  onSearchChange(val: string): void {
+    this.searchQuery.set(val);
+    this.currentPage.set(1);
+    this.updateQueryParams();
+  }
+
+  onTypeChange(event: Event): void {
+    const val = (event.target as HTMLSelectElement).value;
+    this.selectedType.set(val);
+    this.currentPage.set(1);
+    this.updateQueryParams();
+  }
+
+  onStatusChange(event: Event): void {
+    const val = (event.target as HTMLSelectElement).value;
+    this.selectedStatus.set(val);
+    this.currentPage.set(1);
+    this.updateQueryParams();
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage.set(page);
+    this.updateQueryParams();
+  }
+
+  clearFilters(): void {
+    this.searchQuery.set('');
+    this.selectedType.set('');
+    this.selectedStatus.set('');
+    this.currentPage.set(1);
+    this.updateQueryParams();
+  }
+
+  hasActiveFilters(): boolean {
+    return !!(this.searchQuery() || this.selectedType() || this.selectedStatus());
+  }
+
+  formatType(typeStr: string): string {
+    return (typeStr || '').replace(/_/g, ' ');
+  }
+
+  getOwnerName(prop: Property): string {
+    if (!prop.owner) return '—';
+    if ('data' in prop.owner && prop.owner.data) return prop.owner.data.display_name;
+    if ('display_name' in prop.owner) return (prop.owner as any).display_name;
+    return '—';
+  }
+
+  navigateToCreate(): void {
+    this.router.navigate(['/app/properties/new']);
+  }
+
+  confirmArchive(prop: Property): void {
+    this.selectedProperty.set(prop);
+    this.archiveDialogOpen.set(true);
+  }
+
+  executeArchive(): void {
+    const prop = this.selectedProperty();
+    if (!prop) return;
+
+    this.isArchiving.set(true);
+    this.api.archiveProperty(prop.id).subscribe({
+      next: () => {
+        this.isArchiving.set(false);
+        this.archiveDialogOpen.set(false);
+        this.loadProperties();
+      },
+      error: (err) => {
+        this.isArchiving.set(false);
+        alert(err.message || 'Failed to archive property.');
+      },
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.branchSub?.unsubscribe();
+  }
+}

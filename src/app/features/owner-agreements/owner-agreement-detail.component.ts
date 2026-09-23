@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { BmLoadingStateComponent } from '../../shared/components/bm-loading-state/bm-loading-state.component';
 import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm-error-state.component';
 import { BmConfirmDialogComponent } from '../../shared/components/bm-confirm-dialog/bm-confirm-dialog.component';
@@ -51,12 +51,16 @@ import { OwnerAgreement, AgreementInstallment } from '../../shared/models/agreem
             <!-- Action Hierarchy Buttons -->
             <div class="flex items-center gap-2.5 flex-wrap">
               @if (agreement()!.status === 'draft') {
-                <button type="button" (click)="transition('approved')" [disabled]="isActioning()" class="bm-btn bm-btn-primary text-xs font-semibold px-4 py-2 rounded-xl shadow-xs">
-                  Approve Agreement
+                <button type="button" (click)="transition('pending_approval')" [disabled]="isActioning()" class="bm-btn bm-btn-primary text-xs font-semibold px-4 py-2 rounded-xl shadow-xs">
+                  Submit for Approval
                 </button>
                 <a [routerLink]="['/app/owner-agreements', agreement()!.id, 'edit']" class="bm-btn bm-btn-secondary text-xs font-semibold px-4 py-2 rounded-xl border border-slate-200">
                   Edit
                 </a>
+              }
+              @if (agreement()!.status === 'pending_approval') {
+                <button type="button" (click)="transition('approved')" [disabled]="isActioning()" class="bm-btn bm-btn-primary text-xs font-semibold px-4 py-2 rounded-xl shadow-xs">Approve Agreement</button>
+                <a [routerLink]="['/app/owner-agreements', agreement()!.id, 'edit']" class="bm-btn bm-btn-secondary text-xs font-semibold px-4 py-2 rounded-xl border border-slate-200">Edit</a>
               }
               @if (agreement()!.status === 'approved') {
                 <button type="button" (click)="transition('commenced')" [disabled]="isActioning()" class="bm-btn bm-btn-primary text-xs font-semibold px-4 py-2 rounded-xl shadow-xs">
@@ -108,10 +112,13 @@ import { OwnerAgreement, AgreementInstallment } from '../../shared/models/agreem
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                       </svg>
-                      <span>Add Payment Line</span>
+                    <span>Add Payment Line</span>
                     </button>
 
-                    @if (agreement()!.status !== 'terminated') {
+                    @if (agreement()!.available_actions?.includes('extend')) { <button type="button" (click)="openExtendModal(); showMoreMenu.set(false)" class="w-full text-left px-4 py-2 hover:bg-slate-50 text-slate-700 font-medium">Extend Agreement</button> }
+                    @if (agreement()!.available_actions?.includes('renew')) { <button type="button" (click)="openRenewModal(); showMoreMenu.set(false)" class="w-full text-left px-4 py-2 hover:bg-slate-50 text-slate-700 font-medium">Renew Agreement</button> }
+
+                    @if (agreement()!.available_actions?.includes('terminate') || agreement()!.available_actions?.includes('cancel')) {
                       <div class="border-t border-slate-100 my-1"></div>
                       <button
                         type="button"
@@ -121,7 +128,7 @@ import { OwnerAgreement, AgreementInstallment } from '../../shared/models/agreem
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                         </svg>
-                        <span>Terminate Agreement</span>
+                        <span>{{ agreement()!.available_actions?.includes('cancel') ? 'Cancel Agreement' : 'Terminate Agreement' }}</span>
                       </button>
                     }
                   </div>
@@ -527,6 +534,14 @@ import { OwnerAgreement, AgreementInstallment } from '../../shared/models/agreem
           </div>
         }
 
+        @if (extendModalOpen()) {
+          <div class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4"><form class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 border border-slate-200" (ngSubmit)="submitExtend()"><h2 class="text-lg font-semibold text-slate-900 mb-4">Extend Owner Agreement</h2><label class="block text-xs font-semibold text-slate-700">New end date<input [(ngModel)]="newEndDate" name="newEndDate" type="date" required class="bm-input mt-1"></label><label class="block text-xs font-semibold text-slate-700 mt-4">Reason<textarea [(ngModel)]="extensionReason" name="extensionReason" required rows="3" class="bm-input mt-1 !h-auto p-2.5"></textarea></label><div class="flex justify-end gap-3 mt-6"><button type="button" (click)="extendModalOpen.set(false)" class="bm-btn bm-btn-secondary text-xs">Cancel</button><button type="submit" [disabled]="!newEndDate || !extensionReason.trim() || isActioning()" class="bm-btn bm-btn-primary text-xs">Extend</button></div></form></div>
+        }
+
+        @if (renewModalOpen()) {
+          <div class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4"><form class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 border border-slate-200" (ngSubmit)="submitRenew()"><h2 class="text-lg font-semibold text-slate-900 mb-4">Renew Owner Agreement</h2><div class="grid grid-cols-2 gap-4"><label class="block text-xs font-semibold text-slate-700">Start date<input [(ngModel)]="renewStartDate" name="renewStartDate" type="date" required class="bm-input mt-1"></label><label class="block text-xs font-semibold text-slate-700">End date<input [(ngModel)]="renewEndDate" name="renewEndDate" type="date" required class="bm-input mt-1"></label></div><div class="flex justify-end gap-3 mt-6"><button type="button" (click)="renewModalOpen.set(false)" class="bm-btn bm-btn-secondary text-xs">Cancel</button><button type="submit" [disabled]="!renewStartDate || !renewEndDate || isActioning()" class="bm-btn bm-btn-primary text-xs">Create Renewal</button></div></form></div>
+        }
+
         @if (disputeModalOpen()) {
           <div class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
             <form class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 border border-slate-200" (ngSubmit)="submitDispute()">
@@ -565,6 +580,7 @@ import { OwnerAgreement, AgreementInstallment } from '../../shared/models/agreem
 export class OwnerAgreementDetailComponent implements OnInit {
   private api = inject(OwnerAgreementsApiService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   agreement = signal<OwnerAgreement | null>(null);
   isLoading = signal(true);
@@ -573,10 +589,16 @@ export class OwnerAgreementDetailComponent implements OnInit {
   installmentProcessingId = signal<number | string | null>(null);
   paymentLineOpen = signal(false);
   holdModalOpen = signal(false);
+  extendModalOpen = signal(false);
+  renewModalOpen = signal(false);
   disputeModalOpen = signal(false);
   commentModalOpen = signal(false);
   commentDisputeId: number | null = null;
   holdReason = '';
+  newEndDate = '';
+  extensionReason = '';
+  renewStartDate = '';
+  renewEndDate = '';
   disputeSubject = '';
   disputeDescription = '';
   disputeComment = '';
@@ -684,7 +706,12 @@ export class OwnerAgreementDetailComponent implements OnInit {
     this.transition('on_hold', reason);
   }
 
-  transition(status: 'approved' | 'commenced' | 'on_hold', reason = ''): void {
+  openExtendModal(): void { this.newEndDate = ''; this.extensionReason = ''; this.extendModalOpen.set(true); }
+  submitExtend(): void { const id = this.agreement()?.id; if (!id || !this.newEndDate || !this.extensionReason.trim()) return; this.isActioning.set(true); this.api.lifecycle(id, 'extend', { new_end_date: this.newEndDate, reason: this.extensionReason.trim() }).subscribe({ next: (res) => { this.agreement.set(res.data); this.isActioning.set(false); this.extendModalOpen.set(false); }, error: (err) => { this.isActioning.set(false); this.error.set(err.message || 'Unable to extend agreement.'); } }); }
+  openRenewModal(): void { this.renewStartDate = ''; this.renewEndDate = ''; this.renewModalOpen.set(true); }
+  submitRenew(): void { const id = this.agreement()?.id; if (!id || !this.renewStartDate || !this.renewEndDate) return; this.isActioning.set(true); this.api.lifecycle(id, 'renew', { start_date: this.renewStartDate, end_date: this.renewEndDate }).subscribe({ next: (res) => { this.isActioning.set(false); this.renewModalOpen.set(false); this.router.navigate(['/app/owner-agreements', res.data.id]); }, error: (err) => { this.isActioning.set(false); this.error.set(err.message || 'Unable to renew agreement.'); } }); }
+
+  transition(status: 'pending_approval' | 'approved' | 'commenced' | 'on_hold', reason = ''): void {
     const id = this.agreement()?.id;
     if (!id) return;
     this.isActioning.set(true);

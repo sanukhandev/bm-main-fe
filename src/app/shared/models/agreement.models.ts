@@ -8,7 +8,10 @@ export type AgreementStatus =
   | 'commenced'
   | 'on_hold'
   | 'expired'
-  | 'terminated';
+  | 'terminated'
+  | 'cancelled';
+
+export type AgreementAction = 'submit' | 'approve' | 'commence' | 'hold' | 'resume' | 'expire' | 'terminate' | 'cancel' | 'extend' | 'renew';
 
 export type PaymentMode = 'cash' | 'cheque' | 'bank_transfer';
 
@@ -30,6 +33,7 @@ export interface OwnerAgreement {
   terms_text?: string | null;
   notes?: string | null;
   status: AgreementStatus;
+  available_actions?: AgreementAction[];
   lock_version?: number;
   terminated_at?: string | null;
   termination_reason?: string | null;
@@ -63,6 +67,7 @@ export interface TenantAgreement {
   terms_text?: string | null;
   notes?: string | null;
   status: AgreementStatus;
+  available_actions?: AgreementAction[];
   lock_version?: number;
   terminated_at?: string | null;
   termination_reason?: string | null;

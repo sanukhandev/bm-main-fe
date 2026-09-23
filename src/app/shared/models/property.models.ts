@@ -36,7 +36,7 @@ export interface Property {
 
 export interface CreatePropertyDto {
   owner_customer_id: number;
-  property_code: string;
+  property_code?: string;
   unit_number: string;
   property_type: PropertyType;
   name: string;

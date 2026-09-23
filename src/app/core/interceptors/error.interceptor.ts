@@ -22,10 +22,12 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
           request_id: error.error.request_id,
         };
       } else if (error.status === 0) {
-        normalizedError.message = 'Unable to connect to backend server. Please verify backend (Laravel) is running at http://127.0.0.1:8000.';
+        normalizedError.message =
+          'Unable to connect to backend server. Please verify backend (Laravel) is running at http://127.0.0.1:8000.';
         normalizedError.code = 'NETWORK_ERROR';
       } else if (error.status === 404) {
-        normalizedError.message = 'API endpoint not found (404). Please check backend routing and proxy configuration.';
+        normalizedError.message =
+          'API endpoint not found (404). Please check backend routing and proxy configuration.';
         normalizedError.code = 'NOT_FOUND';
       } else if (typeof error.error === 'string' && error.error.includes('<!DOCTYPE html>')) {
         normalizedError.message = `Backend returned non-JSON response (${error.status}). Check backend proxy configuration.`;
@@ -39,6 +41,6 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       }
 
       return throwError(() => normalizedError);
-    })
+    }),
   );
 };

@@ -13,7 +13,9 @@ import { CommonModule } from '@angular/common';
     >
       @if (title) {
         <div class="mb-4 flex items-center justify-between border-b border-[#E5E0D8] pb-3">
-          <h3 class="text-xs font-semibold uppercase tracking-[0.08em] text-[#1B1E1C]">{{ title }}</h3>
+          <h3 class="text-xs font-semibold uppercase tracking-[0.08em] text-[#1B1E1C]">
+            {{ title }}
+          </h3>
           <ng-content select="[card-action]"></ng-content>
         </div>
       }

@@ -6,7 +6,11 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="inline-flex items-center gap-2" [class.flex-col]="stacked" [class.justify-center]="centered">
+    <div
+      class="inline-flex items-center gap-2"
+      [class.flex-col]="stacked"
+      [class.justify-center]="centered"
+    >
       <svg
         [class]="spinnerClass"
         class="animate-spin"

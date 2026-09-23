@@ -1,10 +1,11 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BmPageHeaderComponent } from '../../../shared/components/bm-page-header/bm-page-header.component';
 import { BmStatusBadgeComponent } from '../../../shared/components/bm-status-badge/bm-status-badge.component';
 import { BmLoadingStateComponent } from '../../../shared/components/bm-loading-state/bm-loading-state.component';
 import { BmErrorStateComponent } from '../../../shared/components/bm-error-state/bm-error-state.component';
 import { BmEmptyStateComponent } from '../../../shared/components/bm-empty-state/bm-empty-state.component';
+import { BmSearchInputComponent } from '../../../shared/components/bm-search-input/bm-search-input.component';
 import { AdministrationApiService } from '../../../core/api/administration-api.service';
 import { UserAdmin } from '../../../shared/models/admin.models';
 
@@ -18,26 +19,41 @@ import { UserAdmin } from '../../../shared/models/admin.models';
     BmLoadingStateComponent,
     BmErrorStateComponent,
     BmEmptyStateComponent,
+    BmSearchInputComponent,
   ],
   template: `
-    <bm-page-header title="Users Administration" subtitle="System user access and branch role assignments">
+    <bm-page-header
+      title="Users Administration"
+      subtitle="System user access and branch role assignments"
+    >
     </bm-page-header>
+
+    <!-- Toolbar Filters -->
+    <div class="bm-card p-4 mb-6 max-w-5xl flex items-center justify-between gap-4">
+      <bm-search-input
+        [value]="searchQuery()"
+        placeholder="Search user name, email, role, branch..."
+        (searchChange)="searchQuery.set($event)"
+      ></bm-search-input>
+    </div>
 
     @if (isLoading()) {
       <bm-loading-state type="table"></bm-loading-state>
     } @else if (error()) {
       <bm-error-state [message]="error()!" (retry)="loadUsers()"></bm-error-state>
-    } @else if (users().length === 0) {
+    } @else if (filteredUsers().length === 0) {
       <bm-empty-state
         title="No user records found"
-        description="User administrative management records."
+        description="No user records match your search criteria."
       ></bm-empty-state>
     } @else {
       <div class="bm-card overflow-hidden max-w-5xl">
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse text-xs">
             <thead>
-              <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
+              <tr
+                class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]"
+              >
                 <th class="py-3.5 px-4">User Name</th>
                 <th class="py-3.5 px-4">Email</th>
                 <th class="py-3.5 px-4">Roles</th>
@@ -46,7 +62,7 @@ import { UserAdmin } from '../../../shared/models/admin.models';
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
-              @for (u of users(); track u.id) {
+              @for (u of filteredUsers(); track u.id) {
                 <tr class="hover:bg-slate-50/60 transition-colors">
                   <td class="py-3.5 px-4 font-semibold text-slate-900">
                     {{ u.name }}
@@ -80,15 +96,37 @@ export class UsersListComponent implements OnInit {
   private api = inject(AdministrationApiService);
 
   users = signal<UserAdmin[]>([]);
+  searchQuery = signal('');
   isLoading = signal(true);
   error = signal<string | null>(null);
+
+  filteredUsers = computed(() => {
+    const q = this.searchQuery().toLowerCase().trim();
+    if (!q) return this.users();
+    return this.users().filter((u) => {
+      const name = (u.name || '').toLowerCase();
+      const email = (u.email || '').toLowerCase();
+      const roles = (u.roles || []).join(' ').toLowerCase();
+      const branches = this.getBranchesSummary(u).toLowerCase();
+      const status = (u.status || '').toLowerCase();
+      return (
+        name.includes(q) ||
+        email.includes(q) ||
+        roles.includes(q) ||
+        branches.includes(q) ||
+        status.includes(q)
+      );
+    });
+  });
 
   ngOnInit(): void {
     this.loadUsers();
   }
 
-  loadUsers(): void {
-    this.isLoading.set(true);
+  loadUsers(silent = false): void {
+    if (!silent && this.users().length === 0) {
+      this.isLoading.set(true);
+    }
     this.error.set(null);
 
     this.api.getUsers().subscribe({

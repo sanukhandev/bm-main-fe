@@ -31,8 +31,18 @@ import { PaginationMeta } from '../../core/api/api.models';
     BmConfirmDialogComponent,
   ],
   template: `
-    <bm-page-header [title]="role() ? (role() === 'owner' ? 'Owners' : 'Tenants') : 'Customers'" subtitle="Branch-scoped customer directory">
-      <a [routerLink]="role() ? ['/app/customers', role() === 'owner' ? 'owners' : 'tenants', 'new'] : ['/app/customers/new']" class="bm-btn bm-btn-primary text-xs">
+    <bm-page-header
+      [title]="role() ? (role() === 'owner' ? 'Owners' : 'Tenants') : 'Customers'"
+      subtitle="Branch-scoped customer directory"
+    >
+      <a
+        [routerLink]="
+          role()
+            ? ['/app/customers', role() === 'owner' ? 'owners' : 'tenants', 'new']
+            : ['/app/customers/new']
+        "
+        class="bm-btn bm-btn-primary text-xs"
+      >
         + Create {{ role() === 'owner' ? 'Owner' : role() === 'tenant' ? 'Tenant' : 'Customer' }}
       </a>
     </bm-page-header>
@@ -69,7 +79,11 @@ import { PaginationMeta } from '../../core/api/api.models';
       </div>
 
       @if (hasActiveFilters()) {
-        <button type="button" (click)="clearFilters()" class="text-xs text-emerald-700 hover:text-emerald-800 font-medium">
+        <button
+          type="button"
+          (click)="clearFilters()"
+          class="text-xs text-emerald-700 hover:text-emerald-800 font-medium"
+        >
           Clear Filters
         </button>
       }
@@ -84,7 +98,9 @@ import { PaginationMeta } from '../../core/api/api.models';
       <bm-empty-state
         title="No customers found"
         description="No customer records match your filter criteria."
-        [actionLabel]="'+ Create ' + (role() === 'owner' ? 'Owner' : role() === 'tenant' ? 'Tenant' : 'Customer')"
+        [actionLabel]="
+          '+ Create ' + (role() === 'owner' ? 'Owner' : role() === 'tenant' ? 'Tenant' : 'Customer')
+        "
         (action)="navigateToCreate()"
       ></bm-empty-state>
     } @else {
@@ -92,7 +108,9 @@ import { PaginationMeta } from '../../core/api/api.models';
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse text-xs">
             <thead>
-              <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
+              <tr
+                class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]"
+              >
                 <th class="py-3.5 px-4">Customer Code</th>
                 <th class="py-3.5 px-4">Display Name</th>
                 <th class="py-3.5 px-4">Type</th>
@@ -109,7 +127,10 @@ import { PaginationMeta } from '../../core/api/api.models';
                     {{ cust.customer_code }}
                   </td>
                   <td class="py-3.5 px-4 font-medium text-slate-900">
-                    <a [routerLink]="['/app/customers', cust.id]" class="hover:text-emerald-600 transition-colors">
+                    <a
+                      [routerLink]="['/app/customers', cust.id]"
+                      class="hover:text-emerald-600 transition-colors"
+                    >
                       {{ cust.display_name }}
                     </a>
                   </td>
@@ -138,19 +159,55 @@ import { PaginationMeta } from '../../core/api/api.models';
                         aria-label="View Details"
                         class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200/60 inline-flex items-center justify-center transition shadow-2xs"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                          />
                         </svg>
                       </a>
                       <a
-                        [routerLink]="role() ? ['/app/customers', role() === 'owner' ? 'owners' : 'tenants', cust.id, 'edit'] : ['/app/customers', cust.id, 'edit']"
+                        [routerLink]="
+                          role()
+                            ? [
+                                '/app/customers',
+                                role() === 'owner' ? 'owners' : 'tenants',
+                                cust.id,
+                                'edit',
+                              ]
+                            : ['/app/customers', cust.id, 'edit']
+                        "
                         title="Edit Customer"
                         aria-label="Edit Customer"
                         class="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-slate-900 border border-slate-200 inline-flex items-center justify-center transition shadow-2xs"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                          />
                         </svg>
                       </a>
                       <button
@@ -160,8 +217,19 @@ import { PaginationMeta } from '../../core/api/api.models';
                         aria-label="Archive Customer"
                         class="w-8 h-8 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 hover:text-rose-800 border border-rose-200/60 inline-flex items-center justify-center transition shadow-2xs"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
                         </svg>
                       </button>
                     </div>
@@ -172,7 +240,10 @@ import { PaginationMeta } from '../../core/api/api.models';
           </table>
         </div>
 
-        <bm-pagination [meta]="paginationMeta()" (pageChange)="onPageChange($event)"></bm-pagination>
+        <bm-pagination
+          [meta]="paginationMeta()"
+          (pageChange)="onPageChange($event)"
+        ></bm-pagination>
       </div>
     }
 
@@ -180,7 +251,9 @@ import { PaginationMeta } from '../../core/api/api.models';
     <bm-confirm-dialog
       [isOpen]="archiveDialogOpen()"
       title="Archive Customer"
-      [message]="'Are you sure you want to archive customer ' + selectedCustomer()?.display_name + '?'"
+      [message]="
+        'Are you sure you want to archive customer ' + selectedCustomer()?.display_name + '?'
+      "
       confirmLabel="Archive Customer"
       [isDanger]="true"
       [isSubmitting]="isArchiving()"
@@ -214,7 +287,13 @@ export class CustomersListComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     const routePath = this.router.url.split('?')[0];
-    this.role.set(routePath.includes('/customers/owners') ? 'owner' : routePath.includes('/customers/tenants') ? 'tenant' : null);
+    this.role.set(
+      routePath.includes('/customers/owners')
+        ? 'owner'
+        : routePath.includes('/customers/tenants')
+          ? 'tenant'
+          : null,
+    );
     this.route.queryParams.subscribe((queryParams) => {
       this.searchQuery.set(queryParams['search'] || '');
       this.selectedType.set(queryParams['customer_type'] || '');
@@ -228,8 +307,10 @@ export class CustomersListComponent implements OnInit, OnDestroy {
     });
   }
 
-  loadCustomers(): void {
-    this.isLoading.set(true);
+  loadCustomers(silent = false): void {
+    if (!silent && this.customers().length === 0) {
+      this.isLoading.set(true);
+    }
     this.error.set(null);
 
     this.api
@@ -305,7 +386,9 @@ export class CustomersListComponent implements OnInit, OnDestroy {
   }
 
   navigateToCreate(): void {
-    this.router.navigate(this.role() ? ['/app/customers', `${this.role()}s`, 'new'] : ['/app/customers/new']);
+    this.router.navigate(
+      this.role() ? ['/app/customers', `${this.role()}s`, 'new'] : ['/app/customers/new'],
+    );
   }
 
   confirmArchive(cust: Customer): void {

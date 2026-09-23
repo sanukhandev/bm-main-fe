@@ -11,7 +11,17 @@ export type AgreementStatus =
   | 'terminated'
   | 'cancelled';
 
-export type AgreementAction = 'submit' | 'approve' | 'commence' | 'hold' | 'resume' | 'expire' | 'terminate' | 'cancel' | 'extend' | 'renew';
+export type AgreementAction =
+  | 'submit'
+  | 'approve'
+  | 'commence'
+  | 'hold'
+  | 'resume'
+  | 'expire'
+  | 'terminate'
+  | 'cancel'
+  | 'extend'
+  | 'renew';
 
 export type PaymentMode = 'cash' | 'cheque' | 'bank_transfer';
 
@@ -40,8 +50,22 @@ export interface OwnerAgreement {
   created_at?: string;
   updated_at?: string;
   installments?: AgreementInstallment[];
-  disputes?: Array<{ id: number; subject: string; description: string; status: string; comments?: Array<{ comment: string; created_at?: string }> }>;
-  additional_payments?: Array<{ category: string; particulars: string; direction: string; amount: string | number; due_date: string; payment_mode: string; terms?: string }>;
+  disputes?: Array<{
+    id: number;
+    subject: string;
+    description: string;
+    status: string;
+    comments?: Array<{ comment: string; created_at?: string }>;
+  }>;
+  additional_payments?: Array<{
+    category: string;
+    particulars: string;
+    direction: string;
+    amount: string | number;
+    due_date: string;
+    payment_mode: string;
+    terms?: string;
+  }>;
 }
 
 export interface TenantAgreementPropertyItem {
@@ -74,8 +98,22 @@ export interface TenantAgreement {
   created_at?: string;
   updated_at?: string;
   installments?: AgreementInstallment[];
-  disputes?: Array<{ id: number; subject: string; description: string; status: string; comments?: Array<{ comment: string; created_at?: string }> }>;
-  additional_payments?: Array<{ category: string; particulars: string; direction: string; amount: string | number; due_date: string; payment_mode: string; terms?: string }>;
+  disputes?: Array<{
+    id: number;
+    subject: string;
+    description: string;
+    status: string;
+    comments?: Array<{ comment: string; created_at?: string }>;
+  }>;
+  additional_payments?: Array<{
+    category: string;
+    particulars: string;
+    direction: string;
+    amount: string | number;
+    due_date: string;
+    payment_mode: string;
+    terms?: string;
+  }>;
 }
 
 export interface InstallmentItem {
@@ -84,6 +122,8 @@ export interface InstallmentItem {
   amount: number;
   status?: string;
 }
+
+import type { PaymentReceipt } from './payment.models';
 
 export interface AgreementInstallment {
   id: number | string;
@@ -97,4 +137,5 @@ export interface AgreementInstallment {
   status: string;
   notes?: string | null;
   is_extra?: boolean;
+  receipt?: PaymentReceipt | null;
 }

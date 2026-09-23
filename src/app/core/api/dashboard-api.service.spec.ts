@@ -1,29 +1,47 @@
-import { TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { describe, expect, it, beforeEach, afterEach } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import { of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Injector } from '@angular/core';
 import { DashboardApiService } from './dashboard-api.service';
 
 describe('DashboardApiService', () => {
-  let service: DashboardApiService;
-  let http: HttpTestingController;
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({ providers: [DashboardApiService, provideHttpClient(), provideHttpClientTesting()] });
-    service = TestBed.inject(DashboardApiService);
-    http = TestBed.inject(HttpTestingController);
-  });
-
-  afterEach(() => http.verify());
-
   it('loads the typed operational dashboard read model', () => {
+    const mockHttp = {
+      get: (url: string) => {
+        expect(url).toBe('/api/v1/dashboard/operational');
+        return of({
+          data: {
+            summary: {
+              owners: 2,
+              tenants: 3,
+              properties: 4,
+              owner_agreements_active: 1,
+              tenant_agreements_active: 2,
+            },
+          },
+        });
+      },
+    };
+
+    const injector = Injector.create({
+      providers: [
+        { provide: HttpClient, useValue: mockHttp },
+        { provide: DashboardApiService, useClass: DashboardApiService },
+      ],
+    });
+
+    const service = injector.get(DashboardApiService);
     let result: unknown;
     service.getMetrics().subscribe((data) => (result = data));
 
-    const request = http.expectOne('/api/v1/dashboard/operational');
-    expect(request.request.method).toBe('GET');
-    request.flush({ data: { summary: { owners: 2, tenants: 3, properties: 4, owner_agreements_active: 1, tenant_agreements_active: 2 } } });
-
-    expect(result).toEqual({ summary: { owners: 2, tenants: 3, properties: 4, owner_agreements_active: 1, tenant_agreements_active: 2 } });
+    expect(result).toEqual({
+      summary: {
+        owners: 2,
+        tenants: 3,
+        properties: 4,
+        owner_agreements_active: 1,
+        tenant_agreements_active: 2,
+      },
+    });
   });
 });

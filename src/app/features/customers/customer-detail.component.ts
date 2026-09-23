@@ -31,10 +31,11 @@ import { Customer } from '../../shared/models/customer.models';
         [title]="customer()!.display_name"
         [subtitle]="'Customer Code: ' + customer()!.customer_code"
       >
-        <a routerLink="/app/customers" class="bm-btn bm-btn-secondary text-xs">
-          Back to List
-        </a>
-        <a [routerLink]="['/app/customers', customer()!.id, 'edit']" class="bm-btn bm-btn-primary text-xs">
+        <a routerLink="/app/customers" class="bm-btn bm-btn-secondary text-xs"> Back to List </a>
+        <a
+          [routerLink]="['/app/customers', customer()!.id, 'edit']"
+          class="bm-btn bm-btn-primary text-xs"
+        >
           Edit Customer
         </a>
       </bm-page-header>
@@ -52,7 +53,9 @@ import { Customer } from '../../shared/models/customer.models';
 
               <div>
                 <div class="text-slate-400 font-medium">Legal Name</div>
-                <div class="font-semibold text-slate-800 mt-1">{{ customer()!.legal_name || '—' }}</div>
+                <div class="font-semibold text-slate-800 mt-1">
+                  {{ customer()!.legal_name || '—' }}
+                </div>
               </div>
 
               <div>
@@ -73,7 +76,9 @@ import { Customer } from '../../shared/models/customer.models';
 
               <div>
                 <div class="text-slate-400 font-medium">TRN Registration</div>
-                <div class="font-semibold text-slate-800 mt-1 tabular-nums">{{ customer()!.tax_registration_no || '—' }}</div>
+                <div class="font-semibold text-slate-800 mt-1 tabular-nums">
+                  {{ customer()!.tax_registration_no || '—' }}
+                </div>
               </div>
 
               <div>
@@ -92,7 +97,9 @@ import { Customer } from '../../shared/models/customer.models';
                 <div>{{ customer()!.address_line_2 }}</div>
               }
               <div class="font-medium text-slate-900">
-                {{ customer()!.city || '' }} {{ customer()!.state_or_emirate ? ', ' + customer()!.state_or_emirate : '' }} {{ customer()!.country_code ? ' (' + customer()!.country_code + ')' : '' }}
+                {{ customer()!.city || '' }}
+                {{ customer()!.state_or_emirate ? ', ' + customer()!.state_or_emirate : '' }}
+                {{ customer()!.country_code ? ' (' + customer()!.country_code + ')' : '' }}
               </div>
             </div>
           </bm-card>
@@ -103,7 +110,9 @@ import { Customer } from '../../shared/models/customer.models';
             <div class="space-y-4 text-xs">
               <div>
                 <div class="text-slate-400 font-medium">Phone</div>
-                <div class="font-semibold text-slate-900 mt-1 tabular-nums">{{ customer()!.phone || '—' }}</div>
+                <div class="font-semibold text-slate-900 mt-1 tabular-nums">
+                  {{ customer()!.phone || '—' }}
+                </div>
               </div>
 
               <div>
@@ -113,7 +122,9 @@ import { Customer } from '../../shared/models/customer.models';
 
               <div class="border-t border-slate-100 pt-3">
                 <div class="text-slate-400 font-medium mb-1">Notes</div>
-                <p class="text-slate-600 leading-relaxed italic">{{ customer()!.notes || 'No additional notes.' }}</p>
+                <p class="text-slate-600 leading-relaxed italic">
+                  {{ customer()!.notes || 'No additional notes.' }}
+                </p>
               </div>
             </div>
           </bm-card>
@@ -134,11 +145,13 @@ export class CustomerDetailComponent implements OnInit {
     this.loadCustomer();
   }
 
-  loadCustomer(): void {
+  loadCustomer(silent = false): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (!id) return;
 
-    this.isLoading.set(true);
+    if (!silent && !this.customer()) {
+      this.isLoading.set(true);
+    }
     this.error.set(null);
 
     this.api.getCustomer(id).subscribe({

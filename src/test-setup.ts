@@ -5,7 +5,4 @@ import {
   platformBrowserTesting,
 } from '@angular/platform-browser/testing';
 
-TestBed.initTestEnvironment(
-  BrowserDynamicTestingModule,
-  platformBrowserTesting()
-);
+TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserTesting());

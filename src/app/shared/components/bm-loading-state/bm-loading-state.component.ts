@@ -18,7 +18,7 @@ import { BmSpinnerComponent } from '../bm-spinner/bm-spinner.component';
               <div class="h-9 bg-[#E5E0D8] rounded-lg w-24"></div>
             </div>
           </div>
-          
+
           <div class="overflow-hidden border border-[#E5E0D8] rounded-xl bg-[#FBFAF7]">
             <div class="h-10 bg-[#F2EFE9] flex items-center justify-between px-4">
               <div class="h-3 bg-[#E5E0D8] rounded w-1/6"></div>
@@ -50,7 +50,9 @@ import { BmSpinnerComponent } from '../bm-spinner/bm-spinner.component';
         <!-- KPI Metrics Skeleton -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-pulse">
           @for (i of [1, 2, 3, 4]; track i) {
-            <div class="p-5 bg-[#FBFAF7] border border-[#E5E0D8] rounded-xl flex flex-col justify-between h-32 relative overflow-hidden">
+            <div
+              class="p-5 bg-[#FBFAF7] border border-[#E5E0D8] rounded-xl flex flex-col justify-between h-32 relative overflow-hidden"
+            >
               <div class="flex items-center justify-between">
                 <div class="h-3.5 bg-[#E5E0D8] rounded w-1/2"></div>
                 <div class="w-8 h-8 rounded-lg bg-[#9CAF9F]/20"></div>
@@ -88,7 +90,9 @@ import { BmSpinnerComponent } from '../bm-spinner/bm-spinner.component';
         <!-- Detail Document Skeleton Loader -->
         <div class="space-y-6 animate-pulse">
           <div class="p-6 bg-[#FBFAF7] border border-[#E5E0D8] rounded-xl space-y-6">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E5E0D8] pb-5">
+            <div
+              class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E5E0D8] pb-5"
+            >
               <div class="space-y-2">
                 <div class="h-6 bg-[#E5E0D8] rounded-lg w-64"></div>
                 <div class="h-3.5 bg-[#E5E0D8] rounded w-48"></div>

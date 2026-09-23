@@ -19,7 +19,7 @@ export interface AccountTransaction {
   bank_name: string | null;
   bank_reference: string | null;
   transfer_date: string | null;
-  status: 'draft' | 'posted' | 'void';
+  status: 'draft' | 'posted' | 'void' | 'voided';
   cheque_status?: 'received' | 'deposited' | 'cleared' | 'bounced' | 'cancelled' | null;
   voided_at?: string | null;
   void_reason?: string | null;
@@ -42,8 +42,15 @@ export interface AccountsDashboardSnapshot {
 }
 
 export interface RecentAccountTransaction {
-  id: number; document_no: string; direction: AccountDirection; transaction_date: string;
-  payment_mode: PaymentMode; amount: string; status: string; party: string | null; particulars: string | null;
+  id: number;
+  document_no: string;
+  direction: AccountDirection;
+  transaction_date: string;
+  payment_mode: PaymentMode;
+  amount: string;
+  status: string;
+  party: string | null;
+  particulars: string | null;
 }
 
 export interface PettyCashDaybookResponse {
@@ -51,9 +58,26 @@ export interface PettyCashDaybookResponse {
   meta: { opening_balance: string; total_in: string; total_out: string; closing_balance: string };
 }
 
-export interface DailyMovement { date: string; inward: string; outward: string; net: string; }
-export interface PaymentModeSummary { payment_mode: PaymentMode; direction: AccountDirection; count: number; amount: string; }
-export interface PettyCashRequest { transaction_date: string; direction: AccountDirection; amount: number; particulars: string; category?: string; remarks?: string; }
+export interface DailyMovement {
+  date: string;
+  inward: string;
+  outward: string;
+  net: string;
+}
+export interface PaymentModeSummary {
+  payment_mode: PaymentMode;
+  direction: AccountDirection;
+  count: number;
+  amount: string;
+}
+export interface PettyCashRequest {
+  transaction_date: string;
+  direction: AccountDirection;
+  amount: number;
+  particulars: string;
+  category?: string;
+  remarks?: string;
+}
 
 @Injectable({ providedIn: 'root' })
 export class AccountsApiService {
@@ -64,12 +88,18 @@ export class AccountsApiService {
     return this.http.get<ApiResponse<AccountsDashboardSnapshot>>(`${this.baseUrl}/dashboard`);
   }
 
-  getTransactions(direction: AccountDirection, params: ListQueryParams = {}): Observable<PaginatedResponse<AccountTransaction>> {
+  getTransactions(
+    direction: AccountDirection,
+    params: ListQueryParams = {},
+  ): Observable<PaginatedResponse<AccountTransaction>> {
     let httpParams = new HttpParams();
     Object.entries({ page: 1, per_page: 25, ...params }).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') httpParams = httpParams.set(key, String(value));
+      if (value !== undefined && value !== null && value !== '')
+        httpParams = httpParams.set(key, String(value));
     });
-    return this.http.get<PaginatedResponse<AccountTransaction>>(`${this.baseUrl}/${direction}`, { params: httpParams });
+    return this.http.get<PaginatedResponse<AccountTransaction>>(`${this.baseUrl}/${direction}`, {
+      params: httpParams,
+    });
   }
 
   getPettyCash(): Observable<PettyCashDaybookResponse> {
@@ -81,11 +111,21 @@ export class AccountsApiService {
   }
 
   voidTransaction(id: number, reason: string): Observable<ApiResponse<AccountTransaction>> {
-    return this.http.post<ApiResponse<AccountTransaction>>(`${this.baseUrl}/transactions/${id}/void`, { reason }, { headers: new HttpHeaders({ 'Idempotency-Key': `void-${id}-${Date.now()}` }) });
+    return this.http.post<ApiResponse<AccountTransaction>>(
+      `${this.baseUrl}/transactions/${id}/void`,
+      { reason },
+      { headers: new HttpHeaders({ 'Idempotency-Key': `void-${id}-${Date.now()}` }) },
+    );
   }
 
-  chequeAction(id: number, action: 'deposit' | 'clear' | 'bounce' | 'cancel'): Observable<ApiResponse<AccountTransaction>> {
-    return this.http.post<ApiResponse<AccountTransaction>>(`${this.baseUrl}/transactions/${id}/cheque/${action}`, {});
+  chequeAction(
+    id: number,
+    action: 'deposit' | 'clear' | 'bounce' | 'cancel',
+  ): Observable<ApiResponse<AccountTransaction>> {
+    return this.http.post<ApiResponse<AccountTransaction>>(
+      `${this.baseUrl}/transactions/${id}/cheque/${action}`,
+      {},
+    );
   }
 
   getDailyMovement(): Observable<ApiResponse<DailyMovement[]>> {
@@ -93,6 +133,8 @@ export class AccountsApiService {
   }
 
   getPaymentModeSummary(): Observable<ApiResponse<PaymentModeSummary[]>> {
-    return this.http.get<ApiResponse<PaymentModeSummary[]>>(`${this.baseUrl}/reports/payment-modes`);
+    return this.http.get<ApiResponse<PaymentModeSummary[]>>(
+      `${this.baseUrl}/reports/payment-modes`,
+    );
   }
 }

@@ -32,9 +32,7 @@ import { PaginationMeta } from '../../core/api/api.models';
   ],
   template: `
     <bm-page-header title="Properties" subtitle="Master list of leasable real estate assets">
-      <a routerLink="/app/properties/new" class="bm-btn bm-btn-primary text-xs">
-        + Add Property
-      </a>
+      <a routerLink="/app/properties/new" class="bm-btn bm-btn-primary text-xs"> + Add Property </a>
     </bm-page-header>
 
     <!-- Toolbar Filters -->
@@ -75,7 +73,11 @@ import { PaginationMeta } from '../../core/api/api.models';
       </div>
 
       @if (hasActiveFilters()) {
-        <button type="button" (click)="clearFilters()" class="text-xs text-emerald-700 hover:text-emerald-800 font-medium">
+        <button
+          type="button"
+          (click)="clearFilters()"
+          class="text-xs text-emerald-700 hover:text-emerald-800 font-medium"
+        >
           Clear Filters
         </button>
       }
@@ -98,7 +100,9 @@ import { PaginationMeta } from '../../core/api/api.models';
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse text-xs">
             <thead>
-              <tr class="bg-[#F2EFE9] border-b border-[#E5E0D8] text-[#1B1E1C]/60 font-semibold uppercase tracking-[0.08em] text-[10px]">
+              <tr
+                class="bg-[#F2EFE9] border-b border-[#E5E0D8] text-[#1B1E1C]/60 font-semibold uppercase tracking-[0.08em] text-[10px]"
+              >
                 <th class="py-3.5 px-4">Code / Property No.</th>
                 <th class="py-3.5 px-4">Property Name</th>
                 <th class="py-3.5 px-4">Type</th>
@@ -114,14 +118,21 @@ import { PaginationMeta } from '../../core/api/api.models';
                 <tr class="hover:bg-[#F2EFE9]/40 transition-colors">
                   <td class="py-3.5 px-4 font-semibold text-[#1B1E1C] tabular-nums">
                     <div>{{ prop.property_code }}</div>
-                    <div class="text-[10px] text-[#1B1E1C]/50 font-normal">Unit No.: {{ prop.unit_number }}</div>
+                    <div class="text-[10px] text-[#1B1E1C]/50 font-normal">
+                      Unit No.: {{ prop.unit_number }}
+                    </div>
                   </td>
                   <td class="py-3.5 px-4 font-medium text-[#1B1E1C]">
-                    <a [routerLink]="['/app/properties', prop.id]" class="hover:text-[#193D32] transition-colors font-semibold">
+                    <a
+                      [routerLink]="['/app/properties', prop.id]"
+                      class="hover:text-[#193D32] transition-colors font-semibold"
+                    >
                       {{ prop.name }}
                     </a>
                     @if (prop.building_name) {
-                      <div class="text-[10px] text-[#1B1E1C]/50 font-normal">{{ prop.building_name }}</div>
+                      <div class="text-[10px] text-[#1B1E1C]/50 font-normal">
+                        {{ prop.building_name }}
+                      </div>
                     }
                   </td>
                   <td class="py-3.5 px-4">
@@ -147,9 +158,25 @@ import { PaginationMeta } from '../../core/api/api.models';
                         aria-label="View Details"
                         class="w-7 h-7 rounded-lg bg-[#F2EFE9] text-[#193D32] hover:bg-[#193D32] hover:text-white border border-[#E5E0D8] inline-flex items-center justify-center transition"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-3.5 w-3.5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                          />
                         </svg>
                       </a>
                       <a
@@ -158,8 +185,19 @@ import { PaginationMeta } from '../../core/api/api.models';
                         aria-label="Edit Property"
                         class="w-7 h-7 rounded-lg bg-[#F2EFE9] text-[#1B1E1C] hover:bg-[#1B1E1C] hover:text-white border border-[#E5E0D8] inline-flex items-center justify-center transition"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-3.5 w-3.5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                          />
                         </svg>
                       </a>
                       <button
@@ -169,8 +207,19 @@ import { PaginationMeta } from '../../core/api/api.models';
                         aria-label="Archive Property"
                         class="w-7 h-7 rounded-lg bg-[#B98D91]/15 text-[#B98D91] hover:bg-[#B98D91] hover:text-white border border-[#B98D91]/30 inline-flex items-center justify-center transition"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-3.5 w-3.5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
                         </svg>
                       </button>
                     </div>
@@ -181,7 +230,10 @@ import { PaginationMeta } from '../../core/api/api.models';
           </table>
         </div>
 
-        <bm-pagination [meta]="paginationMeta()" (pageChange)="onPageChange($event)"></bm-pagination>
+        <bm-pagination
+          [meta]="paginationMeta()"
+          (pageChange)="onPageChange($event)"
+        ></bm-pagination>
       </div>
     }
 
@@ -233,8 +285,10 @@ export class PropertiesListComponent implements OnInit, OnDestroy {
     });
   }
 
-  loadProperties(): void {
-    this.isLoading.set(true);
+  loadProperties(silent = false): void {
+    if (!silent && this.properties().length === 0) {
+      this.isLoading.set(true);
+    }
     this.error.set(null);
 
     this.api

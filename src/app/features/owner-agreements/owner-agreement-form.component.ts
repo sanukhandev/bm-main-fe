@@ -12,6 +12,11 @@ import { Customer } from '../../shared/models/customer.models';
 import { Property } from '../../shared/models/property.models';
 import { InstallmentItem, PaymentMode } from '../../shared/models/agreement.models';
 
+import {
+  BmComboboxComponent,
+  ComboboxOption,
+} from '../../shared/components/bm-combobox/bm-combobox.component';
+
 @Component({
   selector: 'bm-owner-agreement-form',
   standalone: true,
@@ -22,6 +27,7 @@ import { InstallmentItem, PaymentMode } from '../../shared/models/agreement.mode
     BmPageHeaderComponent,
     BmLoadingStateComponent,
     BmErrorStateComponent,
+    BmComboboxComponent,
   ],
   template: `
     <div class="max-w-[1240px] w-full mx-auto pb-12">
@@ -125,18 +131,14 @@ import { InstallmentItem, PaymentMode } from '../../shared/models/agreement.mode
                 <label class="block text-[13px] font-semibold text-[#26312C] mb-2">
                   Property Owner <span class="text-rose-600 font-bold ml-0.5">*</span>
                 </label>
-                <select
+                <bm-combobox
                   formControlName="owner_customer_id"
+                  [options]="ownerOptions()"
+                  placeholder="Search or select property owner..."
+                  searchPlaceholder="Search owner by name, code, phone..."
                   (change)="onOwnerChange()"
-                  class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium shadow-2xs focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
-                >
-                  <option value="">Select Property Owner...</option>
-                  @for (owner of owners(); track owner.id) {
-                    <option [value]="owner.id">
-                      [{{ owner.customer_code }}] {{ owner.display_name }}
-                    </option>
-                  }
-                </select>
+                  [invalid]="isFieldInvalid('owner_customer_id')"
+                ></bm-combobox>
                 @if (isFieldInvalid('owner_customer_id')) {
                   <span class="text-xs font-medium text-rose-600 mt-1.5 flex items-center gap-1">
                     Property owner selection is required.
@@ -544,6 +546,15 @@ export class OwnerAgreementFormComponent implements OnInit {
   owners = signal<Customer[]>([]);
   allOwnerProperties = signal<Property[]>([]);
   selectedPropertyIds = signal<number[]>([]);
+
+  ownerOptions = computed<ComboboxOption[]>(() => {
+    return this.owners().map((owner) => ({
+      id: owner.id,
+      label: owner.display_name,
+      code: owner.customer_code,
+      subtitle: owner.phone || owner.email || '',
+    }));
+  });
 
   isLoading = signal(false);
   isSubmitting = signal(false);

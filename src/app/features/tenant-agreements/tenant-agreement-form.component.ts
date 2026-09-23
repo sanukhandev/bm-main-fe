@@ -13,6 +13,11 @@ import { Customer } from '../../shared/models/customer.models';
 import { Property } from '../../shared/models/property.models';
 import { InstallmentItem, OwnerAgreement, PaymentMode } from '../../shared/models/agreement.models';
 
+import {
+  BmComboboxComponent,
+  ComboboxOption,
+} from '../../shared/components/bm-combobox/bm-combobox.component';
+
 @Component({
   selector: 'bm-tenant-agreement-form',
   standalone: true,
@@ -23,6 +28,7 @@ import { InstallmentItem, OwnerAgreement, PaymentMode } from '../../shared/model
     BmPageHeaderComponent,
     BmLoadingStateComponent,
     BmErrorStateComponent,
+    BmComboboxComponent,
   ],
   template: `
     <div class="max-w-[1240px] w-full mx-auto pb-12">
@@ -126,17 +132,13 @@ import { InstallmentItem, OwnerAgreement, PaymentMode } from '../../shared/model
                 <label class="block text-[13px] font-semibold text-[#26312C] mb-2">
                   Tenant Customer <span class="text-rose-600 font-bold ml-0.5">*</span>
                 </label>
-                <select
+                <bm-combobox
                   formControlName="tenant_customer_id"
-                  class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium shadow-2xs focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
-                >
-                  <option value="">Select Tenant...</option>
-                  @for (tenant of tenants(); track tenant.id) {
-                    <option [value]="tenant.id">
-                      [{{ tenant.customer_code }}] {{ tenant.display_name }}
-                    </option>
-                  }
-                </select>
+                  [options]="tenantOptions()"
+                  placeholder="Search or select tenant..."
+                  searchPlaceholder="Search tenant by name, customer code, phone..."
+                  [invalid]="isFieldInvalid('tenant_customer_id')"
+                ></bm-combobox>
                 @if (isFieldInvalid('tenant_customer_id')) {
                   <span class="text-xs font-medium text-rose-600 mt-1.5 flex items-center gap-1">
                     Tenant customer selection is required.
@@ -249,19 +251,14 @@ import { InstallmentItem, OwnerAgreement, PaymentMode } from '../../shared/model
               <label class="block text-[13px] font-semibold text-[#26312C] mb-2">
                 Source Owner Agreement <span class="text-rose-600 font-bold ml-0.5">*</span>
               </label>
-              <select
+              <bm-combobox
                 formControlName="source_owner_agreement_id"
+                [options]="sourceOwnerAgreementOptions()"
+                placeholder="Search or select source owner agreement..."
+                searchPlaceholder="Search agreement by reference number or dates..."
                 (change)="onAvailabilityInputsChange()"
-                class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium shadow-2xs focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
-              >
-                <option value="">Select source agreement...</option>
-                @for (ownerAgreement of ownerAgreements(); track ownerAgreement.id) {
-                  <option [value]="ownerAgreement.id">
-                    {{ ownerAgreement.agreement_no }} · {{ ownerAgreement.start_date }} –
-                    {{ ownerAgreement.end_date }}
-                  </option>
-                }
-              </select>
+                [invalid]="isFieldInvalid('source_owner_agreement_id')"
+              ></bm-combobox>
               @if (isFieldInvalid('source_owner_agreement_id')) {
                 <span class="text-xs font-medium text-rose-600 mt-1.5 flex items-center gap-1"
                   >Source owner agreement is required.</span
@@ -544,6 +541,24 @@ export class TenantAgreementFormComponent implements OnInit {
   tenants = signal<Customer[]>([]);
   ownerAgreements = signal<OwnerAgreement[]>([]);
   availableProperties = signal<Property[]>([]);
+
+  tenantOptions = computed<ComboboxOption[]>(() => {
+    return this.tenants().map((tenant) => ({
+      id: tenant.id,
+      label: tenant.display_name,
+      code: tenant.customer_code,
+      subtitle: tenant.phone || tenant.email || '',
+    }));
+  });
+
+  sourceOwnerAgreementOptions = computed<ComboboxOption[]>(() => {
+    return this.ownerAgreements().map((oa) => ({
+      id: oa.id,
+      label: `${oa.agreement_no} (${oa.start_date} – ${oa.end_date})`,
+      code: oa.agreement_no,
+      subtitle: `Valid ${oa.start_date} to ${oa.end_date}`,
+    }));
+  });
 
   isLoading = signal(false);
   isSubmitting = signal(false);

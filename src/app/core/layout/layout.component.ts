@@ -53,9 +53,11 @@ export interface PageSearchItem {
     >
       <!-- Global Top Loading Progress Bar -->
       @if (loadingService.isLoading()) {
-        <div class="fixed top-0 left-0 right-0 z-50 h-1 bg-[#0F172A]/10 overflow-hidden">
+        <div
+          class="fixed top-0 left-0 right-0 z-[100] h-1 bg-slate-900/10 backdrop-blur-xs overflow-hidden"
+        >
           <div
-            class="h-full bg-[#0F172A] animate-pulse shadow-[0_0_8px_rgba(15,23,42,0.4)] w-full"
+            class="h-full bg-gradient-to-r from-emerald-500 via-emerald-600 to-slate-900 animate-bm-top-loader shadow-[0_0_10px_rgba(16,185,129,0.5)] w-full"
           ></div>
         </div>
       }
@@ -534,7 +536,7 @@ export interface PageSearchItem {
             title="Keyboard shortcuts"
             aria-label="Show keyboard shortcuts"
             (click)="toggleShortcutHelp()"
-            class="hidden sm:inline-flex w-9 h-9 rounded-full bg-white border border-[#E2E8F0] !text-[0px] text-[#334155] hover:text-[#0F172A] hover:bg-slate-50 items-center justify-center transition shrink-0 cursor-pointer shadow-2xs"
+            class="hidden sm:inline-flex w-9 h-9 rounded-full bg-white border border-[#E2E8F0] text-[#334155] hover:text-[#0F172A] hover:bg-slate-50 flex items-center justify-center transition shrink-0 cursor-pointer shadow-2xs"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -543,15 +545,15 @@ export interface PageSearchItem {
               fill="none"
               stroke="currentColor"
               stroke-width="1.75"
+              stroke-linecap="round"
+              stroke-linejoin="round"
               aria-hidden="true"
             >
-              <rect x="3" y="5" width="18" height="14" rx="2" />
+              <rect x="2" y="4" width="20" height="16" rx="2" />
               <path
-                stroke-linecap="round"
-                d="M6 9h.01M9 9h.01M12 9h.01M15 9h.01M18 9h.01M6 13h.01M9 13h.01M12 13h.01M15 13h3M6 17h12"
+                d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M7 16h10"
               />
             </svg>
-            <span class="text-sm font-semibold">⌨</span>
           </button>
 
           <!-- Branch Selector -->

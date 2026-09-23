@@ -672,17 +672,92 @@ export class LayoutComponent {
   private elementRef = inject(ElementRef);
   loadingService = inject(BmLoadingService);
 
+  @ViewChild('searchInput') searchInputRef?: ElementRef<HTMLInputElement>;
+
   user = this.authService.currentUser;
   isSuperAdmin = this.authService.isSuperAdmin;
 
   activeMegaMenu = signal<MegaMenuTab>(null);
   mobileDrawerOpen = signal(false);
 
+  searchQuery = signal('');
+  isSearchOpen = signal(false);
+  selectedIndex = signal(0);
+
+  readonly allSearchItems: PageSearchItem[] = [
+    // Dashboard & Overview
+    { title: 'Executive Overview', subtitle: 'Real-time ERP dashboard & metrics', category: 'Pages', url: '/app/dashboard', keywords: ['dashboard', 'home', 'overview', 'metrics', 'analytics'] },
+
+    // Customers: Owners
+    { title: 'Owner Directory', subtitle: 'List of property owners & investors', category: 'Customers', url: '/app/customers/owners', keywords: ['owner', 'owners', 'investor', 'landlord', 'directory', 'customer'] },
+    { title: 'Add New Owner', subtitle: 'Register a new property owner', category: 'Actions', url: '/app/customers/owners/new', keywords: ['add owner', 'new owner', 'create owner', 'register owner'], badge: 'New Action' },
+
+    // Customers: Tenants
+    { title: 'Tenant Directory', subtitle: 'Active tenant directory & occupants', category: 'Customers', url: '/app/customers/tenants', keywords: ['tenant', 'tenants', 'renter', 'leaseholder', 'occupant'] },
+    { title: 'Add New Tenant', subtitle: 'Register a new tenant', category: 'Actions', url: '/app/customers/tenants/new', keywords: ['add tenant', 'new tenant', 'create tenant', 'register tenant'], badge: 'New Action' },
+
+    // Properties & Units
+    { title: 'Property Directory', subtitle: 'Master property & unit portfolio', category: 'Properties', url: '/app/properties', keywords: ['property', 'properties', 'unit', 'building', 'portfolio', 'estate'] },
+    { title: 'Add New Property', subtitle: 'Register a new property or unit', category: 'Actions', url: '/app/properties/new', keywords: ['add property', 'new property', 'create property', 'new unit'], badge: 'New Action' },
+
+    // Owner Agreements
+    { title: 'Owner Agreements', subtitle: 'Management contracts with owners', category: 'Agreements', url: '/app/owner-agreements', keywords: ['owner agreement', 'management contract', 'owner terms'] },
+    { title: 'New Owner Agreement', subtitle: 'Create a new owner management contract', category: 'Actions', url: '/app/owner-agreements/new', keywords: ['new owner agreement', 'create owner agreement'], badge: 'New Action' },
+
+    // Tenant Agreements
+    { title: 'Tenant Agreements', subtitle: 'Lease contracts & rent schedules', category: 'Agreements', url: '/app/tenant-agreements', keywords: ['tenant agreement', 'lease', 'rent contract', 'expiry', 'installments'] },
+    { title: 'New Tenant Lease', subtitle: 'Create a new tenant lease contract', category: 'Actions', url: '/app/tenant-agreements/new', keywords: ['new lease', 'create tenant agreement', 'new rent contract'], badge: 'New Action' },
+
+    // Accounts & Financials
+    { title: 'Accounts Dashboard', subtitle: 'Real-time financial ledger & position', category: 'Financials', url: '/app/accounts/dashboard', keywords: ['accounts', 'finance', 'ledger', 'cash flow', 'balance'] },
+    { title: 'Inward Receipts', subtitle: 'Collection vouchers & incoming money', category: 'Financials', url: '/app/accounts/inward', keywords: ['inward', 'receipt', 'rent payment', 'income', 'cash in'] },
+    { title: 'Issue Inward Receipt', subtitle: 'Record an incoming rent receipt voucher', category: 'Actions', url: '/app/accounts/inward', keywords: ['new receipt', 'issue inward', 'collect rent'], badge: 'New Action' },
+    { title: 'Outward Vouchers', subtitle: 'Payment vouchers & disbursements', category: 'Financials', url: '/app/accounts/outward', keywords: ['outward', 'voucher', 'expense', 'payout', 'disbursement'] },
+    { title: 'Issue Outward Voucher', subtitle: 'Record an outgoing payment voucher', category: 'Actions', url: '/app/accounts/outward', keywords: ['new voucher', 'issue outward', 'make payment'], badge: 'New Action' },
+    { title: 'Petty Cash Daybook', subtitle: 'Daily petty cash transactions log', category: 'Financials', url: '/app/accounts/petty-cash', keywords: ['petty cash', 'daybook', 'daily cash', 'expenses'] },
+
+    // Maintenance & Inventory
+    { title: 'Work Orders', subtitle: 'Maintenance requests & repairs', category: 'Pages', url: '/app/maintenance/work-orders', keywords: ['work order', 'maintenance', 'repair', 'ticket', 'dispatch'] },
+    { title: 'Vendors Directory', subtitle: 'Approved contractors & service providers', category: 'Pages', url: '/app/maintenance/vendors', keywords: ['vendor', 'contractor', 'supplier', 'plumber', 'electrician'] },
+    { title: 'Inventory Management', subtitle: 'Stock items & spare parts', category: 'Pages', url: '/app/maintenance/inventory', keywords: ['inventory', 'stock', 'parts', 'spares'] },
+
+    // Billing & Reports
+    { title: 'Quotations', subtitle: 'Price quotes & cost estimates', category: 'Pages', url: '/app/billing/quotations', keywords: ['quotation', 'quote', 'estimate'] },
+    { title: 'Invoices', subtitle: 'Receivable billing invoices', category: 'Pages', url: '/app/billing/invoices', keywords: ['invoice', 'billing', 'statement'] },
+    { title: 'Financial Reports', subtitle: 'Operational & audit reports', category: 'Pages', url: '/app/reports', keywords: ['reports', 'statement', 'financial report', 'audit'] },
+    { title: 'Disputes & Claims', subtitle: 'Tenant & owner dispute management', category: 'Pages', url: '/app/disputes', keywords: ['dispute', 'complaint', 'issue', 'claim'] },
+
+    // Administration (Super Admin)
+    { title: 'Branch Management', subtitle: 'Branches & office locations', category: 'System', url: '/app/administration/branches', keywords: ['branch', 'branches', 'location', 'office'], adminOnly: true },
+    { title: 'User Management', subtitle: 'Staff accounts & system users', category: 'System', url: '/app/administration/users', keywords: ['user', 'users', 'staff', 'employee', 'account'], adminOnly: true },
+    { title: 'Roles & Permissions', subtitle: 'Security roles & access control', category: 'System', url: '/app/administration/roles', keywords: ['role', 'roles', 'permission', 'security', 'access'], adminOnly: true },
+  ];
+
+  filteredSearchResults = computed(() => {
+    const query = this.searchQuery().toLowerCase().trim();
+    const isAdmin = this.isSuperAdmin();
+
+    const items = this.allSearchItems.filter((item) => !item.adminOnly || isAdmin);
+
+    if (!query) {
+      return items.slice(0, 8); // Top quick shortcuts
+    }
+
+    return items.filter((item) => {
+      const matchTitle = item.title.toLowerCase().includes(query);
+      const matchSub = item.subtitle?.toLowerCase().includes(query) || false;
+      const matchCat = item.category.toLowerCase().includes(query);
+      const matchKeyword = item.keywords.some((k) => k.toLowerCase().includes(query));
+      return matchTitle || matchSub || matchCat || matchKeyword;
+    });
+  });
+
   constructor() {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationStart) {
         this.loadingService.setRouteLoading(true);
         this.closeMegaMenu();
+        this.closeSearch();
       } else if (
         event instanceof NavigationEnd ||
         event instanceof NavigationCancel ||
@@ -699,6 +774,7 @@ export class LayoutComponent {
       this.activeMegaMenu.set(null);
     } else {
       this.activeMegaMenu.set(tab);
+      this.closeSearch();
     }
   }
 
@@ -714,16 +790,83 @@ export class LayoutComponent {
     this.mobileDrawerOpen.set(false);
   }
 
+  onSearchInput(event: Event): void {
+    const val = (event.target as HTMLInputElement).value;
+    this.searchQuery.set(val);
+    this.isSearchOpen.set(true);
+    this.selectedIndex.set(0);
+  }
+
+  openSearch(): void {
+    this.isSearchOpen.set(true);
+    this.closeMegaMenu();
+  }
+
+  closeSearch(): void {
+    this.isSearchOpen.set(false);
+  }
+
+  clearSearch(): void {
+    this.searchQuery.set('');
+    this.selectedIndex.set(0);
+    if (this.searchInputRef) {
+      this.searchInputRef.nativeElement.focus();
+    }
+  }
+
+  selectSearchResult(item: PageSearchItem): void {
+    this.closeSearch();
+    this.searchQuery.set('');
+    this.router.navigateByUrl(item.url);
+  }
+
+  onSearchKeydown(event: KeyboardEvent): void {
+    const results = this.filteredSearchResults();
+    if (!results.length) return;
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      this.selectedIndex.update((idx) => (idx + 1) % results.length);
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      this.selectedIndex.update((idx) => (idx - 1 + results.length) % results.length);
+    } else if (event.key === 'Enter') {
+      event.preventDefault();
+      const selected = results[this.selectedIndex()];
+      if (selected) {
+        this.selectSearchResult(selected);
+      }
+    }
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  onWindowKeydown(event: KeyboardEvent): void {
+    const target = event.target as HTMLElement;
+    const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
+
+    if (event.key === '/' && !isInput) {
+      event.preventDefault();
+      this.openSearch();
+      setTimeout(() => this.searchInputRef?.nativeElement.focus(), 50);
+    } else if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+      event.preventDefault();
+      this.openSearch();
+      setTimeout(() => this.searchInputRef?.nativeElement.focus(), 50);
+    }
+  }
+
   @HostListener('document:keydown.escape')
   onEscapePress(): void {
     this.closeMegaMenu();
     this.closeMobileDrawer();
+    this.closeSearch();
   }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     if (!this.elementRef.nativeElement.contains(event.target)) {
       this.closeMegaMenu();
+      this.closeSearch();
     }
   }
 

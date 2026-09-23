@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse, ListQueryParams, PaginatedResponse } from './api.models';
 
@@ -20,6 +20,8 @@ export interface AccountTransaction {
   bank_reference: string | null;
   transfer_date: string | null;
   status: 'draft' | 'posted' | 'void';
+  voided_at?: string | null;
+  void_reason?: string | null;
   party?: { id: number; display_name: string; customer_code: string } | null;
 }
 
@@ -75,6 +77,10 @@ export class AccountsApiService {
 
   createPettyCash(payload: PettyCashRequest): Observable<ApiResponse<AccountTransaction>> {
     return this.http.post<ApiResponse<AccountTransaction>>(`${this.baseUrl}/petty-cash`, payload);
+  }
+
+  voidTransaction(id: number, reason: string): Observable<ApiResponse<AccountTransaction>> {
+    return this.http.post<ApiResponse<AccountTransaction>>(`${this.baseUrl}/transactions/${id}/void`, { reason }, { headers: new HttpHeaders({ 'Idempotency-Key': `void-${id}-${Date.now()}` }) });
   }
 
   getDailyMovement(): Observable<ApiResponse<DailyMovement[]>> {

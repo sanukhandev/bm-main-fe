@@ -56,8 +56,10 @@ import { PaginationMeta } from '../../core/api/api.models';
           <option value="pending_approval">Pending Approval</option>
           <option value="approved">Approved</option>
           <option value="commenced">Commenced</option>
+          <option value="on_hold">On Hold</option>
           <option value="expired">Expired</option>
           <option value="terminated">Terminated</option>
+          <option value="cancelled">Cancelled</option>
         </select>
       </div>
 

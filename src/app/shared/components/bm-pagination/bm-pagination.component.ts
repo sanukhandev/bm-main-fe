@@ -8,7 +8,9 @@ import { PaginationMeta } from '../../../core/api/api.models';
   imports: [CommonModule],
   template: `
     @if (meta && meta.total > 0) {
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 py-3.5 px-6 bg-[#FBFAF7] border-t border-[#E5E0D8] text-xs text-[#1B1E1C]/60 font-medium">
+      <div
+        class="flex flex-col sm:flex-row items-center justify-between gap-4 py-3.5 px-6 bg-[#FBFAF7] border-t border-[#E5E0D8] text-xs text-[#1B1E1C]/60 font-medium"
+      >
         <div>
           Showing
           <span class="font-semibold text-[#1B1E1C] tabular-nums">{{ meta.from || 1 }}</span>
@@ -29,8 +31,19 @@ import { PaginationMeta } from '../../../core/api/api.models';
             aria-label="Previous Page"
             class="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-[#E5E0D8] bg-[#FBFAF7] hover:bg-[#F2EFE9] text-[#1B1E1C] text-xs font-semibold transition disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
             <span class="hidden md:inline">Previous</span>
           </button>
@@ -39,7 +52,10 @@ import { PaginationMeta } from '../../../core/api/api.models';
           <div class="flex items-center gap-1">
             @for (p of pageNumbers; track $index) {
               @if (p === '...') {
-                <span class="w-8 h-8 flex items-center justify-center text-[#1B1E1C]/40 font-medium select-none">...</span>
+                <span
+                  class="w-8 h-8 flex items-center justify-center text-[#1B1E1C]/40 font-medium select-none"
+                  >...</span
+                >
               } @else {
                 <button
                   type="button"
@@ -70,8 +86,19 @@ import { PaginationMeta } from '../../../core/api/api.models';
             class="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-[#E5E0D8] bg-[#FBFAF7] hover:bg-[#F2EFE9] text-[#1B1E1C] text-xs font-semibold transition disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <span class="hidden md:inline">Next</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
             </svg>
           </button>
         </div>

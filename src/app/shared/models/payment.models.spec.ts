@@ -1,9 +1,21 @@
 import { describe, expect, it } from 'vitest';
-import { chequeActions, clearIrrelevantPaymentFields, InFlightGuard, PaymentModeDetails } from './payment.models';
+import {
+  chequeActions,
+  clearIrrelevantPaymentFields,
+  InFlightGuard,
+  PaymentModeDetails,
+} from './payment.models';
 
 describe('financial payment mode details', () => {
   const base = (): PaymentModeDetails => ({
-    payment_mode: 'cheque', transaction_date: '2026-09-23', remarks: '', cheque_no: '123', cheque_date: '2026-09-23', bank_name: 'Bank', bank_reference: 'REF', transfer_date: '2026-09-23',
+    payment_mode: 'cheque',
+    transaction_date: '2026-09-23',
+    remarks: '',
+    cheque_no: '123',
+    cheque_date: '2026-09-23',
+    bank_name: 'Bank',
+    bank_reference: 'REF',
+    transfer_date: '2026-09-23',
   });
 
   it('clears cheque and bank metadata when switching to cash', () => {

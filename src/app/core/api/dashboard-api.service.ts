@@ -29,9 +29,26 @@ export interface DashboardMetrics {
   } | null;
   maintenance?: {
     open_work_orders: number;
-    items: Array<{ id: number; work_order_no: string; title: string; priority: string; status: string; property_name: string; vendor_name: string | null; created_at: string }>;
+    items: Array<{
+      id: number;
+      work_order_no: string;
+      title: string;
+      priority: string;
+      status: string;
+      property_name: string;
+      vendor_name: string | null;
+      created_at: string;
+    }>;
   };
-  expiring_agreements?: Array<{ id: number; agreement_no: string; agreement_type: 'owner' | 'tenant'; customer: string; end_date: string; days_remaining: number; status: string }>;
+  expiring_agreements?: Array<{
+    id: number;
+    agreement_no: string;
+    agreement_type: 'owner' | 'tenant';
+    customer: string;
+    end_date: string;
+    days_remaining: number;
+    status: string;
+  }>;
 }
 
 @Injectable({
@@ -41,8 +58,8 @@ export class DashboardApiService {
   private http = inject(HttpClient);
 
   getMetrics(): Observable<DashboardMetrics> {
-    return this.http.get<ApiResponse<DashboardMetrics>>('/api/v1/dashboard/operational').pipe(
-      map((res) => res.data)
-    );
+    return this.http
+      .get<ApiResponse<DashboardMetrics>>('/api/v1/dashboard/operational')
+      .pipe(map((res) => res.data));
   }
 }

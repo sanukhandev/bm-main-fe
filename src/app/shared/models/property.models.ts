@@ -1,14 +1,7 @@
 import { Customer } from './customer.models';
 
 export type PropertyType =
-  | 'apartment'
-  | 'villa'
-  | 'shop'
-  | 'office'
-  | 'space'
-  | 'labor_camp'
-  | 'warehouse'
-  | 'land';
+  'apartment' | 'villa' | 'shop' | 'office' | 'space' | 'labor_camp' | 'warehouse' | 'land';
 
 export type PropertyStatus = 'active' | 'inactive' | 'archived';
 

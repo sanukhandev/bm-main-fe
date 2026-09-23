@@ -13,7 +13,9 @@ export interface SummaryItem {
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="bm-paper-card p-4 flex flex-wrap items-center divide-y sm:divide-y-0 sm:divide-x divide-[#D8D4CB]">
+    <div
+      class="bm-paper-card p-4 flex flex-wrap items-center divide-y sm:divide-y-0 sm:divide-x divide-[#D8D4CB]"
+    >
       @for (item of items; track item.label) {
         <div class="py-2 sm:py-0 px-4 first:pl-0 last:pr-0 flex-1 min-w-[140px]">
           <div class="text-[11px] font-semibold text-[#74776F] uppercase tracking-wider">

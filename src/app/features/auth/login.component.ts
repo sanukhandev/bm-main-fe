@@ -49,7 +49,9 @@ import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.c
               <div class="font-bold text-white text-base tracking-tight leading-tight">
                 Baithul Madeena
               </div>
-              <div class="text-[10px] text-[#9CAF9F] font-semibold uppercase tracking-widest mt-0.5">
+              <div
+                class="text-[10px] text-[#9CAF9F] font-semibold uppercase tracking-widest mt-0.5"
+              >
                 Real Estate ERP
               </div>
             </div>
@@ -57,15 +59,12 @@ import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.c
 
           <!-- Middle Value Proposition -->
           <div class="z-10 my-auto py-8">
-            <h1
-              class="text-[32px] leading-[1.2] font-semibold text-white tracking-tight mb-4"
-            >
+            <h1 class="text-[32px] leading-[1.2] font-semibold text-white tracking-tight mb-4">
               Multi-branch real estate operations.
             </h1>
-            <p
-              class="text-[#9CAF9F]/90 text-sm leading-relaxed max-w-[380px] font-normal"
-            >
-              Manage properties, agreements, customers, and financial operations with secure verified branch-level isolation.
+            <p class="text-[#9CAF9F]/90 text-sm leading-relaxed max-w-[380px] font-normal">
+              Manage properties, agreements, customers, and financial operations with secure
+              verified branch-level isolation.
             </p>
 
             <!-- Subtle Feature Tags -->
@@ -105,7 +104,9 @@ import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.c
             </div>
             <div>
               <div class="font-semibold text-[#1B1E1C] text-sm">Baithul Madeena</div>
-              <div class="text-[10px] text-[#193D32] font-semibold uppercase tracking-wider">Real Estate ERP</div>
+              <div class="text-[10px] text-[#193D32] font-semibold uppercase tracking-wider">
+                Real Estate ERP
+              </div>
             </div>
           </div>
 
@@ -113,9 +114,7 @@ import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.c
           <div class="max-w-[400px] w-full mx-auto">
             <!-- Header Block -->
             <div class="mb-8">
-              <h2
-                class="text-[28px] font-semibold text-[#1B1E1C] tracking-tight leading-tight"
-              >
+              <h2 class="text-[28px] font-semibold text-[#1B1E1C] tracking-tight leading-tight">
                 Sign In
               </h2>
               <p class="text-xs text-[#1B1E1C]/60 mt-1.5 font-normal">
@@ -145,9 +144,7 @@ import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.c
                   />
                 </svg>
                 <div>
-                  <div class="font-semibold text-[#1B1E1C] mb-0.5">
-                    Unable to sign in
-                  </div>
+                  <div class="font-semibold text-[#1B1E1C] mb-0.5">Unable to sign in</div>
                   <div class="text-[#1B1E1C]/80 leading-relaxed">
                     {{ errorMessage() }}
                   </div>
@@ -330,7 +327,10 @@ import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.c
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  <span>Securing connection to <span class="font-zaakiy font-bold">ZaakiyV3RSE</span>...</span>
+                  <span
+                    >Securing connection to
+                    <span class="font-zaakiy font-bold">ZaakiyV3RSE</span>...</span
+                  >
                 } @else {
                   <span>Sign In</span>
                 }
@@ -402,20 +402,17 @@ export class LoginComponent {
 
     const { email, password } = this.loginForm.value;
 
-    this.authService
-      .login({ email: email!, password: password! })
-      .subscribe({
-        next: () => {
-          this.isSubmitting.set(false);
-          this.router.navigate(['/app/dashboard']);
-        },
-        error: (err) => {
-          this.isSubmitting.set(false);
-          this.errorMessage.set(
-            err.message || 'Invalid email or password. Please check your credentials.'
-          );
-        },
-      });
+    this.authService.login({ email: email!, password: password! }).subscribe({
+      next: () => {
+        this.isSubmitting.set(false);
+        this.router.navigate(['/app/dashboard']);
+      },
+      error: (err) => {
+        this.isSubmitting.set(false);
+        this.errorMessage.set(
+          err.message || 'Invalid email or password. Please check your credentials.',
+        );
+      },
+    });
   }
 }
-

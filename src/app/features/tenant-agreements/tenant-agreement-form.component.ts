@@ -28,9 +28,16 @@ import { InstallmentItem, OwnerAgreement, PaymentMode } from '../../shared/model
     <div class="max-w-[1240px] w-full mx-auto pb-12">
       <bm-page-header
         [title]="isEditMode() ? 'Edit Tenant Agreement' : 'Create Tenant Agreement'"
-        [subtitle]="isEditMode() ? 'Update agreement lease details and commercial schedule' : 'Draft a new tenant lease contract for a property asset'"
+        [subtitle]="
+          isEditMode()
+            ? 'Update agreement lease details and commercial schedule'
+            : 'Draft a new tenant lease contract for a property asset'
+        "
       >
-        <a routerLink="/app/tenant-agreements" class="bm-btn bm-btn-secondary text-xs font-semibold px-4 py-2 rounded-xl border border-slate-200 shadow-xs hover:bg-slate-100 transition">
+        <a
+          routerLink="/app/tenant-agreements"
+          class="bm-btn bm-btn-secondary text-xs font-semibold px-4 py-2 rounded-xl border border-slate-200 shadow-xs hover:bg-slate-100 transition"
+        >
           Cancel
         </a>
       </bm-page-header>
@@ -41,12 +48,24 @@ import { InstallmentItem, OwnerAgreement, PaymentMode } from '../../shared/model
         <bm-error-state [message]="error()!" (retry)="loadAgreement()"></bm-error-state>
       } @else {
         <form [formGroup]="agreementForm" (ngSubmit)="onSubmit()" class="space-y-6">
-          
           <!-- Top Server Error Alert -->
           @if (serverError()) {
-            <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs font-medium text-rose-800 flex items-start gap-3 shadow-xs">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-rose-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <div
+              class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs font-medium text-rose-800 flex items-start gap-3 shadow-xs"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 text-rose-600 shrink-0 mt-0.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
               <div>
                 <div class="font-semibold text-rose-900 mb-0.5">Submission Error</div>
@@ -58,20 +77,39 @@ import { InstallmentItem, OwnerAgreement, PaymentMode } from '../../shared/model
           <!-- SECTION 1: Agreement Identity & Tenant Selection -->
           <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
             <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
-              <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              <div
+                class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
                 </svg>
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">Agreement Identity & Tenant</h3>
-                <p class="text-xs text-slate-500 font-normal">Contract reference code and leasing tenant assignment</p>
+                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">
+                  Agreement Identity & Tenant
+                </h3>
+                <p class="text-xs text-slate-500 font-normal">
+                  Contract reference code and leasing tenant assignment
+                </p>
               </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
               <div>
-                <label class="block text-[13px] font-semibold text-[#26312C] mb-2 flex items-center justify-between">
+                <label
+                  class="block text-[13px] font-semibold text-[#26312C] mb-2 flex items-center justify-between"
+                >
                   <span>Agreement Number</span>
                   <span class="text-[11px] text-slate-400 font-normal">System generated</span>
                 </label>
@@ -111,14 +149,31 @@ import { InstallmentItem, OwnerAgreement, PaymentMode } from '../../shared/model
           <!-- SECTION 2: Lease Period -->
           <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
             <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
-              <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              <div
+                class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
                 </svg>
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">Lease Term & Period</h3>
-                <p class="text-xs text-slate-500 font-normal">Tenant tenancy commencement and expiration dates</p>
+                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">
+                  Lease Term & Period
+                </h3>
+                <p class="text-xs text-slate-500 font-normal">
+                  Tenant tenancy commencement and expiration dates
+                </p>
               </div>
             </div>
 
@@ -162,14 +217,31 @@ import { InstallmentItem, OwnerAgreement, PaymentMode } from '../../shared/model
           <!-- SECTION 3: Leased Property Asset Selection -->
           <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
             <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
-              <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              <div
+                class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                  />
                 </svg>
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">Leased Property Asset</h3>
-                <p class="text-xs text-slate-500 font-normal">Select one or more available properties for this tenancy contract</p>
+                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">
+                  Leased Property Asset
+                </h3>
+                <p class="text-xs text-slate-500 font-normal">
+                  Select one or more available properties for this tenancy contract
+                </p>
               </div>
             </div>
 
@@ -184,11 +256,16 @@ import { InstallmentItem, OwnerAgreement, PaymentMode } from '../../shared/model
               >
                 <option value="">Select source agreement...</option>
                 @for (ownerAgreement of ownerAgreements(); track ownerAgreement.id) {
-                  <option [value]="ownerAgreement.id">{{ ownerAgreement.agreement_no }} · {{ ownerAgreement.start_date }} – {{ ownerAgreement.end_date }}</option>
+                  <option [value]="ownerAgreement.id">
+                    {{ ownerAgreement.agreement_no }} · {{ ownerAgreement.start_date }} –
+                    {{ ownerAgreement.end_date }}
+                  </option>
                 }
               </select>
               @if (isFieldInvalid('source_owner_agreement_id')) {
-                <span class="text-xs font-medium text-rose-600 mt-1.5 flex items-center gap-1">Source owner agreement is required.</span>
+                <span class="text-xs font-medium text-rose-600 mt-1.5 flex items-center gap-1"
+                  >Source owner agreement is required.</span
+                >
               }
             </div>
 
@@ -205,7 +282,8 @@ import { InstallmentItem, OwnerAgreement, PaymentMode } from '../../shared/model
                 <option value="">Select Property Asset...</option>
                 @for (prop of availableProperties(); track prop.id) {
                   <option [value]="prop.id">
-                    [{{ prop.property_code }}] {{ prop.name }} (Property / Unit No.: {{ prop.unit_number }})
+                    [{{ prop.property_code }}] {{ prop.name }} (Property / Unit No.:
+                    {{ prop.unit_number }})
                   </option>
                 }
               </select>
@@ -220,14 +298,31 @@ import { InstallmentItem, OwnerAgreement, PaymentMode } from '../../shared/model
           <!-- SECTION 4: Commercial Terms -->
           <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
             <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
-              <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 12v-2m0 0c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <div
+                class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 12v-2m0 0c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">Commercial & Rent Terms</h3>
-                <p class="text-xs text-slate-500 font-normal">Total contract rent, number of payments, and payment mode</p>
+                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">
+                  Commercial & Rent Terms
+                </h3>
+                <p class="text-xs text-slate-500 font-normal">
+                  Total contract rent, number of payments, and payment mode
+                </p>
               </div>
             </div>
 
@@ -314,14 +409,31 @@ import { InstallmentItem, OwnerAgreement, PaymentMode } from '../../shared/model
           <!-- SECTION 5: Rent Schedule Preview -->
           <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
             <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
-              <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              <div
+                class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                  />
                 </svg>
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">Rent Installment Schedule Preview</h3>
-                <p class="text-xs text-slate-500 font-normal">Informative schedule breakdown generated based on commercial terms</p>
+                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">
+                  Rent Installment Schedule Preview
+                </h3>
+                <p class="text-xs text-slate-500 font-normal">
+                  Informative schedule breakdown generated based on commercial terms
+                </p>
               </div>
             </div>
 
@@ -329,7 +441,9 @@ import { InstallmentItem, OwnerAgreement, PaymentMode } from '../../shared/model
               <div class="border border-slate-200/80 rounded-xl overflow-hidden">
                 <table class="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
+                    <tr
+                      class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]"
+                    >
                       <th class="py-3 px-4">Payment No</th>
                       <th class="py-3 px-4">Estimated Due Date</th>
                       <th class="py-3 px-4 text-right">Rent Installment (AED)</th>
@@ -338,10 +452,14 @@ import { InstallmentItem, OwnerAgreement, PaymentMode } from '../../shared/model
                   <tbody class="divide-y divide-slate-100">
                     @for (item of installmentPreview(); track item.installment_number) {
                       <tr class="hover:bg-slate-50/50 transition-colors">
-                        <td class="py-3 px-4 font-semibold text-slate-800">Payment {{ item.installment_number }}</td>
-                        <td class="py-3 px-4 text-slate-600 tabular-nums font-medium">{{ item.due_date }}</td>
+                        <td class="py-3 px-4 font-semibold text-slate-800">
+                          Payment {{ item.installment_number }}
+                        </td>
+                        <td class="py-3 px-4 text-slate-600 tabular-nums font-medium">
+                          {{ item.due_date }}
+                        </td>
                         <td class="py-3 px-4 text-right font-semibold text-slate-900 tabular-nums">
-                          AED {{ item.amount | number:'1.2-2' }}
+                          AED {{ item.amount | number: '1.2-2' }}
                         </td>
                       </tr>
                     }
@@ -349,19 +467,29 @@ import { InstallmentItem, OwnerAgreement, PaymentMode } from '../../shared/model
                 </table>
               </div>
             } @else {
-              <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/60 text-center text-xs text-slate-400 italic">
+              <div class="py-6 text-center text-xs text-slate-400 italic">
                 Enter total rent amount, dates, and payment count above to preview schedule.
               </div>
             }
           </div>
 
           <!-- STICKY ACTION BAR -->
-          <div class="sticky bottom-4 z-10 bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200/90 shadow-lg flex items-center justify-between mt-8">
+          <div
+            class="sticky bottom-4 z-10 bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200/90 shadow-lg flex items-center justify-between mt-8"
+          >
             <div class="text-xs text-slate-500 font-medium hidden sm:block">
-              <span class="text-slate-400">Status:</span> {{ isEditMode() ? 'Editing tenant agreement lease' : 'Creating new tenant agreement draft' }}
+              <span class="text-slate-400">Status:</span>
+              {{
+                isEditMode()
+                  ? 'Editing tenant agreement lease'
+                  : 'Creating new tenant agreement draft'
+              }}
             </div>
             <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
-              <a routerLink="/app/tenant-agreements" class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold border border-slate-200/80 transition">
+              <a
+                routerLink="/app/tenant-agreements"
+                class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold border border-slate-200/80 transition"
+              >
                 Cancel
               </a>
               <button
@@ -370,9 +498,24 @@ import { InstallmentItem, OwnerAgreement, PaymentMode } from '../../shared/model
                 class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#132a13] to-[#31572c] hover:brightness-110 text-white text-sm font-semibold shadow-sm transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 @if (isSubmitting()) {
-                  <svg class="animate-spin -ml-1 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    class="animate-spin -ml-1 h-4 w-4 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      class="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="4"
+                    ></circle>
+                    <path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                   <span>Saving Agreement...</span>
                 } @else {
@@ -491,23 +634,29 @@ export class TenantAgreementFormComponent implements OnInit {
       this.availableProperties.set([]);
       return;
     }
-    this.propertiesApi.getAvailableProperties({
-      per_page: 100,
-      start_date: value.start_date,
-      end_date: value.end_date,
-      source_owner_agreement_id: value.source_owner_agreement_id || undefined,
-      exclude_tenant_agreement_id: this.agreementId() || undefined,
-    }).subscribe({
-      next: (res) => {
-        if (request !== this.availabilityRequest) return;
-        this.availableProperties.set(res.data);
-        const selected = (this.agreementForm.get('selected_property_ids')?.value as Array<number | string>).map(Number).filter((id) => res.data.some((property) => property.id === id));
-        this.agreementForm.get('selected_property_ids')?.setValue(selected);
-      },
-      error: () => {
-        if (request === this.availabilityRequest) this.availableProperties.set([]);
-      },
-    });
+    this.propertiesApi
+      .getAvailableProperties({
+        per_page: 100,
+        start_date: value.start_date,
+        end_date: value.end_date,
+        source_owner_agreement_id: value.source_owner_agreement_id || undefined,
+        exclude_tenant_agreement_id: this.agreementId() || undefined,
+      })
+      .subscribe({
+        next: (res) => {
+          if (request !== this.availabilityRequest) return;
+          this.availableProperties.set(res.data);
+          const selected = (
+            this.agreementForm.get('selected_property_ids')?.value as Array<number | string>
+          )
+            .map(Number)
+            .filter((id) => res.data.some((property) => property.id === id));
+          this.agreementForm.get('selected_property_ids')?.setValue(selected);
+        },
+        error: () => {
+          if (request === this.availabilityRequest) this.availableProperties.set([]);
+        },
+      });
   }
 
   loadAgreement(): void {
@@ -528,7 +677,9 @@ export class TenantAgreementFormComponent implements OnInit {
         this.agreementForm.patchValue({
           agreement_no: agr.agreement_no,
           tenant_customer_id: String(agr.tenant_customer_id),
-          source_owner_agreement_id: agr.properties?.[0]?.source_owner_agreement_id ? String(agr.properties[0].source_owner_agreement_id) : '',
+          source_owner_agreement_id: agr.properties?.[0]?.source_owner_agreement_id
+            ? String(agr.properties[0].source_owner_agreement_id)
+            : '',
           selected_property_ids: agr.properties?.map((property) => property.property_id) || [],
           start_date: agr.start_date,
           end_date: agr.end_date,
@@ -548,7 +699,9 @@ export class TenantAgreementFormComponent implements OnInit {
     });
   }
 
-  onDateChange(): void { this.onAvailabilityInputsChange(); }
+  onDateChange(): void {
+    this.onAvailabilityInputsChange();
+  }
   onAvailabilityInputsChange(): void {
     this.agreementForm.get('selected_property_ids')?.setValue([]);
     this.loadAvailableProperties();
@@ -612,9 +765,14 @@ export class TenantAgreementFormComponent implements OnInit {
     }
   }
 
-  private handleSubmitError(err: { error?: { code?: string; errors?: Record<string, unknown> }; message?: string }, fallback: string): void {
+  private handleSubmitError(
+    err: { error?: { code?: string; errors?: Record<string, unknown> }; message?: string },
+    fallback: string,
+  ): void {
     if (err.error?.code === 'PROPERTY_NOT_AVAILABLE') {
-      this.serverError.set('One or more selected properties are no longer available for this agreement period. Review the property selection and try again.');
+      this.serverError.set(
+        'One or more selected properties are no longer available for this agreement period. Review the property selection and try again.',
+      );
       this.loadAvailableProperties();
       return;
     }

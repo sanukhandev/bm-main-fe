@@ -22,6 +22,9 @@ describe('AuditApiService', () => {
       ],
     });
 
-    injector.get(AuditApiService).getLogs({ action: 'property.updated', date_from: '2026-01-01', page: 2 }).subscribe();
+    injector
+      .get(AuditApiService)
+      .getLogs({ action: 'property.updated', date_from: '2026-01-01', page: 2 })
+      .subscribe();
   });
 });

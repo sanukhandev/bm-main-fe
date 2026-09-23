@@ -1,38 +1,38 @@
 @import url('https://fonts.googleapis.com/css2?family=Anta&family=Instrument+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap');
 @import 'dirham/css';
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
   --font-ui: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
   --font-display: 'Newsreader', Georgia, serif;
   --font-zaakiy: 'Anta', sans-serif;
 
-  --bm-canvas: #F8FAFC;
-  --bm-paper: #FFFFFF;
-  --bm-surface: #FFFFFF;
-  --bm-surface-soft: #F1F5F9;
-  --bm-surface-warm: #F8FAFC;
-  --bm-white: #FFFFFF;
-  --bm-ink: #0F172A;
+  --bm-canvas: #f8fafc;
+  --bm-paper: #ffffff;
+  --bm-surface: #ffffff;
+  --bm-surface-soft: #f1f5f9;
+  --bm-surface-warm: #f8fafc;
+  --bm-white: #ffffff;
+  --bm-ink: #0f172a;
   --bm-ink-soft: #334155;
-  --bm-muted: #64748B;
-  --bm-line: #E2E8F0;
+  --bm-muted: #64748b;
+  --bm-line: #e2e8f0;
 
-  --bm-mint: #10B981;
-  --bm-mint-pale: #ECFDF5;
-  --bm-sand: #F59E0B;
-  --bm-sand-pale: #FFFBEB;
-  --bm-rose: #EF4444;
-  --bm-rose-pale: #FEF2F2;
-  --bm-blue: #3B82F6;
-  --bm-blue-pale: #EFF6FF;
+  --bm-mint: #10b981;
+  --bm-mint-pale: #ecfdf5;
+  --bm-sand: #f59e0b;
+  --bm-sand-pale: #fffbeb;
+  --bm-rose: #ef4444;
+  --bm-rose-pale: #fef2f2;
+  --bm-blue: #3b82f6;
+  --bm-blue-pale: #eff6ff;
   --bm-pine: #047857;
 
   --bm-success: #059669;
-  --bm-warning: #D97706;
-  --bm-danger: #DC2626;
-  --bm-info: #2563EB;
-  --bm-draft: #64748B;
+  --bm-warning: #d97706;
+  --bm-danger: #dc2626;
+  --bm-info: #2563eb;
+  --bm-draft: #64748b;
 
   --bm-radius-sm: 6px;
   --bm-radius-control: 8px;
@@ -85,11 +85,11 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
+  background: #cbd5e1;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background: #94a3b8;
 }
 
 /* Custom Base Components */
@@ -154,7 +154,7 @@ body {
 
 .bm-btn-primary {
   background-color: var(--bm-ink);
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .bm-btn-primary:hover:not(:disabled) {
@@ -163,11 +163,11 @@ body {
 
 .bm-btn-pine {
   background-color: var(--bm-pine);
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .bm-btn-pine:hover:not(:disabled) {
-  background-color: #03543F;
+  background-color: #03543f;
 }
 
 .bm-btn-secondary {
@@ -182,9 +182,40 @@ body {
 
 .bm-btn-danger {
   background-color: var(--bm-danger);
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .bm-btn-danger:hover:not(:disabled) {
-  background-color: #B91C1C;
+  background-color: #b91c1c;
+}
+
+/* Modal Overlay & Card Animations */
+@keyframes bmModalBackdropFadeIn {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(8px);
+  }
+}
+
+@keyframes bmModalContentSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.bm-modal-backdrop {
+  animation: bmModalBackdropFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.bm-modal-content {
+  animation: bmModalContentSlideIn 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

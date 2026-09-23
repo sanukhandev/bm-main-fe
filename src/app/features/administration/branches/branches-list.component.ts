@@ -18,7 +18,10 @@ import { Branch } from '../../../core/branch-context/branch.models';
     BmErrorStateComponent,
   ],
   template: `
-    <bm-page-header title="Branches Administration" subtitle="Super Admin multi-branch organization control">
+    <bm-page-header
+      title="Branches Administration"
+      subtitle="Super Admin multi-branch organization control"
+    >
     </bm-page-header>
 
     @if (isLoading()) {
@@ -30,7 +33,9 @@ import { Branch } from '../../../core/branch-context/branch.models';
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse text-xs">
             <thead>
-              <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
+              <tr
+                class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]"
+              >
                 <th class="py-3.5 px-4">Branch Code</th>
                 <th class="py-3.5 px-4">Branch Name</th>
                 <th class="py-3.5 px-4">Timezone</th>
@@ -76,8 +81,10 @@ export class BranchesListComponent implements OnInit {
     this.loadBranches();
   }
 
-  loadBranches(): void {
-    this.isLoading.set(true);
+  loadBranches(silent = false): void {
+    if (!silent && this.branches().length === 0) {
+      this.isLoading.set(true);
+    }
     this.error.set(null);
 
     this.api.getBranches().subscribe({

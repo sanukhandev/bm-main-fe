@@ -14,7 +14,9 @@ export interface BreadcrumbItem {
     <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
       <div>
         @if (breadcrumbs && breadcrumbs.length > 0) {
-          <nav class="mb-1.5 flex items-center gap-2 text-[11px] text-[#1B1E1C]/50 font-semibold uppercase tracking-[0.08em]">
+          <nav
+            class="mb-1.5 flex items-center gap-2 text-[11px] text-[#1B1E1C]/50 font-semibold uppercase tracking-[0.08em]"
+          >
             @for (crumb of breadcrumbs; track crumb.label; let last = $last) {
               <span>{{ crumb.label }}</span>
               @if (!last) {

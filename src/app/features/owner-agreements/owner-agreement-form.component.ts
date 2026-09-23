@@ -27,9 +27,16 @@ import { InstallmentItem, PaymentMode } from '../../shared/models/agreement.mode
     <div class="max-w-[1240px] w-full mx-auto pb-12">
       <bm-page-header
         [title]="isEditMode() ? 'Edit Owner Agreement' : 'Draft Owner Agreement'"
-        [subtitle]="isEditMode() ? 'Update agreement contract details and covered assets' : 'Create new property owner management contract in draft state'"
+        [subtitle]="
+          isEditMode()
+            ? 'Update agreement contract details and covered assets'
+            : 'Create new property owner management contract in draft state'
+        "
       >
-        <a routerLink="/app/owner-agreements" class="bm-btn bm-btn-secondary text-xs font-semibold px-4 py-2 rounded-xl border border-slate-200 shadow-xs hover:bg-slate-100 transition">
+        <a
+          routerLink="/app/owner-agreements"
+          class="bm-btn bm-btn-secondary text-xs font-semibold px-4 py-2 rounded-xl border border-slate-200 shadow-xs hover:bg-slate-100 transition"
+        >
           Cancel
         </a>
       </bm-page-header>
@@ -40,12 +47,24 @@ import { InstallmentItem, PaymentMode } from '../../shared/models/agreement.mode
         <bm-error-state [message]="error()!" (retry)="loadAgreement()"></bm-error-state>
       } @else {
         <form [formGroup]="agreementForm" (ngSubmit)="onSubmit()" class="space-y-6">
-          
           <!-- Top Server Error Alert -->
           @if (serverError()) {
-            <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs font-medium text-rose-800 flex items-start gap-3 shadow-xs">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-rose-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <div
+              class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs font-medium text-rose-800 flex items-start gap-3 shadow-xs"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 text-rose-600 shrink-0 mt-0.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
               <div>
                 <div class="font-semibold text-rose-900 mb-0.5">Submission Error</div>
@@ -57,20 +76,39 @@ import { InstallmentItem, PaymentMode } from '../../shared/models/agreement.mode
           <!-- SECTION 1: Agreement Identity & Owner Selection -->
           <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
             <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
-              <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              <div
+                class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
                 </svg>
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">Agreement Identity & Owner</h3>
-                <p class="text-xs text-slate-500 font-normal">Contract reference code and master property owner assignment</p>
+                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">
+                  Agreement Identity & Owner
+                </h3>
+                <p class="text-xs text-slate-500 font-normal">
+                  Contract reference code and master property owner assignment
+                </p>
               </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
               <div>
-                <label class="block text-[13px] font-semibold text-[#26312C] mb-2 flex items-center justify-between">
+                <label
+                  class="block text-[13px] font-semibold text-[#26312C] mb-2 flex items-center justify-between"
+                >
                   <span>Agreement Number</span>
                   <span class="text-[11px] text-slate-400 font-normal">System generated</span>
                 </label>
@@ -111,23 +149,42 @@ import { InstallmentItem, PaymentMode } from '../../shared/models/agreement.mode
           <!-- SECTION 2: Property Selection -->
           <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
             <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
-              <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              <div
+                class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                  />
                 </svg>
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">Covered Property Assets</h3>
-                <p class="text-xs text-slate-500 font-normal">Select property assets managed under this owner contract</p>
+                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">
+                  Covered Property Assets
+                </h3>
+                <p class="text-xs text-slate-500 font-normal">
+                  Select property assets managed under this owner contract
+                </p>
               </div>
             </div>
 
             @if (!agreementForm.value.owner_customer_id) {
-              <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/60 text-center text-xs text-slate-500 italic">
+              <div class="py-6 text-center text-xs text-slate-500 italic border-t border-slate-100">
                 Please select a property owner above to view available assets.
               </div>
             } @else if (availableProperties().length === 0) {
-              <div class="p-6 rounded-2xl bg-amber-50 border border-amber-200/60 text-center text-xs text-amber-800 font-medium">
+              <div
+                class="py-6 text-center text-xs text-amber-700 font-medium border-t border-slate-100"
+              >
                 No active property assets registered under this owner in current branch.
               </div>
             } @else {
@@ -135,9 +192,15 @@ import { InstallmentItem, PaymentMode } from '../../shared/models/agreement.mode
                 <label class="block text-[13px] font-semibold text-[#26312C] mb-3">
                   Select Properties Managed <span class="text-rose-600 font-bold ml-0.5">*</span>
                 </label>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-72 overflow-y-auto p-1">
+                <div
+                  class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-72 overflow-y-auto p-1"
+                >
                   @for (prop of availableProperties(); track prop.id) {
-                    <label class="flex items-center gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50/80 hover:bg-emerald-50/50 hover:border-emerald-200 cursor-pointer transition-all duration-150">
+                    <label
+                      class="flex items-center gap-3 p-3.5 rounded-xl border border-slate-200 bg-white hover:border-emerald-600 hover:shadow-2xs cursor-pointer transition-all duration-150"
+                      [class.border-emerald-600]="isPropertySelected(prop.id)"
+                      [class.bg-emerald-50/20]="isPropertySelected(prop.id)"
+                    >
                       <input
                         type="checkbox"
                         [checked]="isPropertySelected(prop.id)"
@@ -145,8 +208,12 @@ import { InstallmentItem, PaymentMode } from '../../shared/models/agreement.mode
                         class="rounded-md text-emerald-700 focus:ring-emerald-600 h-4.5 w-4.5 border-slate-300"
                       />
                       <div class="text-xs overflow-hidden">
-                        <div class="font-semibold text-slate-900 truncate">[{{ prop.property_code }}] {{ prop.name }}</div>
-                        <div class="text-slate-500 text-[11px] truncate">Property / Unit No.: {{ prop.unit_number }} | {{ prop.property_type }}</div>
+                        <div class="font-semibold text-slate-900 truncate">
+                          [{{ prop.property_code }}] {{ prop.name }}
+                        </div>
+                        <div class="text-slate-500 text-[11px] truncate">
+                          Property / Unit No.: {{ prop.unit_number }} | {{ prop.property_type }}
+                        </div>
                       </div>
                     </label>
                   }
@@ -163,14 +230,31 @@ import { InstallmentItem, PaymentMode } from '../../shared/models/agreement.mode
           <!-- SECTION 3: Agreement Period -->
           <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
             <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
-              <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              <div
+                class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
                 </svg>
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">Contract Term & Validity</h3>
-                <p class="text-xs text-slate-500 font-normal">Agreement commencement and expiration dates</p>
+                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">
+                  Contract Term & Validity
+                </h3>
+                <p class="text-xs text-slate-500 font-normal">
+                  Agreement commencement and expiration dates
+                </p>
               </div>
             </div>
 
@@ -212,14 +296,31 @@ import { InstallmentItem, PaymentMode } from '../../shared/models/agreement.mode
           <!-- SECTION 4: Commercial Terms -->
           <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
             <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
-              <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 12v-2m0 0c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <div
+                class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 12v-2m0 0c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">Commercial & Financial Terms</h3>
-                <p class="text-xs text-slate-500 font-normal">Contract value, installment frequency, and payment mode</p>
+                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">
+                  Commercial & Financial Terms
+                </h3>
+                <p class="text-xs text-slate-500 font-normal">
+                  Contract value, installment frequency, and payment mode
+                </p>
               </div>
             </div>
 
@@ -306,14 +407,31 @@ import { InstallmentItem, PaymentMode } from '../../shared/models/agreement.mode
           <!-- SECTION 5: Client Installment Schedule Preview -->
           <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
             <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
-              <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              <div
+                class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                  />
                 </svg>
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">Installment Schedule Preview</h3>
-                <p class="text-xs text-slate-500 font-normal">Informative schedule breakdown generated based on commercial terms</p>
+                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">
+                  Installment Schedule Preview
+                </h3>
+                <p class="text-xs text-slate-500 font-normal">
+                  Informative schedule breakdown generated based on commercial terms
+                </p>
               </div>
             </div>
 
@@ -321,7 +439,9 @@ import { InstallmentItem, PaymentMode } from '../../shared/models/agreement.mode
               <div class="border border-slate-200/80 rounded-xl overflow-hidden">
                 <table class="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
+                    <tr
+                      class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]"
+                    >
                       <th class="py-3 px-4">Installment</th>
                       <th class="py-3 px-4">Estimated Due Date</th>
                       <th class="py-3 px-4 text-right">Amount (AED)</th>
@@ -330,10 +450,14 @@ import { InstallmentItem, PaymentMode } from '../../shared/models/agreement.mode
                   <tbody class="divide-y divide-slate-100">
                     @for (item of installmentPreview(); track item.installment_number) {
                       <tr class="hover:bg-slate-50/50 transition-colors">
-                        <td class="py-3 px-4 font-semibold text-slate-800">Installment {{ item.installment_number }}</td>
-                        <td class="py-3 px-4 text-slate-600 tabular-nums font-medium">{{ item.due_date }}</td>
+                        <td class="py-3 px-4 font-semibold text-slate-800">
+                          Installment {{ item.installment_number }}
+                        </td>
+                        <td class="py-3 px-4 text-slate-600 tabular-nums font-medium">
+                          {{ item.due_date }}
+                        </td>
                         <td class="py-3 px-4 text-right font-semibold text-slate-900 tabular-nums">
-                          AED {{ item.amount | number:'1.2-2' }}
+                          AED {{ item.amount | number: '1.2-2' }}
                         </td>
                       </tr>
                     }
@@ -341,19 +465,30 @@ import { InstallmentItem, PaymentMode } from '../../shared/models/agreement.mode
                 </table>
               </div>
             } @else {
-              <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/60 text-center text-xs text-slate-400 italic">
-                Enter total contract amount, dates, and installment count above to calculate schedule preview.
+              <div class="py-6 text-center text-xs text-slate-400 italic">
+                Enter total contract amount, dates, and installment count above to calculate
+                schedule preview.
               </div>
             }
           </div>
 
           <!-- STICKY ACTION BAR -->
-          <div class="sticky bottom-4 z-10 bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200/90 shadow-lg flex items-center justify-between mt-8">
+          <div
+            class="sticky bottom-4 z-10 bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200/90 shadow-lg flex items-center justify-between mt-8"
+          >
             <div class="text-xs text-slate-500 font-medium hidden sm:block">
-              <span class="text-slate-400">Status:</span> {{ isEditMode() ? 'Editing draft owner agreement' : 'Creating new owner agreement in draft state' }}
+              <span class="text-slate-400">Status:</span>
+              {{
+                isEditMode()
+                  ? 'Editing draft owner agreement'
+                  : 'Creating new owner agreement in draft state'
+              }}
             </div>
             <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
-              <a routerLink="/app/owner-agreements" class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold border border-slate-200/80 transition">
+              <a
+                routerLink="/app/owner-agreements"
+                class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold border border-slate-200/80 transition"
+              >
                 Cancel
               </a>
               <button
@@ -362,13 +497,30 @@ import { InstallmentItem, PaymentMode } from '../../shared/models/agreement.mode
                 class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#132a13] to-[#31572c] hover:brightness-110 text-white text-sm font-semibold shadow-sm transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 @if (isSubmitting()) {
-                  <svg class="animate-spin -ml-1 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    class="animate-spin -ml-1 h-4 w-4 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      class="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="4"
+                    ></circle>
+                    <path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                   <span>Saving Agreement...</span>
                 } @else {
-                  <span>{{ isEditMode() ? 'Update Draft Agreement' : 'Save Draft Agreement' }}</span>
+                  <span>{{
+                    isEditMode() ? 'Update Draft Agreement' : 'Save Draft Agreement'
+                  }}</span>
                 }
               </button>
             </div>

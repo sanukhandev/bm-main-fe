@@ -1,101 +1,124 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Baithul Madeena ERP</title>
-  <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anta&family=Instrument+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
-  <style>
-    /* Inline styles for instantaneous app boot preloader */
-    .bm-boot-splash {
-      position: fixed;
-      inset: 0;
-      background: #193D32;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 99999;
-      font-family: 'Instrument Sans', system-ui, sans-serif;
-      color: #ffffff;
-    }
-    .bm-boot-logo {
-      width: 72px;
-      height: 72px;
-      border-radius: 16px;
-      background: #285746;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 10px 25px -5px rgba(25, 61, 50, 0.5), 0 0 0 1px rgba(255,255,255,0.1);
-      margin-bottom: 24px;
-      position: relative;
-    }
-    .bm-boot-title {
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      color: #ffffff;
-      margin: 0 0 6px 0;
-    }
-    .bm-boot-subtitle {
-      font-size: 11px;
-      font-weight: 600;
-      color: #9CAF9F;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      margin-bottom: 32px;
-    }
-    .bm-boot-bar-track {
-      width: 180px;
-      height: 4px;
-      background: rgba(255, 255, 255, 0.12);
-      border-radius: 999px;
-      overflow: hidden;
-      position: relative;
-    }
-    .bm-boot-bar-fill {
-      position: absolute;
-      top: 0;
-      left: -50%;
-      height: 100%;
-      width: 50%;
-      background: #9CAF9F;
-      border-radius: 999px;
-      animation: bmIndeterminate 1.5s infinite ease-in-out;
-    }
-    @keyframes bmIndeterminate {
-      0% { left: -50%; width: 30%; }
-      50% { left: 35%; width: 40%; }
-      100% { left: 100%; width: 30%; }
-    }
-  </style>
-</head>
-<body>
-  <app-root>
-    <div class="bm-boot-splash">
-      <div class="bm-boot-logo">
-        <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#DDE5DD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 21h18"/>
-          <path d="M3 10h18"/>
-          <path d="M5 6l7-3 7 3"/>
-          <path d="M4 10v11"/>
-          <path d="M20 10v11"/>
-          <path d="M8 14v3"/>
-          <path d="M12 14v3"/>
-          <path d="M16 14v3"/>
-        </svg>
+  <head>
+    <meta charset="utf-8" />
+    <title>Baithul Madeena ERP</title>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anta&family=Instrument+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* Inline styles for instantaneous app boot preloader */
+      .bm-boot-splash {
+        position: fixed;
+        inset: 0;
+        background: #193d32;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 99999;
+        font-family: 'Instrument Sans', system-ui, sans-serif;
+        color: #ffffff;
+      }
+      .bm-boot-logo {
+        width: 72px;
+        height: 72px;
+        border-radius: 16px;
+        background: #285746;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow:
+          0 10px 25px -5px rgba(25, 61, 50, 0.5),
+          0 0 0 1px rgba(255, 255, 255, 0.1);
+        margin-bottom: 24px;
+        position: relative;
+      }
+      .bm-boot-title {
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        color: #ffffff;
+        margin: 0 0 6px 0;
+      }
+      .bm-boot-subtitle {
+        font-size: 11px;
+        font-weight: 600;
+        color: #9caf9f;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        margin-bottom: 32px;
+      }
+      .bm-boot-bar-track {
+        width: 180px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 999px;
+        overflow: hidden;
+        position: relative;
+      }
+      .bm-boot-bar-fill {
+        position: absolute;
+        top: 0;
+        left: -50%;
+        height: 100%;
+        width: 50%;
+        background: #9caf9f;
+        border-radius: 999px;
+        animation: bmIndeterminate 1.5s infinite ease-in-out;
+      }
+      @keyframes bmIndeterminate {
+        0% {
+          left: -50%;
+          width: 30%;
+        }
+        50% {
+          left: 35%;
+          width: 40%;
+        }
+        100% {
+          left: 100%;
+          width: 30%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <app-root>
+      <div class="bm-boot-splash">
+        <div class="bm-boot-logo">
+          <svg
+            width="38"
+            height="38"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#DDE5DD"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M3 21h18" />
+            <path d="M3 10h18" />
+            <path d="M5 6l7-3 7 3" />
+            <path d="M4 10v11" />
+            <path d="M20 10v11" />
+            <path d="M8 14v3" />
+            <path d="M12 14v3" />
+            <path d="M16 14v3" />
+          </svg>
+        </div>
+        <h1 class="bm-boot-title">BAITHUL MADEENA</h1>
+        <p class="bm-boot-subtitle">PROPERTY OPERATING SYSTEM</p>
+        <div class="bm-boot-bar-track">
+          <div class="bm-boot-bar-fill"></div>
+        </div>
       </div>
-      <h1 class="bm-boot-title">BAITHUL MADEENA</h1>
-      <p class="bm-boot-subtitle">PROPERTY OPERATING SYSTEM</p>
-      <div class="bm-boot-bar-track">
-        <div class="bm-boot-bar-fill"></div>
-      </div>
-    </div>
-  </app-root>
-</body>
+    </app-root>
+  </body>
 </html>

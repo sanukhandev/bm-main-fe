@@ -538,15 +538,15 @@ export interface PageSearchItem {
           <!-- REPORTS MEGA MENU -->
           @if (activeMegaMenu() === 'reports') {
             <div class="grid grid-cols-2 gap-6">
-              <a routerLink="/app/accounts/reports" (click)="closeMegaMenu()" class="group flex items-start gap-3 p-3 rounded-xl hover:bg-[#F8FAFC] transition border border-transparent hover:border-[#E2E8F0]">
+              <a routerLink="/app/reports/owner-agreements" (click)="closeMegaMenu()" class="group flex items-start gap-3 p-3 rounded-xl hover:bg-[#F8FAFC] transition border border-transparent hover:border-[#E2E8F0]">
                 <div class="w-9 h-9 rounded-xl bg-[#EFF6FF] text-[#2563EB] flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
                 <div>
-                  <div class="text-sm font-semibold text-[#0F172A] group-hover:text-[#2563EB]">Financial & Daily Reports</div>
-                  <div class="text-xs text-[#64748B] mt-0.5">Daily cash movement & payment mode breakdowns</div>
+                  <div class="text-sm font-semibold text-[#0F172A] group-hover:text-[#2563EB]">Core Reports</div>
+                  <div class="text-xs text-[#64748B] mt-0.5">Agreements, receivables, payables & cash</div>
                 </div>
               </a>
             </div>

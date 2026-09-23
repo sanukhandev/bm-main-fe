@@ -195,6 +195,7 @@ export const routes: Routes = [
         canActivate: [accountsViewGuard],
         loadComponent: () => import('./features/accounts/accounts-reports.component').then((m) => m.AccountsReportsComponent),
       },
+      { path: 'reports/:type', loadComponent: () => import('./features/reports/reports.component').then((m) => m.ReportsComponent) },
       { path: 'maintenance/work-orders/new', loadComponent: () => import('./features/maintenance/work-order-form.component').then((m) => m.WorkOrderFormComponent) },
       { path: 'maintenance/work-orders/:id', loadComponent: () => import('./features/maintenance/work-order-detail.component').then((m) => m.WorkOrderDetailComponent) },
       { path: 'maintenance/work-orders', data: { section: 'work-orders', title: 'Work Orders' }, loadComponent: () => import('./features/maintenance/maintenance.component').then((m) => m.MaintenanceComponent) },

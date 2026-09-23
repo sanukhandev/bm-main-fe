@@ -79,6 +79,7 @@ describe('DashboardComponent', () => {
     expect(fixture.nativeElement.querySelector('a[href="/app/owner-agreements/11"]')).toBeTruthy();
     expect(fixture.nativeElement.querySelector('a[href="/app/tenant-agreements/12"]')).toBeTruthy();
     expect(fixture.nativeElement.querySelector('a[href="/app/maintenance/work-orders/9"]')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('a[href*="/app/accounts/inward"]')).toBeTruthy();
   });
 
   it('shows loading without rendering false zero KPIs', () => {

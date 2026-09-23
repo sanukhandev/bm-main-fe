@@ -361,7 +361,7 @@ import { OwnerAgreement, AgreementInstallment } from '../../shared/models/agreem
                         <button
                           type="button"
                           [disabled]="installmentProcessingId() === item.id || item.status === 'paid'"
-                          (click)="setInstallmentStatus(item.id, 'paid')"
+                          (click)="item.is_extra ? setInstallmentStatus(item.id, 'paid') : openPaymentModal(item.id)"
                           title="Mark as Paid"
                           aria-label="Mark as Paid"
                           class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200/60 inline-flex items-center justify-center transition shadow-2xs disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-emerald-50"
@@ -414,7 +414,7 @@ import { OwnerAgreement, AgreementInstallment } from '../../shared/models/agreem
                   <button
                     type="button"
                     [disabled]="installmentProcessingId() === item.id || item.status === 'paid'"
-                    (click)="setInstallmentStatus(item.id, 'paid')"
+                    (click)="item.is_extra ? setInstallmentStatus(item.id, 'paid') : openPaymentModal(item.id)"
                     class="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200/60 text-xs disabled:opacity-40"
                   >
                     Mark Paid
@@ -471,6 +471,23 @@ import { OwnerAgreement, AgreementInstallment } from '../../shared/models/agreem
           </div>
         }
 
+        @if (paymentModalOpen()) {
+          <div class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+            <form class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 border border-slate-200" (ngSubmit)="submitPayment()">
+              <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100"><h2 class="text-lg font-semibold text-slate-900">Record Owner Payment</h2><button type="button" (click)="paymentModalOpen.set(false)" class="text-slate-400 text-xl">Ã—</button></div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                <label class="font-semibold text-slate-700">Amount<input [(ngModel)]="paymentAmount" name="paymentAmount" type="number" min="0.01" step="0.01" required class="bm-input mt-1"></label>
+                <label class="font-semibold text-slate-700">Transaction date<input [(ngModel)]="paymentDate" name="paymentDate" type="date" required class="bm-input mt-1"></label>
+                <label class="font-semibold text-slate-700">Payment mode<select [(ngModel)]="paymentMode" name="paymentMode" (ngModelChange)="updatePaymentRemarks()" class="bm-input mt-1"><option value="cash">Cash</option><option value="cheque">Cheque</option><option value="bank_transfer">Bank Transfer</option></select></label>
+                @if (paymentMode === 'cheque') { <label class="font-semibold text-slate-700">Cheque number<input [(ngModel)]="chequeNo" name="chequeNo" (ngModelChange)="updatePaymentRemarks()" required class="bm-input mt-1"></label><label class="font-semibold text-slate-700">Cheque date<input [(ngModel)]="chequeDate" name="chequeDate" type="date" required class="bm-input mt-1"></label><label class="font-semibold text-slate-700">Bank name<input [(ngModel)]="bankName" name="bankName" class="bm-input mt-1"></label> }
+                @if (paymentMode === 'bank_transfer') { <label class="font-semibold text-slate-700">Bank reference<input [(ngModel)]="bankReference" name="bankReference" (ngModelChange)="updatePaymentRemarks()" required class="bm-input mt-1"></label><label class="font-semibold text-slate-700">Transfer date<input [(ngModel)]="transferDate" name="transferDate" type="date" required class="bm-input mt-1"></label><label class="font-semibold text-slate-700">Bank name<input [(ngModel)]="bankName" name="bankName" class="bm-input mt-1"></label> }
+                <label class="font-semibold text-slate-700 md:col-span-2">Remarks<textarea [(ngModel)]="paymentRemarks" name="paymentRemarks" rows="2" class="bm-input mt-1 !h-auto p-2.5"></textarea></label>
+              </div>
+              <div class="flex justify-end gap-3 mt-6"><button type="button" (click)="paymentModalOpen.set(false)" class="bm-btn bm-btn-secondary text-xs">Cancel</button><button type="submit" [disabled]="paymentPosting || paymentAmount <= 0 || !paymentDate || (paymentMode === 'cheque' && (!chequeNo || !chequeDate)) || (paymentMode === 'bank_transfer' && (!bankReference || !transferDate))" class="bm-btn bm-btn-primary text-xs">{{ paymentPosting ? 'Posting…' : 'Post Payment' }}</button></div>
+            </form>
+          </div>
+        }
+
         <!-- Add Extra Payment Line Modal -->
         @if (paymentLineOpen()) {
           <div class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
@@ -511,6 +528,8 @@ import { OwnerAgreement, AgreementInstallment } from '../../shared/models/agreem
                     <option value="bank_transfer">Bank Transfer</option>
                   </select>
                 </div>
+                @if (paymentLine.payment_mode === 'cheque') { <div><label class="block font-semibold text-slate-700 mb-1">Cheque Number</label><input [(ngModel)]="paymentLine.cheque_no" class="bm-input" required /></div><div><label class="block font-semibold text-slate-700 mb-1">Cheque Date</label><input [(ngModel)]="paymentLine.cheque_date" type="date" class="bm-input" required /></div><div><label class="block font-semibold text-slate-700 mb-1">Bank Name</label><input [(ngModel)]="paymentLine.bank_name" class="bm-input" /></div> }
+                @if (paymentLine.payment_mode === 'bank_transfer') { <div><label class="block font-semibold text-slate-700 mb-1">Bank Reference</label><input [(ngModel)]="paymentLine.bank_reference" class="bm-input" required /></div><div><label class="block font-semibold text-slate-700 mb-1">Transfer Date</label><input [(ngModel)]="paymentLine.transfer_date" type="date" class="bm-input" required /></div><div><label class="block font-semibold text-slate-700 mb-1">Bank Name</label><input [(ngModel)]="paymentLine.bank_name" class="bm-input" /></div> }
                 <div class="md:col-span-2">
                   <label class="block font-semibold text-slate-700 mb-1">Terms / Notes</label>
                   <textarea [(ngModel)]="paymentLine.terms" rows="3" class="bm-input !h-auto p-2.5"></textarea>
@@ -587,6 +606,18 @@ export class OwnerAgreementDetailComponent implements OnInit {
   isActioning = signal(false);
   showMoreMenu = signal(false);
   installmentProcessingId = signal<number | string | null>(null);
+  paymentModalOpen = signal(false);
+  paymentPosting = false;
+  paymentItemId = 0;
+  paymentAmount = 0;
+  paymentDate = new Date().toLocaleDateString('en-CA');
+  paymentMode: 'cash' | 'cheque' | 'bank_transfer' = 'cash';
+  paymentRemarks = '';
+  chequeNo = '';
+  chequeDate = new Date().toLocaleDateString('en-CA');
+  bankName = '';
+  bankReference = '';
+  transferDate = new Date().toLocaleDateString('en-CA');
   paymentLineOpen = signal(false);
   holdModalOpen = signal(false);
   extendModalOpen = signal(false);
@@ -609,6 +640,7 @@ export class OwnerAgreementDetailComponent implements OnInit {
     amount: 0,
     due_date: new Date().toLocaleDateString('en-CA'),
     payment_mode: 'cash' as 'cash' | 'cheque' | 'bank_transfer',
+    cheque_no: '', cheque_date: new Date().toLocaleDateString('en-CA'), bank_name: '', bank_reference: '', transfer_date: new Date().toLocaleDateString('en-CA'),
     terms: '',
   };
   error = signal<string | null>(null);
@@ -694,6 +726,39 @@ export class OwnerAgreementDetailComponent implements OnInit {
         this.installmentProcessingId.set(null);
         this.error.set(err.message || 'Unable to update installment.');
       },
+    });
+  }
+
+  openPaymentModal(id: number | string): void {
+    const item = this.agreement()?.installments?.find((entry) => entry.id === id);
+    if (!item || item.is_extra || item.status === 'paid') return;
+    this.paymentItemId = Number(id);
+    this.paymentAmount = Number(item.balance);
+    this.paymentDate = new Date().toLocaleDateString('en-CA');
+    this.chequeDate = this.paymentDate;
+    this.transferDate = this.paymentDate;
+    this.paymentMode = 'cash';
+    this.paymentRemarks = '';
+    this.chequeNo = '';
+    this.bankName = '';
+    this.bankReference = '';
+    this.paymentModalOpen.set(true);
+    this.updatePaymentRemarks();
+  }
+
+  updatePaymentRemarks(): void {
+    if (this.paymentRemarks && !this.paymentRemarks.startsWith('Cash Payment') && !this.paymentRemarks.startsWith('Cheque ') && !this.paymentRemarks.startsWith('Bank transfer ')) return;
+    this.paymentRemarks = this.paymentMode === 'cheque' ? `Cheque ${this.chequeNo}` : this.paymentMode === 'bank_transfer' ? `Bank transfer ${this.bankReference}` : 'Cash Payment';
+  }
+
+  submitPayment(): void {
+    const agreement = this.agreement();
+    if (!agreement || this.paymentPosting) return;
+    this.paymentPosting = true;
+    const key = globalThis.crypto.randomUUID();
+    this.api.postPayment(agreement.id, { installment_id: this.paymentItemId, amount: this.paymentAmount, payment_mode: this.paymentMode, payment_date: this.paymentDate, remarks: this.paymentRemarks, cheque_no: this.chequeNo || undefined, cheque_date: this.chequeDate || undefined, bank_name: this.bankName || undefined, bank_reference: this.bankReference || undefined, transfer_date: this.transferDate || undefined }, key).subscribe({
+      next: () => { this.paymentPosting = false; this.paymentModalOpen.set(false); this.loadAgreement(); },
+      error: (err) => { this.paymentPosting = false; this.error.set(err.message || 'Unable to post payment.'); },
     });
   }
 

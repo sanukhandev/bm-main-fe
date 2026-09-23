@@ -169,7 +169,7 @@ import { InstallmentItem, OwnerAgreement, PaymentMode } from '../../shared/model
               </div>
               <div>
                 <h3 class="text-lg font-semibold text-slate-900 tracking-tight">Leased Property Asset</h3>
-                <p class="text-xs text-slate-500 font-normal">Select an active property for this tenancy contract</p>
+                <p class="text-xs text-slate-500 font-normal">Select one or more available properties for this tenancy contract</p>
               </div>
             </div>
 
@@ -197,7 +197,8 @@ import { InstallmentItem, OwnerAgreement, PaymentMode } from '../../shared/model
                 Property Asset <span class="text-rose-600 font-bold ml-0.5">*</span>
               </label>
               <select
-                formControlName="selected_property_id"
+                formControlName="selected_property_ids"
+                multiple
                 (change)="onPropertyChange()"
                 class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium shadow-2xs focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
               >
@@ -210,7 +211,7 @@ import { InstallmentItem, OwnerAgreement, PaymentMode } from '../../shared/model
               </select>
               @if (isFieldInvalid('selected_property_id')) {
                 <span class="text-xs font-medium text-rose-600 mt-1.5 flex items-center gap-1">
-                  Property asset selection is required.
+                  Select at least one property asset.
                 </span>
               }
             </div>
@@ -411,7 +412,7 @@ export class TenantAgreementFormComponent implements OnInit {
     agreement_no: [''],
     tenant_customer_id: ['', Validators.required],
     source_owner_agreement_id: ['', Validators.required],
-    selected_property_id: ['', Validators.required],
+    selected_property_ids: this.fb.nonNullable.control<number[]>([], Validators.required),
     start_date: ['', Validators.required],
     end_date: ['', Validators.required],
     total_amount: [0, [Validators.required, Validators.min(0.01)]],
@@ -500,8 +501,8 @@ export class TenantAgreementFormComponent implements OnInit {
       next: (res) => {
         if (request !== this.availabilityRequest) return;
         this.availableProperties.set(res.data);
-        const selected = Number(this.agreementForm.get('selected_property_id')?.value);
-        if (selected && !res.data.some((property) => property.id === selected)) this.agreementForm.get('selected_property_id')?.setValue('');
+        const selected = (this.agreementForm.get('selected_property_ids')?.value as Array<number | string>).map(Number).filter((id) => res.data.some((property) => property.id === id));
+        this.agreementForm.get('selected_property_ids')?.setValue(selected);
       },
       error: () => {
         if (request === this.availabilityRequest) this.availableProperties.set([]);
@@ -528,7 +529,7 @@ export class TenantAgreementFormComponent implements OnInit {
           agreement_no: agr.agreement_no,
           tenant_customer_id: String(agr.tenant_customer_id),
           source_owner_agreement_id: agr.properties?.[0]?.source_owner_agreement_id ? String(agr.properties[0].source_owner_agreement_id) : '',
-          selected_property_id: selectedPropId,
+          selected_property_ids: agr.properties?.map((property) => property.property_id) || [],
           start_date: agr.start_date,
           end_date: agr.end_date,
           total_amount: Number(agr.total_amount),
@@ -549,7 +550,7 @@ export class TenantAgreementFormComponent implements OnInit {
 
   onDateChange(): void { this.onAvailabilityInputsChange(); }
   onAvailabilityInputsChange(): void {
-    this.agreementForm.get('selected_property_id')?.setValue('');
+    this.agreementForm.get('selected_property_ids')?.setValue([]);
     this.loadAvailableProperties();
   }
   onPropertyChange(): void {}
@@ -569,25 +570,20 @@ export class TenantAgreementFormComponent implements OnInit {
     this.serverError.set(null);
 
     const val = this.agreementForm.value;
-    const selectedPropId = Number(val.selected_property_id);
-
-    // Find property owner from available properties
-    const prop = this.availableProperties().find((p) => p.id === selectedPropId);
-    const ownerCustomerId = prop ? Number(prop.owner_customer_id) : 0;
+    const selectedPropertyIds = (val.selected_property_ids as number[]).map(Number);
 
     const dto = {
       tenant_customer_id: Number(val.tenant_customer_id),
-      owner_customer_id: ownerCustomerId,
       start_date: val.start_date!,
       end_date: val.end_date!,
       total_amount: Number(val.total_amount),
       payment_count: Number(val.payment_count),
       payment_frequency: val.payment_frequency || 'monthly',
       payment_mode: val.payment_mode as PaymentMode,
-      properties: [{
-        property_id: selectedPropId,
+      properties: selectedPropertyIds.map((propertyId) => ({
+        property_id: propertyId,
         source_owner_agreement_id: Number(val.source_owner_agreement_id),
-      }],
+      })),
       notes: val.notes || null,
     };
 

@@ -13,52 +13,65 @@
       rel="stylesheet"
     />
     <style>
-      /* Inline styles for instantaneous app boot preloader */
+      /* Instantaneous app boot preloader matching project design system template */
       .bm-boot-splash {
         position: fixed;
         inset: 0;
-        background: #193d32;
+        background: #0f172a;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         z-index: 99999;
-        font-family: 'Instrument Sans', system-ui, sans-serif;
+        font-family:
+          'Instrument Sans',
+          system-ui,
+          -apple-system,
+          sans-serif;
         color: #ffffff;
       }
       .bm-boot-logo {
-        width: 72px;
-        height: 72px;
-        border-radius: 16px;
-        background: #285746;
+        width: 76px;
+        height: 76px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        border: 1px solid rgba(255, 255, 255, 0.12);
         display: flex;
         align-items: center;
         justify-content: center;
         box-shadow:
-          0 10px 25px -5px rgba(25, 61, 50, 0.5),
-          0 0 0 1px rgba(255, 255, 255, 0.1);
+          0 20px 40px -10px rgba(0, 0, 0, 0.5),
+          0 0 25px rgba(16, 185, 129, 0.25);
         margin-bottom: 24px;
         position: relative;
       }
+      .bm-boot-logo-badge {
+        position: absolute;
+        inset: -2px;
+        border-radius: 22px;
+        background: linear-gradient(135deg, #10b981 0%, transparent 60%);
+        opacity: 0.4;
+        z-index: -1;
+      }
       .bm-boot-title {
-        font-size: 20px;
+        font-size: 22px;
         font-weight: 700;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.08em;
         color: #ffffff;
         margin: 0 0 6px 0;
       }
       .bm-boot-subtitle {
         font-size: 11px;
         font-weight: 600;
-        color: #9caf9f;
-        letter-spacing: 0.15em;
+        color: #10b981;
+        letter-spacing: 0.2em;
         text-transform: uppercase;
-        margin-bottom: 32px;
+        margin-bottom: 36px;
       }
       .bm-boot-bar-track {
-        width: 180px;
+        width: 200px;
         height: 4px;
-        background: rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.1);
         border-radius: 999px;
         overflow: hidden;
         position: relative;
@@ -69,18 +82,19 @@
         left: -50%;
         height: 100%;
         width: 50%;
-        background: #9caf9f;
+        background: linear-gradient(90deg, #10b981, #34d399);
         border-radius: 999px;
-        animation: bmIndeterminate 1.5s infinite ease-in-out;
+        box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+        animation: bmIndeterminate 1.4s infinite ease-in-out;
       }
       @keyframes bmIndeterminate {
         0% {
-          left: -50%;
+          left: -40%;
           width: 30%;
         }
         50% {
-          left: 35%;
-          width: 40%;
+          left: 30%;
+          width: 50%;
         }
         100% {
           left: 100%;
@@ -93,12 +107,13 @@
     <app-root>
       <div class="bm-boot-splash">
         <div class="bm-boot-logo">
+          <div class="bm-boot-logo-badge"></div>
           <svg
             width="38"
             height="38"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#DDE5DD"
+            stroke="#10B981"
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"

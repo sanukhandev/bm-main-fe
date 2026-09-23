@@ -43,35 +43,54 @@ export class ZaakiyApiService {
         headers,
         body: JSON.stringify({ message, history: history.slice(-20) }),
         signal: controller.signal,
-      }).then(async (response) => {
-        if (!response.ok || !response.body) {
-          const error = await response.json().catch(() => null);
-          throw new Error(error?.message || 'Zaakiy is temporarily unavailable.');
-        }
-
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let buffer = '';
-        while (true) {
-          const { value, done } = await reader.read();
-          buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
-          const events = buffer.split('\n\n');
-          buffer = events.pop() || '';
-          for (const event of events) {
-            const lines = event.split('\n');
-            const type = lines.find((line) => line.startsWith('event:'))?.slice(6).trim();
-            const data = lines.find((line) => line.startsWith('data:'))?.slice(5).trim();
-            if (!data) continue;
-            const payload = JSON.parse(data) as { text?: string; message?: string; label?: string; url?: string };
-            if (type === 'error') throw new Error(payload.message || 'Zaakiy is temporarily unavailable.');
-            subscriber.next({ type: type === 'done' ? 'done' : type === 'navigation' ? 'navigation' : 'token', text: payload.text, label: payload.label, url: payload.url });
+      })
+        .then(async (response) => {
+          if (!response.ok || !response.body) {
+            const error = await response.json().catch(() => null);
+            throw new Error(error?.message || 'Zaakiy is temporarily unavailable.');
           }
-          if (done) break;
-        }
-        subscriber.complete();
-      }).catch((error: Error) => {
-        if (error.name !== 'AbortError') subscriber.error(error);
-      });
+
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = '';
+          while (true) {
+            const { value, done } = await reader.read();
+            buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
+            const events = buffer.split('\n\n');
+            buffer = events.pop() || '';
+            for (const event of events) {
+              const lines = event.split('\n');
+              const type = lines
+                .find((line) => line.startsWith('event:'))
+                ?.slice(6)
+                .trim();
+              const data = lines
+                .find((line) => line.startsWith('data:'))
+                ?.slice(5)
+                .trim();
+              if (!data) continue;
+              const payload = JSON.parse(data) as {
+                text?: string;
+                message?: string;
+                label?: string;
+                url?: string;
+              };
+              if (type === 'error')
+                throw new Error(payload.message || 'Zaakiy is temporarily unavailable.');
+              subscriber.next({
+                type: type === 'done' ? 'done' : type === 'navigation' ? 'navigation' : 'token',
+                text: payload.text,
+                label: payload.label,
+                url: payload.url,
+              });
+            }
+            if (done) break;
+          }
+          subscriber.complete();
+        })
+        .catch((error: Error) => {
+          if (error.name !== 'AbortError') subscriber.error(error);
+        });
 
       return () => controller.abort();
     });

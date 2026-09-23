@@ -1,4 +1,17 @@
 export type PaymentMode = 'cash' | 'cheque' | 'bank_transfer';
+export type ChequeStatus = 'received' | 'deposited' | 'cleared' | 'bounced' | 'cancelled';
+export type ChequeAction = 'deposit' | 'clear' | 'bounce' | 'cancel';
+
+export class InFlightGuard {
+  private running = false;
+  begin(): boolean { if (this.running) return false; this.running = true; return true; }
+  end(): void { this.running = false; }
+}
+
+export function chequeActions(status: ChequeStatus, canPost: boolean): ChequeAction[] {
+  if (!canPost) return [];
+  return status === 'received' ? ['deposit', 'cancel'] : status === 'deposited' ? ['clear', 'bounce', 'cancel'] : [];
+}
 
 export interface PaymentModeDetails {
   payment_mode: PaymentMode;

@@ -183,7 +183,7 @@ import { OwnerAgreement, AgreementInstallment } from '../../shared/models/agreem
                     {{ propertiesList()[0].name }}
                   </div>
                   <div class="text-xs text-slate-500 mt-1 tabular-nums">
-                    Code: {{ propertiesList()[0].property_code }} · Unit {{ propertiesList()[0].unit_number }}
+                    Code: {{ propertiesList()[0].property_code }} · Property / Unit No. {{ propertiesList()[0].unit_number }}
                   </div>
                   <div class="text-xs text-slate-500 capitalize">
                     Type: {{ propertiesList()[0].property_type }}

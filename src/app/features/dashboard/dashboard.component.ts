@@ -3,13 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { BmPageHeaderComponent } from '../../shared/components/bm-page-header/bm-page-header.component';
-import { BmCardComponent } from '../../shared/components/bm-card/bm-card.component';
-import { BmKpiCardComponent } from '../../shared/components/bm-kpi-card/bm-kpi-card.component';
 import { BmLoadingStateComponent } from '../../shared/components/bm-loading-state/bm-loading-state.component';
 import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm-error-state.component';
 import { DashboardApiService, DashboardMetrics } from '../../core/api/dashboard-api.service';
 import { BranchContextService } from '../../core/branch-context/branch-context.service';
 import { AccountsApiService, AccountsDashboardSnapshot } from '../../core/api/accounts-api.service';
+import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
   selector: 'bm-dashboard',
@@ -18,37 +17,35 @@ import { AccountsApiService, AccountsDashboardSnapshot } from '../../core/api/ac
     CommonModule,
     RouterLink,
     BmPageHeaderComponent,
-    BmCardComponent,
-    BmKpiCardComponent,
     BmLoadingStateComponent,
     BmErrorStateComponent,
   ],
   template: `
     <bm-page-header
       title="Dashboard"
-      [subtitle]="'Overview of ' + (activeBranch()?.name || 'Branch') + ' operations and financial activity.'"
+      [subtitle]="'Operational & financial snapshot for ' + (activeBranch()?.name || 'Branch') + '.'"
     >
-      <a routerLink="/app/properties/new" class="bm-btn bm-btn-secondary text-xs font-semibold px-4 py-2 rounded-xl border border-slate-200 shadow-xs hover:bg-slate-100 transition">
+      <a routerLink="/app/properties/new" class="bm-btn bm-btn-secondary text-xs font-semibold px-4 py-2 rounded-xl">
         + Add Property
       </a>
-      <a routerLink="/app/tenant-agreements/new" class="bm-btn bm-btn-primary text-xs font-semibold px-4 py-2 rounded-xl shadow-xs transition">
+      <a routerLink="/app/tenant-agreements/new" class="bm-btn bm-btn-emerald text-xs font-semibold px-4 py-2 rounded-xl shadow-xs">
         + New Tenant Agreement
       </a>
     </bm-page-header>
 
     @if (metrics()?.expiring_soon_agreements && metrics()!.expiring_soon_agreements! > 0) {
-      <div class="mb-6 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-900 flex items-center justify-between text-xs font-medium">
+      <div class="mb-6 p-4 rounded-2xl bg-[#FAF1D7] border border-[#EED795] text-[#8A641C] flex items-center justify-between text-xs font-medium">
         <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-700 flex items-center justify-center shrink-0">
+          <div class="w-8 h-8 rounded-xl bg-[#EED795]/50 text-[#8A641C] flex items-center justify-center shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
           </div>
           <div>
-            <span class="font-semibold text-amber-950">Action Required:</span> {{ metrics()?.expiring_soon_agreements }} tenant agreement(s) expiring within 30 days.
+            <span class="font-bold">Action Required:</span> {{ metrics()?.expiring_soon_agreements }} tenant agreement(s) expiring within 30 days.
           </div>
         </div>
-        <a routerLink="/app/tenant-agreements" class="text-amber-800 hover:text-amber-950 font-semibold flex items-center gap-1 underline underline-offset-2">
+        <a routerLink="/app/tenant-agreements" class="font-bold underline underline-offset-2 hover:opacity-80 transition">
           Review Agreements →
         </a>
       </div>
@@ -63,277 +60,179 @@ import { AccountsApiService, AccountsDashboardSnapshot } from '../../core/api/ac
         (retry)="loadData()"
       ></bm-error-state>
     } @else {
-      <!-- LEVEL 2: Operational KPI Grid -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-        <bm-kpi-card
-          label="Total Owners"
-          [value]="metrics()?.total_owners || 0"
-          icon="owners"
-          subtext="Registered property owners"
-        ></bm-kpi-card>
-
-        <bm-kpi-card
-          label="Total Tenants"
-          [value]="metrics()?.total_tenants || 0"
-          icon="tenants"
-          subtext="Active leasing tenants"
-        ></bm-kpi-card>
-
-        <bm-kpi-card
-          label="Properties"
-          [value]="metrics()?.total_properties || 0"
-          icon="properties"
-          subtext="Total rentable assets"
-        ></bm-kpi-card>
-
-        <bm-kpi-card
-          label="Owner Agreements"
-          [value]="metrics()?.total_owner_agreements || 0"
-          icon="owner_agreements"
-          subtext="Owner contracts"
-        ></bm-kpi-card>
-
-        <bm-kpi-card
-          label="Tenant Agreements"
-          [value]="metrics()?.total_tenant_agreements || 0"
-          icon="tenant_agreements"
-          badgeText="Active"
-          subtext="Leased customer contracts"
-        ></bm-kpi-card>
-      </div>
-
-      <!-- LEVEL 3: Split Grid (Portfolio Overview + Quick Actions) -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <!-- Active Branch Portfolio Feature Panel -->
-        <div class="lg:col-span-2">
-          <bm-card variant="gradient">
-            <div class="p-1.5 flex flex-col justify-between h-full">
-              <div>
-                <div class="flex items-center justify-between gap-2 mb-3">
-                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-[#ecf39e] text-[11px] font-semibold uppercase tracking-wider border border-white/10">
-                    <span class="w-2 h-2 rounded-full bg-[#ecf39e] animate-pulse"></span>
-                    Active Branch Portfolio
-                  </span>
-                  <span class="text-xs text-[#a0cc9b] font-medium">{{ activeBranch()?.code || 'N/A' }}</span>
-                </div>
-
-                <h3 class="text-xl lg:text-2xl font-semibold text-white tracking-tight mb-2">
-                  {{ activeBranch()?.name || 'Default Branch' }} Scope
-                </h3>
-                <p class="text-xs lg:text-sm text-[#d0e6cd] font-light max-w-xl mb-6 leading-relaxed">
-                  All property leasing, owner agreements, tenant collection schedules, and maintenance operations reflect strict verified branch-level isolation.
-                </p>
-              </div>
-
-              <div>
-                <div class="grid grid-cols-3 gap-4 border-t border-white/15 pt-4 text-xs mb-5">
-                  <div>
-                    <div class="text-[#a0cc9b] font-medium text-[11px] uppercase tracking-wider">Branch Code</div>
-                    <div class="text-white font-semibold text-sm mt-0.5">{{ activeBranch()?.code || 'N/A' }}</div>
-                  </div>
-                  <div>
-                    <div class="text-[#a0cc9b] font-medium text-[11px] uppercase tracking-wider">Currency</div>
-                    <div class="text-white font-semibold text-sm mt-0.5">{{ activeBranch()?.currency_code || 'AED' }}</div>
-                  </div>
-                  <div>
-                    <div class="text-[#a0cc9b] font-medium text-[11px] uppercase tracking-wider">Timezone</div>
-                    <div class="text-white font-semibold text-sm mt-0.5 truncate">{{ activeBranch()?.timezone || 'Asia/Dubai' }}</div>
-                  </div>
-                </div>
-
-                <div class="flex items-center gap-3 pt-1">
-                  <a
-                    routerLink="/app/properties"
-                    class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition border border-white/15"
-                  >
-                    <span>View Properties</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-[#ecf39e]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                  </a>
-                  <a
-                    routerLink="/app/tenant-agreements"
-                    class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition border border-white/15"
-                  >
-                    <span>View Agreements</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-[#ecf39e]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </bm-card>
-        </div>
-
-        <!-- Quick Actions Panel -->
-        <div>
-          <bm-card title="Quick Actions">
-            <div class="space-y-2.5">
-              <a
-                routerLink="/app/customers/new"
-                class="flex items-center justify-between p-3 rounded-xl bg-[#F8FAFC] hover:bg-slate-100 text-xs font-medium text-slate-900 transition border border-slate-200/80 group"
-              >
-                <div class="flex items-center gap-3">
-                  <span class="w-7 h-7 rounded-lg bg-[#d0e6cd] text-[#132a13] flex items-center justify-center font-semibold text-sm group-hover:bg-[#4ba64b] group-hover:text-white transition">+</span>
-                  <span class="font-semibold text-slate-800">Register Customer</span>
-                </div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 group-hover:text-emerald-700 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
-              </a>
-
-              <a
-                routerLink="/app/properties/new"
-                class="flex items-center justify-between p-3 rounded-xl bg-[#F8FAFC] hover:bg-slate-100 text-xs font-medium text-slate-900 transition border border-slate-200/80 group"
-              >
-                <div class="flex items-center gap-3">
-                  <span class="w-7 h-7 rounded-lg bg-[#d0e6cd] text-[#132a13] flex items-center justify-center font-semibold text-sm group-hover:bg-[#4ba64b] group-hover:text-white transition">+</span>
-                  <span class="font-semibold text-slate-800">Add Property Asset</span>
-                </div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 group-hover:text-emerald-700 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
-              </a>
-
-              <a
-                routerLink="/app/owner-agreements/new"
-                class="flex items-center justify-between p-3 rounded-xl bg-[#F8FAFC] hover:bg-slate-100 text-xs font-medium text-slate-900 transition border border-slate-200/80 group"
-              >
-                <div class="flex items-center gap-3">
-                  <span class="w-7 h-7 rounded-lg bg-[#d0e6cd] text-[#132a13] flex items-center justify-center font-semibold text-sm group-hover:bg-[#4ba64b] group-hover:text-white transition">+</span>
-                  <span class="font-semibold text-slate-800">Draft Owner Agreement</span>
-                </div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 group-hover:text-emerald-700 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
-              </a>
-
-              <a
-                routerLink="/app/tenant-agreements/new"
-                class="flex items-center justify-between p-3 rounded-xl bg-[#F8FAFC] hover:bg-slate-100 text-xs font-medium text-slate-900 transition border border-slate-200/80 group"
-              >
-                <div class="flex items-center gap-3">
-                  <span class="w-7 h-7 rounded-lg bg-[#d0e6cd] text-[#132a13] flex items-center justify-center font-semibold text-sm group-hover:bg-[#4ba64b] group-hover:text-white transition">+</span>
-                  <span class="font-semibold text-slate-800">New Tenant Agreement</span>
-                </div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 group-hover:text-emerald-700 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
-              </a>
-            </div>
-          </bm-card>
-        </div>
-      </div>
-
-      <!-- LEVEL 4: Accounts Snapshot Single Container -->
-      <div class="bg-white rounded-[20px] p-6 border border-slate-200/90 shadow-xs">
-        <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
-          <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 12v-2m0 0c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
+      <!-- HYBRID BENTO GRID CONTAINER -->
+      <div class="space-y-5">
+        <!-- 1. PRIMARY BUSINESS HERO BENTO MODULE (Col 12) -->
+        <div class="bm-card p-6 lg:p-8 bg-gradient-to-br from-[#FFFFFF] via-[#F8F7F4] to-[#E3F2E8]/40 relative overflow-hidden">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
             <div>
-              <h3 class="text-base font-semibold text-slate-900 tracking-tight">Accounts Snapshot</h3>
-              <p class="text-xs text-slate-500 font-normal">Real-time ledger and cash flow positions</p>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="px-2.5 py-0.5 rounded-full bg-[#E2F3E9] text-[#174B38] text-[11px] font-semibold tracking-wide uppercase">
+                  Net Movement Position
+                </span>
+                <span class="text-xs text-[#777B74] font-medium">{{ activeBranch()?.name || 'Branch' }} Scope</span>
+              </div>
+              
+              <div class="flex items-baseline gap-2 my-2">
+                <span class="text-sm font-bold uppercase tracking-wider text-[#777B74]">AED</span>
+                <span class="text-5xl lg:text-6xl font-display font-normal text-[#12372A] tabular-nums tracking-tight">
+                  {{ formatMoney(accountsSnapshot()?.today_net_movement).amount }}
+                </span>
+              </div>
+              <p class="text-xs text-[#777B74] font-medium">Daily net inward receipts less outward vouchers</p>
+            </div>
+
+            <!-- Integrated Portfolio Support Metrics -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white/80 p-4 rounded-2xl border border-[#DDDED9] shadow-xs">
+              <div class="p-2.5">
+                <div class="text-[11px] font-semibold uppercase tracking-wider text-[#777B74]">Owners</div>
+                <div class="text-2xl font-bold text-[#111210] tabular-nums mt-0.5">{{ metrics()?.total_owners || 0 }}</div>
+                <div class="text-[10px] text-[#A8ABA5] font-medium mt-0.5">Registered</div>
+              </div>
+              <div class="p-2.5 border-l border-[#DDDED9]">
+                <div class="text-[11px] font-semibold uppercase tracking-wider text-[#777B74]">Tenants</div>
+                <div class="text-2xl font-bold text-[#111210] tabular-nums mt-0.5">{{ metrics()?.total_tenants || 0 }}</div>
+                <div class="text-[10px] text-[#A8ABA5] font-medium mt-0.5">Leasing</div>
+              </div>
+              <div class="p-2.5 border-l border-[#DDDED9]">
+                <div class="text-[11px] font-semibold uppercase tracking-wider text-[#777B74]">Properties</div>
+                <div class="text-2xl font-bold text-[#111210] tabular-nums mt-0.5">{{ metrics()?.total_properties || 0 }}</div>
+                <div class="text-[10px] text-[#A8ABA5] font-medium mt-0.5">Managed</div>
+              </div>
+              <div class="p-2.5 border-l border-[#DDDED9]">
+                <div class="text-[11px] font-semibold uppercase tracking-wider text-[#777B74]">Active Leases</div>
+                <div class="text-2xl font-bold text-[#247454] tabular-nums mt-0.5">{{ metrics()?.total_tenant_agreements || 0 }}</div>
+                <div class="text-[10px] text-[#247454] font-medium mt-0.5">Contracts</div>
+              </div>
             </div>
           </div>
-          <a routerLink="/app/accounts/dashboard" class="text-xs font-semibold text-emerald-700 hover:text-emerald-800 transition flex items-center gap-1">
-            <span>View Accounts</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </a>
         </div>
 
-        @if (isAccountsLoading()) {
-          <div class="py-6 flex items-center justify-center text-xs text-slate-400 gap-2">
-            <svg class="animate-spin h-4 w-4 text-emerald-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <span>Loading accounts snapshot...</span>
+        <!-- 2. ASYMMETRICAL BENTO MODULES ROW (3 Cards) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <!-- Bento Card A: Portfolio Composition -->
+          <div class="bm-card p-6 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between pb-3 border-b border-[#F1F1EE]">
+                <h3 class="text-sm font-bold text-[#111210] tracking-tight">Portfolio Composition</h3>
+                <span class="w-2 h-2 rounded-full bg-[#247454]"></span>
+              </div>
+              <div class="py-5 space-y-3">
+                <div class="flex justify-between items-center text-xs">
+                  <span class="text-[#777B74] font-medium">Rentable Properties</span>
+                  <span class="font-bold text-[#111210] tabular-nums">{{ metrics()?.total_properties || 0 }}</span>
+                </div>
+                <div class="w-full h-2 rounded-full bg-[#F1F1EE] overflow-hidden">
+                  <div class="h-full bg-[#247454] rounded-full" style="width: 85%"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2 pt-2 text-xs">
+                  <div class="p-2.5 bg-[#F8F7F4] rounded-xl border border-[#DDDED9]">
+                    <div class="text-[10px] text-[#777B74] uppercase font-bold">Owner Contracts</div>
+                    <div class="font-bold text-[#111210] text-lg tabular-nums mt-0.5">{{ metrics()?.total_owner_agreements || 0 }}</div>
+                  </div>
+                  <div class="p-2.5 bg-[#F8F7F4] rounded-xl border border-[#DDDED9]">
+                    <div class="text-[10px] text-[#777B74] uppercase font-bold">Tenant Contracts</div>
+                    <div class="font-bold text-[#247454] text-lg tabular-nums mt-0.5">{{ metrics()?.total_tenant_agreements || 0 }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <a routerLink="/app/properties" class="text-xs font-semibold text-[#247454] hover:underline inline-flex items-center gap-1 pt-2">
+              View Property Asset Directory →
+            </a>
           </div>
-        } @else if (accountsError()) {
-          <div class="py-4 text-xs text-slate-500 flex items-center justify-between bg-slate-50 px-4 rounded-xl border border-slate-200/60">
-            <span>Unable to load account snapshot data at this time.</span>
-            <button (click)="loadAccounts()" class="font-semibold text-emerald-700 hover:underline">Retry</button>
+
+          <!-- Bento Card B: Accounts Cash Flow Snapshot -->
+          <div class="bm-card p-6 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between pb-3 border-b border-[#F1F1EE]">
+                <h3 class="text-sm font-bold text-[#111210] tracking-tight">Accounts & Cash Flow</h3>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-[#F1F1EE] text-[#777B74]">REAL-TIME</span>
+              </div>
+              @if (isAccountsLoading()) {
+                <div class="py-8 text-center text-xs text-[#777B74]">Loading accounts snapshot...</div>
+              } @else if (accountsSnapshot()) {
+                <div class="py-4 space-y-3">
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="text-[#777B74] font-medium">Today's Inward</span>
+                    <span class="font-bold text-[#247454] tabular-nums">AED {{ formatMoney(accountsSnapshot()?.today_inward).amount }}</span>
+                  </div>
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="text-[#777B74] font-medium">Today's Outward</span>
+                    <span class="font-bold text-[#111210] tabular-nums">AED {{ formatMoney(accountsSnapshot()?.today_outward).amount }}</span>
+                  </div>
+                  <div class="flex items-center justify-between text-xs pt-2 border-t border-[#F1F1EE]">
+                    <span class="text-[#777B74] font-medium">Petty Cash Balance</span>
+                    <span class="font-bold text-[#111210] tabular-nums">AED {{ formatMoney(accountsSnapshot()?.petty_cash_balance).amount }}</span>
+                  </div>
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="text-[#777B74] font-medium">Tenant Receivable</span>
+                    <span class="font-bold text-[#B7791F] tabular-nums">AED {{ formatMoney(accountsSnapshot()?.tenant_outstanding_receivable).amount }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+            <a routerLink="/app/accounts/dashboard" class="text-xs font-semibold text-[#247454] hover:underline inline-flex items-center gap-1 pt-2">
+              View Financial Ledger →
+            </a>
           </div>
-        } @else if (accountsSnapshot()) {
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
-            <!-- 1. Today's Inward -->
-            <div class="py-2 sm:py-0 sm:px-4 first:pl-0">
-              <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">
-                Today's Inward
-              </div>
-              <div class="whitespace-nowrap tabular-nums font-semibold tracking-tight text-xl my-1 flex items-baseline gap-1"
-                   [class.text-slate-400]="formatMoney(accountsSnapshot()?.today_inward).isZero"
-                   [class.text-emerald-700]="!formatMoney(accountsSnapshot()?.today_inward).isZero">
-                <span class="text-xs font-semibold text-slate-400 uppercase">AED</span>
-                <span>{{ formatMoney(accountsSnapshot()?.today_inward).amount }}</span>
-              </div>
-              <div class="text-[11px] text-slate-400 font-normal">Posted receipts</div>
-            </div>
 
-            <!-- 2. Today's Outward -->
-            <div class="py-2 sm:py-0 sm:px-4">
-              <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">
-                Today's Outward
+          <!-- Bento Card C: Quick Actions Module -->
+          <div class="bm-card p-6 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between pb-3 border-b border-[#F1F1EE]">
+                <h3 class="text-sm font-bold text-[#111210] tracking-tight">Quick Action Hub</h3>
+                <span class="text-[10px] font-bold text-[#777B74] uppercase">Operations</span>
               </div>
-              <div class="whitespace-nowrap tabular-nums font-semibold tracking-tight text-xl my-1 flex items-baseline gap-1"
-                   [class.text-slate-400]="formatMoney(accountsSnapshot()?.today_outward).isZero"
-                   [class.text-slate-900]="!formatMoney(accountsSnapshot()?.today_outward).isZero">
-                <span class="text-xs font-semibold text-slate-400 uppercase">AED</span>
-                <span>{{ formatMoney(accountsSnapshot()?.today_outward).amount }}</span>
-              </div>
-              <div class="text-[11px] text-slate-400 font-normal">Posted payments</div>
-            </div>
+              <div class="py-4 grid grid-cols-1 gap-2.5">
+                <a
+                  routerLink="/app/customers/owners/new"
+                  class="flex items-center justify-between p-2.5 rounded-xl bg-[#F8F7F4] hover:bg-[#F1F1EE] text-xs font-semibold text-[#111210] transition border border-[#DDDED9]"
+                >
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-6 h-6 rounded-lg bg-[#E2F3E9] text-[#174B38] flex items-center justify-center font-bold text-xs">+</span>
+                    <span>Register Owner</span>
+                  </div>
+                  <span class="text-slate-400">→</span>
+                </a>
 
-            <!-- 3. Petty Cash -->
-            <div class="py-2 sm:py-0 sm:px-4">
-              <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">
-                Petty Cash
-              </div>
-              <div class="whitespace-nowrap tabular-nums font-semibold tracking-tight text-xl my-1 flex items-baseline gap-1"
-                   [class.text-slate-400]="formatMoney(accountsSnapshot()?.petty_cash_balance).isZero"
-                   [class.text-slate-900]="!formatMoney(accountsSnapshot()?.petty_cash_balance).isZero">
-                <span class="text-xs font-semibold text-slate-400 uppercase">AED</span>
-                <span>{{ formatMoney(accountsSnapshot()?.petty_cash_balance).amount }}</span>
-              </div>
-              <div class="text-[11px] text-slate-400 font-normal">Current balance</div>
-            </div>
+                <a
+                  routerLink="/app/customers/tenants/new"
+                  class="flex items-center justify-between p-2.5 rounded-xl bg-[#F8F7F4] hover:bg-[#F1F1EE] text-xs font-semibold text-[#111210] transition border border-[#DDDED9]"
+                >
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-6 h-6 rounded-lg bg-[#E2F3E9] text-[#174B38] flex items-center justify-center font-bold text-xs">+</span>
+                    <span>Register Tenant</span>
+                  </div>
+                  <span class="text-slate-400">→</span>
+                </a>
 
-            <!-- 4. Tenant Receivable -->
-            <div class="py-2 sm:py-0 sm:px-4">
-              <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">
-                Tenant Receivable
-              </div>
-              <div class="whitespace-nowrap tabular-nums font-semibold tracking-tight text-xl my-1 flex items-baseline gap-1"
-                   [class.text-slate-400]="formatMoney(accountsSnapshot()?.tenant_outstanding_receivable).isZero"
-                   [class.text-slate-900]="!formatMoney(accountsSnapshot()?.tenant_outstanding_receivable).isZero">
-                <span class="text-xs font-semibold text-slate-400 uppercase">AED</span>
-                <span>{{ formatMoney(accountsSnapshot()?.tenant_outstanding_receivable).amount }}</span>
-              </div>
-              <div class="text-[11px] text-slate-400 font-normal">Outstanding</div>
-            </div>
+                <a
+                  routerLink="/app/properties/new"
+                  class="flex items-center justify-between p-2.5 rounded-xl bg-[#F8F7F4] hover:bg-[#F1F1EE] text-xs font-semibold text-[#111210] transition border border-[#DDDED9]"
+                >
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-6 h-6 rounded-lg bg-[#E2F3E9] text-[#174B38] flex items-center justify-center font-bold text-xs">+</span>
+                    <span>Add Property</span>
+                  </div>
+                  <span class="text-slate-400">→</span>
+                </a>
 
-            <!-- 5. Owner Payable -->
-            <div class="py-2 sm:py-0 sm:px-4 last:pr-0">
-              <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1 whitespace-nowrap">
-                Owner Payable
+                <a
+                  routerLink="/app/tenant-agreements/new"
+                  class="flex items-center justify-between p-2.5 rounded-xl bg-[#F8F7F4] hover:bg-[#F1F1EE] text-xs font-semibold text-[#111210] transition border border-[#DDDED9]"
+                >
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-6 h-6 rounded-lg bg-[#E2F3E9] text-[#174B38] flex items-center justify-center font-bold text-xs">+</span>
+                    <span>New Tenant Lease</span>
+                  </div>
+                  <span class="text-slate-400">→</span>
+                </a>
               </div>
-              <div class="whitespace-nowrap tabular-nums font-semibold tracking-tight text-xl my-1 flex items-baseline gap-1"
-                   [class.text-slate-400]="formatMoney(accountsSnapshot()?.owner_outstanding_payable).isZero"
-                   [class.text-slate-900]="!formatMoney(accountsSnapshot()?.owner_outstanding_payable).isZero">
-                <span class="text-xs font-semibold text-slate-400 uppercase">AED</span>
-                <span>{{ formatMoney(accountsSnapshot()?.owner_outstanding_payable).amount }}</span>
-              </div>
-              <div class="text-[11px] text-slate-400 font-normal whitespace-nowrap">Outstanding balance</div>
             </div>
+            <div class="text-[11px] text-[#A8ABA5] font-medium pt-1">Permission-guarded ERP actions</div>
           </div>
-        }
+        </div>
       </div>
     }
   `,

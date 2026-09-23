@@ -42,7 +42,7 @@ import { PaginationMeta } from '../../core/api/api.models';
       <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
         <bm-search-input
           [value]="searchQuery()"
-          placeholder="Search code, name, unit..."
+          placeholder="Search code, name, property number..."
           (searchChange)="onSearchChange($event)"
         ></bm-search-input>
 
@@ -99,7 +99,7 @@ import { PaginationMeta } from '../../core/api/api.models';
           <table class="w-full text-left border-collapse text-xs">
             <thead>
               <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
-                <th class="py-3.5 px-4">Code / Unit</th>
+                <th class="py-3.5 px-4">Code / Property No.</th>
                 <th class="py-3.5 px-4">Property Name</th>
                 <th class="py-3.5 px-4">Type</th>
                 <th class="py-3.5 px-4">Owner</th>
@@ -114,7 +114,7 @@ import { PaginationMeta } from '../../core/api/api.models';
                 <tr class="hover:bg-slate-50/60 transition-colors">
                   <td class="py-3.5 px-4 font-semibold text-slate-800 tabular-nums">
                     <div>{{ prop.property_code }}</div>
-                    <div class="text-[11px] text-slate-400 font-normal">Unit: {{ prop.unit_number }}</div>
+                    <div class="text-[11px] text-slate-400 font-normal">Property / Unit No.: {{ prop.unit_number }}</div>
                   </td>
                   <td class="py-3.5 px-4 font-medium text-slate-900">
                     <a [routerLink]="['/app/properties', prop.id]" class="hover:text-emerald-600 transition-colors">

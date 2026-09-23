@@ -3,6 +3,7 @@ import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 import { superAdminGuard } from './core/guards/super-admin.guard';
 import { accountsViewGuard } from './core/auth/permission.guard';
+import { auditViewGuard } from './core/auth/audit.guard';
 
 export const routes: Routes = [
   {
@@ -196,6 +197,7 @@ export const routes: Routes = [
         loadComponent: () => import('./features/accounts/accounts-reports.component').then((m) => m.AccountsReportsComponent),
       },
       { path: 'reports/:type', loadComponent: () => import('./features/reports/reports.component').then((m) => m.ReportsComponent) },
+      { path: 'administration/audit', canActivate: [auditViewGuard], loadComponent: () => import('./features/administration/audit/audit-list.component').then((m) => m.AuditListComponent) },
       { path: 'maintenance/work-orders/new', loadComponent: () => import('./features/maintenance/work-order-form.component').then((m) => m.WorkOrderFormComponent) },
       { path: 'maintenance/work-orders/:id', loadComponent: () => import('./features/maintenance/work-order-detail.component').then((m) => m.WorkOrderDetailComponent) },
       { path: 'maintenance/work-orders', data: { section: 'work-orders', title: 'Work Orders' }, loadComponent: () => import('./features/maintenance/maintenance.component').then((m) => m.MaintenanceComponent) },

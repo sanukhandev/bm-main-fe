@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse, PaginatedResponse } from './api.models';
 import { InventoryItem, Vendor, WorkOrder } from '../../shared/models/maintenance.models';
@@ -22,6 +22,6 @@ export class MaintenanceApiService {
   createWorkOrder(payload: Record<string, unknown>): Observable<ApiResponse<WorkOrder>> { return this.http.post<ApiResponse<WorkOrder>>(`${this.base}/work-orders`, payload); }
   updateWorkOrder(id: number, payload: Record<string, unknown>): Observable<ApiResponse<WorkOrder>> { return this.http.patch<ApiResponse<WorkOrder>>(`${this.base}/work-orders/${id}`, payload); }
   addWorkOrderPayment(id: number, payload: Record<string, unknown>): Observable<ApiResponse<unknown>> { return this.http.post<ApiResponse<unknown>>(`${this.base}/work-orders/${id}/payments`, payload); }
-  updateWorkOrderPaymentStatus(id: number, paymentId: number, status: 'paid' | 'defaulted'): Observable<ApiResponse<unknown>> { return this.http.patch<ApiResponse<unknown>>(`${this.base}/work-orders/${id}/payments/${paymentId}/status`, { status }); }
+  updateWorkOrderPaymentStatus(id: number, paymentId: number, status: 'paid' | 'defaulted', key: string): Observable<ApiResponse<unknown>> { return this.http.patch<ApiResponse<unknown>>(`${this.base}/work-orders/${id}/payments/${paymentId}/status`, { status }, { headers: new HttpHeaders({ 'Idempotency-Key': key }) }); }
   updateWorkOrderStatus(id: number, status: string): Observable<ApiResponse<WorkOrder>> { return this.http.patch<ApiResponse<WorkOrder>>(`${this.base}/work-orders/${id}/status`, { status }); }
 }

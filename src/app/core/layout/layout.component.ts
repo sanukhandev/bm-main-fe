@@ -538,6 +538,7 @@ export interface PageSearchItem {
           <!-- REPORTS MEGA MENU -->
           @if (activeMegaMenu() === 'reports') {
             <div class="grid grid-cols-2 gap-6">
+              @if (hasPermission('audit.view')) { <a routerLink="/app/administration/audit" (click)="closeMegaMenu()" class="group flex items-start gap-3 p-3 rounded-xl hover:bg-[#F8FAFC] transition border border-transparent hover:border-[#E2E8F0]"><div><div class="text-sm font-semibold text-[#0F172A] group-hover:text-[#2563EB]">Audit Trail</div><div class="text-xs text-[#64748B] mt-0.5">Review sensitive system activity</div></div></a> }
               <a routerLink="/app/reports/owner-agreements" (click)="closeMegaMenu()" class="group flex items-start gap-3 p-3 rounded-xl hover:bg-[#F8FAFC] transition border border-transparent hover:border-[#E2E8F0]">
                 <div class="w-9 h-9 rounded-xl bg-[#EFF6FF] text-[#2563EB] flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -676,6 +677,7 @@ export class LayoutComponent {
 
   user = this.authService.currentUser;
   isSuperAdmin = this.authService.isSuperAdmin;
+  hasPermission = (permission: string): boolean => this.authService.hasPermission(permission);
 
   activeMegaMenu = signal<MegaMenuTab>(null);
   mobileDrawerOpen = signal(false);

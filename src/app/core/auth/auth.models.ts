@@ -5,6 +5,7 @@ export interface User {
   name: string;
   email: string;
   roles: string[];
+  permissions?: string[];
   branches: Branch[];
   status?: string;
   created_at?: string;

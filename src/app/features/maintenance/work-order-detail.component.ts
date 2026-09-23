@@ -143,11 +143,14 @@ import { BmSpinnerComponent } from '../../shared/components/bm-spinner/bm-spinne
               <input class="bm-input" formControlName="particulars" placeholder="Particulars">
               <input class="bm-input" type="number" min="0.01" step="0.01" formControlName="amount" placeholder="Amount">
               <input class="bm-input" type="date" formControlName="due_date">
-              <select class="bm-input" formControlName="payment_mode">
+              <select class="bm-input" formControlName="payment_mode" (change)="onPaymentModeChange()">
                 <option value="cash">Cash</option>
                 <option value="cheque">Cheque</option>
                 <option value="bank_transfer">Bank Transfer</option>
               </select>
+              @if (paymentForm.controls.payment_mode.value === 'cheque') { <input class="bm-input" formControlName="cheque_no" placeholder="Cheque Number"><input class="bm-input" type="date" formControlName="cheque_date"><input class="bm-input" formControlName="bank_name" placeholder="Bank Name"> }
+              @if (paymentForm.controls.payment_mode.value === 'bank_transfer') { <input class="bm-input" formControlName="bank_reference" placeholder="Bank Reference"><input class="bm-input" type="date" formControlName="transfer_date"><input class="bm-input" formControlName="bank_name" placeholder="Bank Name"> }
+              <textarea class="bm-input md:col-span-2" formControlName="remarks" rows="2" placeholder="Remarks"></textarea>
               <textarea class="bm-input md:col-span-2" formControlName="terms" rows="3" placeholder="Terms"></textarea>
             </div>
             <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
@@ -194,6 +197,8 @@ export class WorkOrderDetailComponent {
     due_date: [new Date().toLocaleDateString('en-CA')],
     payment_mode: ['cash', Validators.required],
     terms: [''],
+    remarks: [''],
+    cheque_no: [''], cheque_date: [''], bank_name: [''], bank_reference: [''], transfer_date: [''],
   });
 
   constructor() {
@@ -257,7 +262,8 @@ export class WorkOrderDetailComponent {
     const id = this.order()?.id;
     if (!id || this.paymentForm.invalid) return;
     this.saving.set(true);
-    this.api.addWorkOrderPayment(id, this.paymentForm.getRawValue()).subscribe({
+    const payload = this.paymentForm.getRawValue();
+    this.api.addWorkOrderPayment(id, { ...payload, particulars: payload.remarks.trim() || payload.particulars }).subscribe({
       next: () => {
         this.paymentOpen.set(false);
         this.saving.set(false);
@@ -270,12 +276,28 @@ export class WorkOrderDetailComponent {
     });
   }
 
+  onPaymentModeChange(): void {
+    const mode = this.paymentForm.controls.payment_mode.value;
+    const required = mode === 'cheque' ? [Validators.required] : [];
+    this.paymentForm.controls.cheque_no.setValidators(required);
+    this.paymentForm.controls.cheque_date.setValidators(required);
+    const bankRequired = mode === 'bank_transfer' ? [Validators.required] : [];
+    this.paymentForm.controls.bank_reference.setValidators(bankRequired);
+    this.paymentForm.controls.transfer_date.setValidators(bankRequired);
+    [this.paymentForm.controls.cheque_no, this.paymentForm.controls.cheque_date, this.paymentForm.controls.bank_reference, this.paymentForm.controls.transfer_date].forEach((control) => control.updateValueAndValidity({ emitEvent: false }));
+    if (mode !== 'cheque') this.paymentForm.patchValue({ cheque_no: '', cheque_date: '' });
+    if (mode !== 'bank_transfer') this.paymentForm.patchValue({ bank_reference: '', transfer_date: '' });
+    if (mode === 'cash') this.paymentForm.patchValue({ bank_name: '' });
+  }
+
   setPaymentStatus(payment: WorkOrderPayment, status: 'paid' | 'defaulted'): void {
     const id = this.order()?.id;
     if (!id) return;
-    this.api.updateWorkOrderPaymentStatus(id, payment.id, status).subscribe({
-      next: () => this.load(),
-      error: (error) => this.error.set(error.message || 'Unable to post payment.'),
+    if (this.saving()) return;
+    this.saving.set(true);
+    this.api.updateWorkOrderPaymentStatus(id, payment.id, status, `work-order-${id}-${payment.id}-${Date.now()}`).subscribe({
+      next: () => { this.saving.set(false); this.load(); },
+      error: (error) => { this.saving.set(false); this.error.set(error.message || 'Unable to post payment.'); },
     });
   }
 }

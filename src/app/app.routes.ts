@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 import { superAdminGuard } from './core/guards/super-admin.guard';
+import { accountsViewGuard } from './core/auth/permission.guard';
 
 export const routes: Routes = [
   {
@@ -171,22 +172,27 @@ export const routes: Routes = [
       // Accounts
       {
         path: 'accounts/dashboard',
+        canActivate: [accountsViewGuard],
         loadComponent: () => import('./features/accounts/accounts-dashboard.component').then((m) => m.AccountsDashboardComponent),
       },
       {
         path: 'accounts/inward', data: { direction: 'inward' },
+        canActivate: [accountsViewGuard],
         loadComponent: () => import('./features/accounts/account-transactions-list.component').then((m) => m.AccountTransactionsListComponent),
       },
       {
         path: 'accounts/outward', data: { direction: 'outward' },
+        canActivate: [accountsViewGuard],
         loadComponent: () => import('./features/accounts/account-transactions-list.component').then((m) => m.AccountTransactionsListComponent),
       },
       {
         path: 'accounts/petty-cash',
+        canActivate: [accountsViewGuard],
         loadComponent: () => import('./features/accounts/petty-cash.component').then((m) => m.PettyCashComponent),
       },
       {
         path: 'accounts/reports',
+        canActivate: [accountsViewGuard],
         loadComponent: () => import('./features/accounts/accounts-reports.component').then((m) => m.AccountsReportsComponent),
       },
       { path: 'maintenance/work-orders/new', loadComponent: () => import('./features/maintenance/work-order-form.component').then((m) => m.WorkOrderFormComponent) },

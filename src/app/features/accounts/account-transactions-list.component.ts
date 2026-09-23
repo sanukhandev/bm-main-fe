@@ -8,6 +8,7 @@ import { BmLoadingStateComponent } from '../../shared/components/bm-loading-stat
 import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm-error-state.component';
 import { BmEmptyStateComponent } from '../../shared/components/bm-empty-state/bm-empty-state.component';
 import { BmStatusBadgeComponent } from '../../shared/components/bm-status-badge/bm-status-badge.component';
+import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
   selector: 'bm-account-transactions-list', standalone: true,
@@ -22,6 +23,7 @@ import { BmStatusBadgeComponent } from '../../shared/components/bm-status-badge/
 })
 export class AccountTransactionsListComponent implements OnInit {
   private api = inject(AccountsApiService);
+  private auth = inject(AuthService);
   private route = inject(ActivatedRoute);
   direction = signal<AccountDirection>('inward');
   rows = signal<AccountTransaction[]>([]);
@@ -30,9 +32,12 @@ export class AccountTransactionsListComponent implements OnInit {
   voidId = signal<number | null>(null);
   voidReason = '';
   voiding = false;
+  canPost = () => this.auth.hasPermission('accounts.post');
+  canVoid = () => this.auth.hasPermission('accounts.void');
 
   ngOnInit(): void { this.direction.set(this.route.snapshot.data['direction']); this.load(); }
   load(): void { this.loading.set(true); this.api.getTransactions(this.direction()).subscribe({ next: (res) => { this.rows.set(res.data); this.loading.set(false); }, error: (err) => { this.error.set(err.message || 'Unable to load transactions.'); this.loading.set(false); } }); }
   openVoid(id: number): void { this.voidReason = ''; this.voidId.set(id); }
   submitVoid(): void { const id = this.voidId(); if (!id || !this.voidReason.trim() || this.voiding) return; this.voiding = true; this.api.voidTransaction(id, this.voidReason.trim()).subscribe({ next: () => { this.voiding = false; this.voidId.set(null); this.load(); }, error: (err) => { this.voiding = false; this.error.set(err.message || 'Unable to void document.'); } }); }
+  chequeAction(id: number, action: 'deposit' | 'clear' | 'bounce' | 'cancel'): void { this.api.chequeAction(id, action).subscribe({ next: () => this.load(), error: (err) => this.error.set(err.message || 'Unable to update cheque status.') }); }
 }

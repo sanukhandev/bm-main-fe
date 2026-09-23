@@ -20,6 +20,7 @@ export interface AccountTransaction {
   bank_reference: string | null;
   transfer_date: string | null;
   status: 'draft' | 'posted' | 'void';
+  cheque_status?: 'received' | 'deposited' | 'cleared' | 'bounced' | 'cancelled' | null;
   voided_at?: string | null;
   void_reason?: string | null;
   party?: { id: number; display_name: string; customer_code: string } | null;
@@ -81,6 +82,10 @@ export class AccountsApiService {
 
   voidTransaction(id: number, reason: string): Observable<ApiResponse<AccountTransaction>> {
     return this.http.post<ApiResponse<AccountTransaction>>(`${this.baseUrl}/transactions/${id}/void`, { reason }, { headers: new HttpHeaders({ 'Idempotency-Key': `void-${id}-${Date.now()}` }) });
+  }
+
+  chequeAction(id: number, action: 'deposit' | 'clear' | 'bounce' | 'cancel'): Observable<ApiResponse<AccountTransaction>> {
+    return this.http.post<ApiResponse<AccountTransaction>>(`${this.baseUrl}/transactions/${id}/cheque/${action}`, {});
   }
 
   getDailyMovement(): Observable<ApiResponse<DailyMovement[]>> {

@@ -12,27 +12,27 @@ import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.c
   imports: [CommonModule, ReactiveFormsModule, BmFooterComponent],
   template: `
     <div
-      class="min-h-dvh min-h-screen w-full bg-[#101827] bg-[radial-gradient(circle_at_85%_85%,rgba(6,78,59,0.22),transparent_40%)] flex items-center justify-center p-4 sm:p-6 lg:p-12 relative overflow-hidden"
+      class="min-h-dvh min-h-screen w-full bg-[#193D32] bg-[radial-gradient(circle_at_85%_85%,rgba(156,175,159,0.15),transparent_40%)] flex items-center justify-center p-4 sm:p-6 lg:p-12 relative overflow-hidden font-sans"
     >
       <!-- Background Ambient Accents -->
       <div
-        class="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-[#047857]/15 blur-3xl pointer-events-none"
+        class="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-[#9CAF9F]/10 blur-3xl pointer-events-none"
       ></div>
       <div
-        class="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-[#064E3B]/25 blur-3xl pointer-events-none"
+        class="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-[#143229]/40 blur-3xl pointer-events-none"
       ></div>
 
       <!-- Main Login Container Panel -->
       <div
-        class="max-w-[1120px] w-full min-h-[660px] bg-white rounded-[28px] border border-white/10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] z-10"
+        class="max-w-[1120px] w-full min-h-[660px] bg-[#FBFAF7] rounded-2xl border border-[#E5E0D8] shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] z-10"
       >
         <!-- Left Branding Panel (Desktop & Tablet) -->
         <div
-          class="hidden lg:flex p-10 xl:p-14 flex-col justify-between relative overflow-hidden bg-[linear-gradient(145deg,#0A2E1F_0%,#0D3B29_45%,#14532D_100%)] text-white select-none"
+          class="hidden lg:flex p-10 xl:p-14 flex-col justify-between relative overflow-hidden bg-[linear-gradient(145deg,#193D32_0%,#143229_45%,#0F2720_100%)] text-white select-none"
         >
           <!-- Faint Structural Grid Overlay & Radial Highlight -->
           <div
-            class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(52,211,153,0.15),transparent_50%)] pointer-events-none"
+            class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(156,175,159,0.2),transparent_50%)] pointer-events-none"
           ></div>
           <div
             class="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none"
@@ -41,15 +41,15 @@ import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.c
           <!-- Top Brand Monogram -->
           <div class="z-10 flex items-center gap-3.5">
             <div
-              class="w-[50px] h-[50px] rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center justify-center font-bold text-white text-xl tracking-wider shadow-inner shrink-0"
+              class="w-10 h-10 rounded-lg bg-[#FBFAF7] text-[#193D32] flex items-center justify-center font-bold text-sm tracking-wider shadow-sm shrink-0"
             >
               BM
             </div>
             <div>
-              <div class="font-bold text-white text-base tracking-wide leading-tight">
+              <div class="font-bold text-white text-base tracking-tight leading-tight">
                 Baithul Madeena
               </div>
-              <div class="text-[11px] text-emerald-300/90 font-medium uppercase tracking-widest mt-0.5">
+              <div class="text-[10px] text-[#9CAF9F] font-semibold uppercase tracking-widest mt-0.5">
                 Real Estate ERP
               </div>
             </div>
@@ -58,12 +58,12 @@ import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.c
           <!-- Middle Value Proposition -->
           <div class="z-10 my-auto py-8">
             <h1
-              class="text-[34px] leading-[1.15] font-semibold text-white tracking-[-0.025em] mb-4"
+              class="text-[32px] leading-[1.2] font-semibold text-white tracking-tight mb-4"
             >
               Multi-branch real estate operations.
             </h1>
             <p
-              class="text-emerald-100/80 text-sm leading-relaxed max-w-[380px] font-normal"
+              class="text-[#9CAF9F]/90 text-sm leading-relaxed max-w-[380px] font-normal"
             >
               Manage properties, agreements, customers, and financial operations with secure verified branch-level isolation.
             </p>
@@ -71,15 +71,15 @@ import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.c
             <!-- Subtle Feature Tags -->
             <div class="mt-8 flex flex-wrap gap-2.5">
               <span
-                class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-xs font-medium text-emerald-100 backdrop-blur-sm"
+                class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-xs font-medium text-white backdrop-blur-sm"
               >
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#9CAF9F]"></span>
                 Multi-branch Isolation
               </span>
               <span
-                class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-xs font-medium text-emerald-100 backdrop-blur-sm"
+                class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-xs font-medium text-white backdrop-blur-sm"
               >
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-[#9CAF9F]"></span>
                 Secure ERP Workspace
               </span>
             </div>
@@ -87,7 +87,7 @@ import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.c
 
           <!-- Bottom Footer Info -->
           <div
-            class="z-10 pt-6 border-t border-white/10 flex items-center justify-between text-xs text-emerald-100/60 font-medium"
+            class="z-10 pt-6 border-t border-white/10 flex items-center justify-between text-xs text-[#9CAF9F]/80 font-medium"
           >
             <span>&copy; 2026 Baithul Madeena Real Estate</span>
             <span>Enterprise v2.4</span>
@@ -95,17 +95,17 @@ import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.c
         </div>
 
         <!-- Right Form Panel -->
-        <div class="p-8 sm:p-12 lg:p-14 flex flex-col justify-center bg-white relative">
+        <div class="p-8 sm:p-12 lg:p-14 flex flex-col justify-center bg-[#FBFAF7] relative">
           <!-- Mobile Top Header Badge (Shown on small screens) -->
-          <div class="lg:hidden flex items-center gap-3 mb-8 pb-6 border-b border-slate-100">
+          <div class="lg:hidden flex items-center gap-3 mb-8 pb-6 border-b border-[#E5E0D8]">
             <div
-              class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#064E3B] to-[#047857] flex items-center justify-center font-bold text-white text-base shadow-sm shrink-0"
+              class="w-10 h-10 rounded-lg bg-[#193D32] text-white flex items-center justify-center font-bold text-sm shadow-sm shrink-0"
             >
               BM
             </div>
             <div>
-              <div class="font-semibold text-slate-900 text-sm">Baithul Madeena</div>
-              <div class="text-[11px] text-emerald-700 font-medium uppercase tracking-wider">Real Estate ERP</div>
+              <div class="font-semibold text-[#1B1E1C] text-sm">Baithul Madeena</div>
+              <div class="text-[10px] text-[#193D32] font-semibold uppercase tracking-wider">Real Estate ERP</div>
             </div>
           </div>
 
@@ -114,11 +114,11 @@ import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.c
             <!-- Header Block -->
             <div class="mb-8">
               <h2
-                class="text-[32px] font-semibold text-slate-900 tracking-[-0.025em] leading-tight"
+                class="text-[28px] font-semibold text-[#1B1E1C] tracking-tight leading-tight"
               >
                 Sign In
               </h2>
-              <p class="text-sm text-slate-500 mt-2 font-normal">
+              <p class="text-xs text-[#1B1E1C]/60 mt-1.5 font-normal">
                 Access your Baithul Madeena workspace.
               </p>
             </div>
@@ -128,11 +128,11 @@ import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.c
               <div
                 role="alert"
                 aria-live="assertive"
-                class="mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200/80 text-xs text-rose-800 flex items-start gap-3 animate-fade-in"
+                class="mb-6 p-4 rounded-xl bg-[#B98D91]/15 border border-[#B98D91]/40 text-xs text-[#1B1E1C] flex items-start gap-3 animate-fade-in"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5 text-rose-600 shrink-0 mt-0.5"
+                  class="h-5 w-5 text-[#B98D91] shrink-0 mt-0.5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -145,10 +145,10 @@ import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.c
                   />
                 </svg>
                 <div>
-                  <div class="font-semibold text-rose-900 mb-0.5">
+                  <div class="font-semibold text-[#1B1E1C] mb-0.5">
                     Unable to sign in
                   </div>
-                  <div class="text-rose-700/90 leading-relaxed">
+                  <div class="text-[#1B1E1C]/80 leading-relaxed">
                     {{ errorMessage() }}
                   </div>
                 </div>
@@ -161,17 +161,17 @@ import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.c
               <div>
                 <label
                   for="email-input"
-                  class="block text-[13px] font-medium text-slate-700 mb-2"
+                  class="block text-xs font-semibold uppercase tracking-[0.08em] text-[#1B1E1C]/70 mb-2"
                 >
-                  Email address
+                  Email Address
                 </label>
                 <div class="relative">
                   <div
-                    class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400"
+                    class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#1B1E1C]/40"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      class="h-5 w-5"
+                      class="h-4 w-4"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -193,15 +193,14 @@ import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.c
                     aria-required="true"
                     [attr.aria-invalid]="isFieldInvalid('email')"
                     [attr.aria-describedby]="isFieldInvalid('email') ? 'email-error' : null"
-                    class="w-full h-[50px] pl-11 pr-4 rounded-[14px] bg-[#FAFBFA] border border-[#DDE3DF] text-sm text-slate-900 placeholder:text-[#98A2A0] transition-all duration-180 focus:bg-white focus:border-[#047857] focus:ring-4 focus:ring-[#047857]/10 focus:outline-none"
-                    [class.border-rose-300]="isFieldInvalid('email')"
-                    [class.bg-rose-50\/30]="isFieldInvalid('email')"
+                    class="w-full h-11 pl-10 pr-4 rounded-lg bg-[#F2EFE9]/40 border border-[#E5E0D8] text-xs text-[#1B1E1C] placeholder:text-[#1B1E1C]/40 transition-all focus:bg-white focus:border-[#193D32] focus:ring-2 focus:ring-[#193D32]/10 focus:outline-none"
+                    [class.border-[#B98D91]]="isFieldInvalid('email')"
                   />
                 </div>
                 @if (isFieldInvalid('email')) {
                   <span
                     id="email-error"
-                    class="text-[12px] font-medium text-rose-600 mt-1.5 block flex items-center gap-1"
+                    class="text-[11px] font-medium text-[#B98D91] mt-1.5 block flex items-center gap-1"
                   >
                     Please enter a valid email address.
                   </span>
@@ -212,17 +211,17 @@ import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.c
               <div>
                 <label
                   for="password-input"
-                  class="block text-[13px] font-medium text-slate-700 mb-2"
+                  class="block text-xs font-semibold uppercase tracking-[0.08em] text-[#1B1E1C]/70 mb-2"
                 >
                   Password
                 </label>
                 <div class="relative">
                   <div
-                    class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400"
+                    class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#1B1E1C]/40"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      class="h-5 w-5"
+                      class="h-4 w-4"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -244,9 +243,8 @@ import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.c
                     aria-required="true"
                     [attr.aria-invalid]="isFieldInvalid('password')"
                     [attr.aria-describedby]="isFieldInvalid('password') ? 'password-error' : null"
-                    class="w-full h-[50px] pl-11 pr-12 rounded-[14px] bg-[#FAFBFA] border border-[#DDE3DF] text-sm text-slate-900 placeholder:text-[#98A2A0] transition-all duration-180 focus:bg-white focus:border-[#047857] focus:ring-4 focus:ring-[#047857]/10 focus:outline-none"
-                    [class.border-rose-300]="isFieldInvalid('password')"
-                    [class.bg-rose-50\/30]="isFieldInvalid('password')"
+                    class="w-full h-11 pl-10 pr-10 rounded-lg bg-[#F2EFE9]/40 border border-[#E5E0D8] text-xs text-[#1B1E1C] placeholder:text-[#1B1E1C]/40 transition-all focus:bg-white focus:border-[#193D32] focus:ring-2 focus:ring-[#193D32]/10 focus:outline-none"
+                    [class.border-[#B98D91]]="isFieldInvalid('password')"
                   />
 
                   <!-- Password Show/Hide Toggle Button -->
@@ -254,12 +252,12 @@ import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.c
                     type="button"
                     (click)="togglePasswordVisibility()"
                     aria-label="Toggle password visibility"
-                    class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 focus:text-emerald-700 focus:outline-none transition-colors"
+                    class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#1B1E1C]/40 hover:text-[#1B1E1C] focus:outline-none transition-colors"
                   >
                     @if (showPassword()) {
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        class="h-5 w-5"
+                        class="h-4 w-4"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -274,7 +272,7 @@ import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.c
                     } @else {
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        class="h-5 w-5"
+                        class="h-4 w-4"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -298,7 +296,7 @@ import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.c
                 @if (isFieldInvalid('password')) {
                   <span
                     id="password-error"
-                    class="text-[12px] font-medium text-rose-600 mt-1.5 block flex items-center gap-1"
+                    class="text-[11px] font-medium text-[#B98D91] mt-1.5 block flex items-center gap-1"
                   >
                     Please enter your password.
                   </span>
@@ -309,11 +307,11 @@ import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.c
               <button
                 type="submit"
                 [disabled]="isSubmitting()"
-                class="w-full h-[50px] rounded-[14px] bg-gradient-to-r from-[#064E3B] to-[#047857] hover:brightness-110 active:scale-[0.99] font-semibold text-sm text-white shadow-md hover:shadow-lg focus:ring-4 focus:ring-[#047857]/20 focus:outline-none transition-all duration-180 flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-65 disabled:cursor-not-allowed disabled:transform-none mt-7"
+                class="w-full h-11 rounded-lg bg-[#193D32] hover:bg-[#143229] active:scale-[0.99] font-semibold text-xs text-white shadow-sm focus:ring-2 focus:ring-[#193D32]/20 focus:outline-none transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-65 disabled:cursor-not-allowed mt-6"
               >
                 @if (isSubmitting()) {
                   <svg
-                    class="animate-spin h-5 w-5 text-white"
+                    class="animate-spin h-4 w-4 text-white"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -341,11 +339,11 @@ import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.c
 
             <!-- Bottom Security Note -->
             <div
-              class="mt-8 pt-6 border-t border-slate-100 flex items-center justify-center gap-2 text-xs text-slate-400 font-medium select-none"
+              class="mt-8 pt-6 border-t border-[#E5E0D8] flex items-center justify-center gap-2 text-xs text-[#1B1E1C]/50 font-medium select-none"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4 text-emerald-700/80"
+                class="h-4 w-4 text-[#193D32]"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -361,7 +359,7 @@ import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.c
             </div>
 
             <!-- Application Common Footer -->
-            <div class="mt-4 pt-4 border-t border-slate-100">
+            <div class="mt-4 pt-4 border-t border-[#E5E0D8]">
               <bm-footer></bm-footer>
             </div>
           </div>

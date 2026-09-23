@@ -110,12 +110,13 @@ import { Customer } from '../../shared/models/customer.models';
               <!-- Property Code -->
               <div>
                 <label class="block text-[13px] font-semibold text-[#26312C] mb-2">
-                  Property Code <span class="text-rose-600 font-bold ml-0.5">*</span>
+                  Generated Property Code
                 </label>
                 <input
                   type="text"
                   formControlName="property_code"
-                  placeholder="e.g. FLAT-101 or VILLA-12"
+                  placeholder="Generated from branch, emirate, building, unit, and type"
+                  readonly
                   [attr.aria-invalid]="isFieldInvalid('property_code')"
                   aria-describedby="property_code-error"
                   class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium shadow-2xs placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
@@ -359,7 +360,7 @@ export class PropertyFormComponent implements OnInit {
 
   propertyForm = this.fb.group({
     owner_customer_id: ['', Validators.required],
-    property_code: ['', Validators.required],
+    property_code: [{ value: '', disabled: true }],
     unit_number: ['', Validators.required],
     name: ['', Validators.required],
     property_type: ['apartment' as PropertyType, Validators.required],
@@ -446,7 +447,6 @@ export class PropertyFormComponent implements OnInit {
     const val = this.propertyForm.value;
     const dto = {
       owner_customer_id: Number(val.owner_customer_id),
-      property_code: val.property_code!,
       unit_number: val.unit_number!,
       name: val.name!,
       property_type: val.property_type as PropertyType,

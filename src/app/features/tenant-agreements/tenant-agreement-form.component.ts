@@ -11,7 +11,7 @@ import { CustomersApiService } from '../../core/api/customers-api.service';
 import { PropertiesApiService } from '../../core/api/properties-api.service';
 import { Customer } from '../../shared/models/customer.models';
 import { Property } from '../../shared/models/property.models';
-import { InstallmentItem, PaymentMode } from '../../shared/models/agreement.models';
+import { InstallmentItem, OwnerAgreement, PaymentMode } from '../../shared/models/agreement.models';
 
 @Component({
   selector: 'bm-tenant-agreement-form',
@@ -174,6 +174,25 @@ import { InstallmentItem, PaymentMode } from '../../shared/models/agreement.mode
             </div>
 
             <div>
+              <label class="block text-[13px] font-semibold text-[#26312C] mb-2">
+                Source Owner Agreement <span class="text-rose-600 font-bold ml-0.5">*</span>
+              </label>
+              <select
+                formControlName="source_owner_agreement_id"
+                (change)="onAvailabilityInputsChange()"
+                class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium shadow-2xs focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
+              >
+                <option value="">Select source agreement...</option>
+                @for (ownerAgreement of ownerAgreements(); track ownerAgreement.id) {
+                  <option [value]="ownerAgreement.id">{{ ownerAgreement.agreement_no }} · {{ ownerAgreement.start_date }} – {{ ownerAgreement.end_date }}</option>
+                }
+              </select>
+              @if (isFieldInvalid('source_owner_agreement_id')) {
+                <span class="text-xs font-medium text-rose-600 mt-1.5 flex items-center gap-1">Source owner agreement is required.</span>
+              }
+            </div>
+
+            <div class="mt-5">
               <label class="block text-[13px] font-semibold text-[#26312C] mb-2">
                 Property Asset <span class="text-rose-600 font-bold ml-0.5">*</span>
               </label>
@@ -379,16 +398,19 @@ export class TenantAgreementFormComponent implements OnInit {
   agreementId = signal<number | null>(null);
 
   tenants = signal<Customer[]>([]);
+  ownerAgreements = signal<OwnerAgreement[]>([]);
   availableProperties = signal<Property[]>([]);
 
   isLoading = signal(false);
   isSubmitting = signal(false);
   error = signal<string | null>(null);
   serverError = signal<string | null>(null);
+  private availabilityRequest = 0;
 
   agreementForm = this.fb.group({
     agreement_no: [''],
     tenant_customer_id: ['', Validators.required],
+    source_owner_agreement_id: ['', Validators.required],
     selected_property_id: ['', Validators.required],
     start_date: ['', Validators.required],
     end_date: ['', Validators.required],
@@ -434,7 +456,7 @@ export class TenantAgreementFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadTenants();
-    this.loadAvailableProperties();
+    this.loadOwnerAgreements();
 
     const id = this.route.snapshot.paramMap.get('id');
     if (id && id !== 'new') {
@@ -455,9 +477,35 @@ export class TenantAgreementFormComponent implements OnInit {
     });
   }
 
+  loadOwnerAgreements(): void {
+    this.ownerAgreementsApi.getAgreements({ per_page: 100 }).subscribe({
+      next: (res) => this.ownerAgreements.set(res.data),
+    });
+  }
+
   loadAvailableProperties(): void {
-    this.propertiesApi.getProperties({ per_page: 100, status: 'active' }).subscribe({
-      next: (res) => this.availableProperties.set(res.data),
+    const request = ++this.availabilityRequest;
+    const value = this.agreementForm.getRawValue();
+    if (!value.start_date || !value.end_date || value.start_date > value.end_date) {
+      this.availableProperties.set([]);
+      return;
+    }
+    this.propertiesApi.getAvailableProperties({
+      per_page: 100,
+      start_date: value.start_date,
+      end_date: value.end_date,
+      source_owner_agreement_id: value.source_owner_agreement_id || undefined,
+      exclude_tenant_agreement_id: this.agreementId() || undefined,
+    }).subscribe({
+      next: (res) => {
+        if (request !== this.availabilityRequest) return;
+        this.availableProperties.set(res.data);
+        const selected = Number(this.agreementForm.get('selected_property_id')?.value);
+        if (selected && !res.data.some((property) => property.id === selected)) this.agreementForm.get('selected_property_id')?.setValue('');
+      },
+      error: () => {
+        if (request === this.availabilityRequest) this.availableProperties.set([]);
+      },
     });
   }
 
@@ -479,6 +527,7 @@ export class TenantAgreementFormComponent implements OnInit {
         this.agreementForm.patchValue({
           agreement_no: agr.agreement_no,
           tenant_customer_id: String(agr.tenant_customer_id),
+          source_owner_agreement_id: agr.properties?.[0]?.source_owner_agreement_id ? String(agr.properties[0].source_owner_agreement_id) : '',
           selected_property_id: selectedPropId,
           start_date: agr.start_date,
           end_date: agr.end_date,
@@ -488,6 +537,7 @@ export class TenantAgreementFormComponent implements OnInit {
           payment_mode: agr.payment_mode || 'cheque',
           notes: agr.notes || '',
         });
+        this.loadAvailableProperties();
         this.isLoading.set(false);
       },
       error: (err) => {
@@ -497,7 +547,11 @@ export class TenantAgreementFormComponent implements OnInit {
     });
   }
 
-  onDateChange(): void {}
+  onDateChange(): void { this.onAvailabilityInputsChange(); }
+  onAvailabilityInputsChange(): void {
+    this.agreementForm.get('selected_property_id')?.setValue('');
+    this.loadAvailableProperties();
+  }
   onPropertyChange(): void {}
 
   isFieldInvalid(field: string): boolean {
@@ -530,13 +584,11 @@ export class TenantAgreementFormComponent implements OnInit {
       payment_count: Number(val.payment_count),
       payment_frequency: val.payment_frequency || 'monthly',
       payment_mode: val.payment_mode as PaymentMode,
+      properties: [{
+        property_id: selectedPropId,
+        source_owner_agreement_id: Number(val.source_owner_agreement_id),
+      }],
       notes: val.notes || null,
-      properties: [
-        {
-          property_id: selectedPropId,
-          rent_amount: Number(val.total_amount),
-        },
-      ],
     };
 
     if (this.isEditMode()) {
@@ -547,12 +599,7 @@ export class TenantAgreementFormComponent implements OnInit {
         },
         error: (err) => {
           this.isSubmitting.set(false);
-          if (err.error?.errors) {
-            const messages = Object.values(err.error.errors).flat().join(' ');
-            this.serverError.set(messages || err.message || 'Validation failed.');
-          } else {
-            this.serverError.set(err.message || 'Failed to update tenant agreement.');
-          }
+          this.handleSubmitError(err, 'Failed to update tenant agreement.');
         },
       });
     } else {
@@ -563,14 +610,19 @@ export class TenantAgreementFormComponent implements OnInit {
         },
         error: (err) => {
           this.isSubmitting.set(false);
-          if (err.error?.errors) {
-            const messages = Object.values(err.error.errors).flat().join(' ');
-            this.serverError.set(messages || err.message || 'Validation failed.');
-          } else {
-            this.serverError.set(err.message || 'Failed to create tenant agreement.');
-          }
+          this.handleSubmitError(err, 'Failed to create tenant agreement.');
         },
       });
     }
+  }
+
+  private handleSubmitError(err: { error?: { code?: string; errors?: Record<string, unknown> }; message?: string }, fallback: string): void {
+    if (err.error?.code === 'PROPERTY_NOT_AVAILABLE') {
+      this.serverError.set('One or more selected properties are no longer available for this agreement period. Review the property selection and try again.');
+      this.loadAvailableProperties();
+      return;
+    }
+    const messages = err.error?.errors ? Object.values(err.error.errors).flat().join(' ') : '';
+    this.serverError.set(messages || err.message || fallback);
   }
 }

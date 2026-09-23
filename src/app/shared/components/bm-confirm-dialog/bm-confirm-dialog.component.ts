@@ -7,10 +7,10 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   template: `
     @if (isOpen) {
-      <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 animate-fade-in">
-        <div class="bm-card max-w-md w-full p-6 bg-white shadow-xl rounded-2xl animate-scale-up" role="dialog" aria-modal="true">
-          <h3 class="text-lg font-semibold text-[#101214] mb-2">{{ title }}</h3>
-          <p class="text-sm text-[#64748B] mb-6">{{ message }}</p>
+      <div class="fixed inset-0 z-50 flex items-center justify-center bg-[#1B1E1C]/40 backdrop-blur-xs p-4 animate-fade-in font-sans">
+        <div class="bm-card max-w-md w-full p-6 bg-[#FBFAF7] border border-[#E5E0D8] shadow-2xl rounded-xl animate-scale-up" role="dialog" aria-modal="true">
+          <h3 class="text-xs font-semibold uppercase tracking-[0.08em] text-[#1B1E1C] mb-2">{{ title }}</h3>
+          <p class="text-xs text-[#1B1E1C]/70 mb-6 font-normal">{{ message }}</p>
 
           <div class="flex items-center justify-end gap-3">
             <button

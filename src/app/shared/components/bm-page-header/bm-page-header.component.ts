@@ -14,20 +14,20 @@ export interface BreadcrumbItem {
     <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
       <div>
         @if (breadcrumbs && breadcrumbs.length > 0) {
-          <nav class="mb-1 flex items-center gap-2 text-xs text-slate-500 font-medium">
+          <nav class="mb-1.5 flex items-center gap-2 text-[11px] text-[#1B1E1C]/50 font-semibold uppercase tracking-[0.08em]">
             @for (crumb of breadcrumbs; track crumb.label; let last = $last) {
               <span>{{ crumb.label }}</span>
               @if (!last) {
-                <span class="text-slate-300">/</span>
+                <span class="text-[#1B1E1C]/30">/</span>
               }
             }
           </nav>
         }
-        <h1 class="text-2xl md:text-[30px] font-semibold text-[#101214] tracking-tight leading-tight">
+        <h1 class="text-2xl md:text-3xl font-semibold text-[#1B1E1C] tracking-tight leading-tight">
           {{ title }}
         </h1>
         @if (subtitle) {
-          <p class="mt-1 text-sm text-[#64748B]">{{ subtitle }}</p>
+          <p class="mt-1 text-xs text-[#1B1E1C]/60 font-medium">{{ subtitle }}</p>
         }
       </div>
 

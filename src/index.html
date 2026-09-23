@@ -8,33 +8,32 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anta&family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Anta&family=Instrument+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
   <style>
     /* Inline styles for instantaneous app boot preloader */
     .bm-boot-splash {
       position: fixed;
       inset: 0;
-      background: #12372A;
+      background: #193D32;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 99999;
-      font-family: 'Inter', system-ui, sans-serif;
+      font-family: 'Instrument Sans', system-ui, sans-serif;
       color: #ffffff;
     }
     .bm-boot-logo {
       width: 72px;
       height: 72px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, #12372A 0%, #174B38 50%, #247454 100%);
+      border-radius: 16px;
+      background: #285746;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 10px 25px -5px rgba(18, 55, 42, 0.5), 0 0 0 1px rgba(255,255,255,0.1);
+      box-shadow: 0 10px 25px -5px rgba(25, 61, 50, 0.5), 0 0 0 1px rgba(255,255,255,0.1);
       margin-bottom: 24px;
       position: relative;
-      animation: bmPulseRing 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
     .bm-boot-title {
       font-size: 20px;
@@ -44,9 +43,9 @@
       margin: 0 0 6px 0;
     }
     .bm-boot-subtitle {
-      font-size: 12px;
-      font-weight: 500;
-      color: #A9D8C0;
+      font-size: 11px;
+      font-weight: 600;
+      color: #9CAF9F;
       letter-spacing: 0.15em;
       text-transform: uppercase;
       margin-bottom: 32px;
@@ -54,7 +53,7 @@
     .bm-boot-bar-track {
       width: 180px;
       height: 4px;
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.12);
       border-radius: 999px;
       overflow: hidden;
       position: relative;
@@ -65,13 +64,9 @@
       left: -50%;
       height: 100%;
       width: 50%;
-      background: linear-gradient(90deg, #247454, #A9D8C0, #247454);
+      background: #9CAF9F;
       border-radius: 999px;
       animation: bmIndeterminate 1.5s infinite ease-in-out;
-    }
-    @keyframes bmPulseRing {
-      0%, 100% { transform: scale(1); box-shadow: 0 10px 25px -5px rgba(18, 55, 42, 0.5); }
-      50% { transform: scale(1.05); box-shadow: 0 15px 35px -2px rgba(169, 216, 192, 0.3); }
     }
     @keyframes bmIndeterminate {
       0% { left: -50%; width: 30%; }
@@ -84,7 +79,7 @@
   <app-root>
     <div class="bm-boot-splash">
       <div class="bm-boot-logo">
-        <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#A9D8C0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#DDE5DD" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 21h18"/>
           <path d="M3 10h18"/>
           <path d="M5 6l7-3 7 3"/>
@@ -96,7 +91,7 @@
         </svg>
       </div>
       <h1 class="bm-boot-title">BAITHUL MADEENA</h1>
-      <p class="bm-boot-subtitle">PROPERTY ERP SYSTEM</p>
+      <p class="bm-boot-subtitle">PROPERTY OPERATING SYSTEM</p>
       <div class="bm-boot-bar-track">
         <div class="bm-boot-bar-fill"></div>
       </div>

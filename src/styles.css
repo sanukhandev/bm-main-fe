@@ -1,5 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anta&family=Poppins:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
+
+.font-zaakiy {
+  font-family: 'Anta', 'Poppins', sans-serif;
+  letter-spacing: 0.04em;
+}
 
 @theme {
   --color-evergreen: #132a13;

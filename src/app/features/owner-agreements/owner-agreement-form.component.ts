@@ -146,7 +146,7 @@ import { InstallmentItem, PaymentMode } from '../../shared/models/agreement.mode
                       />
                       <div class="text-xs overflow-hidden">
                         <div class="font-semibold text-slate-900 truncate">[{{ prop.property_code }}] {{ prop.name }}</div>
-                        <div class="text-slate-500 text-[11px] truncate">Unit: {{ prop.unit_number }} | {{ prop.property_type }}</div>
+                        <div class="text-slate-500 text-[11px] truncate">Property / Unit No.: {{ prop.unit_number }} | {{ prop.property_type }}</div>
                       </div>
                     </label>
                   }

@@ -169,7 +169,7 @@ import { InstallmentItem, PaymentMode } from '../../shared/models/agreement.mode
               </div>
               <div>
                 <h3 class="text-lg font-semibold text-slate-900 tracking-tight">Leased Property Asset</h3>
-                <p class="text-xs text-slate-500 font-normal">Select active rentable property asset for this tenancy contract</p>
+                <p class="text-xs text-slate-500 font-normal">Select an active property for this tenancy contract</p>
               </div>
             </div>
 
@@ -185,7 +185,7 @@ import { InstallmentItem, PaymentMode } from '../../shared/models/agreement.mode
                 <option value="">Select Property Asset...</option>
                 @for (prop of availableProperties(); track prop.id) {
                   <option [value]="prop.id">
-                    [{{ prop.property_code }}] {{ prop.name }} (Unit: {{ prop.unit_number }})
+                    [{{ prop.property_code }}] {{ prop.name }} (Property / Unit No.: {{ prop.unit_number }})
                   </option>
                 }
               </select>

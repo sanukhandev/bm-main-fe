@@ -29,7 +29,7 @@ import { Property } from '../../shared/models/property.models';
     } @else if (property()) {
       <bm-page-header
         [title]="property()!.name"
-        [subtitle]="'Property Code: ' + property()!.property_code + ' | Unit: ' + property()!.unit_number"
+        [subtitle]="'Property Code: ' + property()!.property_code + ' | Property / Unit No.: ' + property()!.unit_number"
       >
         <a routerLink="/app/properties" class="bm-btn bm-btn-secondary text-xs">
           Back to List
@@ -49,7 +49,7 @@ import { Property } from '../../shared/models/property.models';
               </div>
 
               <div>
-                <div class="text-slate-400 font-medium">Unit / Asset Number</div>
+                <div class="text-slate-400 font-medium">Property / Unit No.</div>
                 <div class="font-semibold text-slate-800 mt-1 tabular-nums">{{ property()!.unit_number }}</div>
               </div>
 

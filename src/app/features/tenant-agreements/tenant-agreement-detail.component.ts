@@ -183,7 +183,7 @@ import { TenantAgreement, AgreementInstallment } from '../../shared/models/agree
                     {{ primaryProperty()!.name }}
                   </div>
                   <div class="text-xs text-slate-500 mt-1 tabular-nums">
-                    Code: {{ primaryProperty()!.property_code }} · Unit {{ primaryProperty()!.unit_number }}
+                    Code: {{ primaryProperty()!.property_code }} · Property / Unit No. {{ primaryProperty()!.unit_number }}
                   </div>
                   <div class="text-xs text-slate-500 capitalize">
                     Type: {{ primaryProperty()!.property_type }}

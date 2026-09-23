@@ -26,7 +26,7 @@ import { Customer } from '../../shared/models/customer.models';
       <!-- Page Header -->
       <bm-page-header
         [title]="isEditMode() ? 'Edit Property' : 'Add Property Asset'"
-        [subtitle]="isEditMode() ? 'Update property specifications and owner assignment' : 'Register a new rentable property asset in current branch'"
+        [subtitle]="isEditMode() ? 'Update property specifications and owner assignment' : 'Register a new property in the current branch'"
       >
         <a routerLink="/app/properties" class="bm-btn bm-btn-secondary text-xs font-semibold px-4 py-2 rounded-xl border border-slate-200 shadow-xs hover:bg-slate-100 transition">
           Cancel
@@ -102,7 +102,7 @@ import { Customer } from '../../shared/models/customer.models';
               </div>
               <div>
                 <h3 class="text-lg font-semibold text-slate-900 tracking-tight">Asset Details & Classification</h3>
-                <p class="text-xs text-slate-500 font-normal">Property identification numbers, classification, and unit area</p>
+                <p class="text-xs text-slate-500 font-normal">Property identification, classification, and area</p>
               </div>
             </div>
 
@@ -127,10 +127,10 @@ import { Customer } from '../../shared/models/customer.models';
                 }
               </div>
 
-              <!-- Unit / Asset Number -->
+              <!-- Property / Unit Number -->
               <div>
                 <label class="block text-[13px] font-semibold text-[#26312C] mb-2">
-                  Unit / Asset Number <span class="text-rose-600 font-bold ml-0.5">*</span>
+                  Property / Unit No. <span class="text-rose-600 font-bold ml-0.5">*</span>
                 </label>
                 <input
                   type="text"

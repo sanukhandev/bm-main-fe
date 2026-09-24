@@ -135,6 +135,11 @@ body {
   cursor: not-allowed;
 }
 
+.bm-input-search {
+  padding-left: 2.75rem !important;
+  padding-right: 2.25rem !important;
+}
+
 .bm-btn {
   display: inline-flex;
   align-items: center;

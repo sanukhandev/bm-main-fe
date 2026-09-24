@@ -8,9 +8,9 @@ import { Subject, Subscription, debounceTime, distinctUntilChanged } from 'rxjs'
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="relative w-full max-w-xs">
+    <div [class]="'relative ' + containerClass">
       <div
-        class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400"
+        class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 z-10"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -32,13 +32,13 @@ import { Subject, Subscription, debounceTime, distinctUntilChanged } from 'rxjs'
         [value]="value"
         (input)="onInput($event)"
         [placeholder]="placeholder"
-        class="bm-input pl-10 pr-8"
+        class="bm-input bm-input-search text-xs text-slate-900 placeholder:text-slate-400"
       />
       @if (value) {
         <button
           type="button"
           (click)="clear()"
-          class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+          class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer z-10"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -62,6 +62,7 @@ import { Subject, Subscription, debounceTime, distinctUntilChanged } from 'rxjs'
 export class BmSearchInputComponent implements OnInit, OnDestroy {
   @Input() value = '';
   @Input() placeholder = 'Search...';
+  @Input() containerClass = 'w-full sm:w-80 md:w-96 max-w-lg';
   @Output() searchChange = new EventEmitter<string>();
 
   private searchSubject = new Subject<string>();

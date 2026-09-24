@@ -6,6 +6,7 @@ import { BmLoadingStateComponent } from '../../shared/components/bm-loading-stat
 import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm-error-state.component';
 import { BmConfirmDialogComponent } from '../../shared/components/bm-confirm-dialog/bm-confirm-dialog.component';
 import { BmReceiptChequeModalComponent } from '../../shared/components/bm-receipt-cheque-modal/bm-receipt-cheque-modal.component';
+import { BmAgreementPrintSheetComponent } from '../../shared/components/bm-agreement-print-sheet/bm-agreement-print-sheet.component';
 import { OwnerAgreementsApiService } from '../../core/api/owner-agreements-api.service';
 import { AccountTransaction } from '../../core/api/accounts-api.service';
 import { OwnerAgreement, AgreementInstallment } from '../../shared/models/agreement.models';
@@ -21,6 +22,15 @@ import { OwnerAgreement, AgreementInstallment } from '../../shared/models/agreem
     BmErrorStateComponent,
     BmConfirmDialogComponent,
     BmReceiptChequeModalComponent,
+    BmAgreementPrintSheetComponent,
+  ],
+  styles: [
+    `
+      @media print {
+        .agreement-screen { display: none !important; }
+        :host { display: block !important; color: #000 !important; background: #fff !important; }
+      }
+    `,
   ],
   template: `
     @if (isLoading()) {
@@ -28,7 +38,7 @@ import { OwnerAgreement, AgreementInstallment } from '../../shared/models/agreem
     } @else if (error()) {
       <bm-error-state [message]="error()!" (retry)="loadAgreement()"></bm-error-state>
     } @else if (agreement()) {
-      <div class="max-w-[1360px] w-full mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+      <div class="agreement-screen max-w-[1360px] w-full mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <!-- Back Breadcrumb & Header -->
         <div class="mb-6">
           <a
@@ -140,6 +150,14 @@ import { OwnerAgreement, AgreementInstallment } from '../../shared/models/agreem
                   Resume Agreement
                 </button>
               }
+
+              <button
+                type="button"
+                (click)="printAgreement()"
+                class="bm-btn bm-btn-secondary text-xs font-semibold px-4 py-2 rounded-xl border border-slate-200"
+              >
+                Print Agreement
+              </button>
 
               <!-- More Dropdown Menu -->
               <div class="relative">
@@ -1606,6 +1624,15 @@ import { OwnerAgreement, AgreementInstallment } from '../../shared/models/agreem
           (close)="selectedVoucherTransaction.set(null)"
         ></bm-receipt-cheque-modal>
       </div>
+      <bm-agreement-print-sheet
+        [agreement]="agreement()!"
+        [isOwnerAgreement]="true"
+        [firstPartyName]="ownerName()"
+        firstPartyRole="Owner / المالك"
+        secondPartyName="Baithul Madeena Real Estate"
+        secondPartyRole="Property Management Company / شركة إدارة العقارات"
+        [properties]="propertiesList()"
+      ></bm-agreement-print-sheet>
     }
   `,
 })
@@ -1668,6 +1695,10 @@ export class OwnerAgreementDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadAgreement();
+  }
+
+  printAgreement(): void {
+    window.print();
   }
 
   loadAgreement(silent = false): void {

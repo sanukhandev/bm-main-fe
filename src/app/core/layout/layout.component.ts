@@ -56,7 +56,7 @@ export interface PageSearchItem {
   ],
   template: `
     <div
-      class="h-screen w-screen flex flex-col overflow-hidden bg-[#F8FAFC] relative font-sans text-[#0F172A] select-none"
+      class="h-screen w-full max-w-full flex flex-col overflow-hidden bg-[#F8FAFC] relative font-sans text-[#0F172A] select-none"
     >
       <!-- Global Top Loading Progress Bar -->
       @if (loadingService.isLoading()) {
@@ -71,14 +71,14 @@ export interface PageSearchItem {
 
       <!-- TOP NAVIGATION BAR (Desktop & Mobile Header) -->
       <header
-        class="h-[70px] shrink-0 border-b border-[#E2E8F0] bg-white px-4 md:px-8 flex items-center justify-between z-30 relative shadow-2xs"
+        class="h-[70px] shrink-0 border-b border-[#E2E8F0] bg-white px-3 sm:px-4 md:px-6 xl:px-8 flex items-center justify-between z-30 relative shadow-2xs max-w-full overflow-hidden"
       >
         <!-- LEFT: BRANDING MONOGRAM & TITLE -->
-        <div class="flex items-center gap-6">
+        <div class="flex items-center gap-2 sm:gap-4 xl:gap-6 min-w-0 shrink-0">
           <a
             routerLink="/app/dashboard"
             (click)="closeMegaMenu()"
-            class="flex items-center gap-3 group"
+            class="flex items-center gap-2.5 sm:gap-3 group shrink-0"
           >
             <div
               class="w-9 h-9 rounded-xl bg-[#0F172A] text-white flex items-center justify-center font-bold text-xs tracking-wider shadow-xs group-hover:scale-105 transition-transform shrink-0"
@@ -96,14 +96,14 @@ export interface PageSearchItem {
           </a>
 
           <!-- DESKTOP CENTER PRIMARY NAVIGATION LINKS -->
-          <nav class="hidden lg:flex items-center gap-1.5 ml-4">
+          <nav class="hidden lg:flex items-center gap-1 xl:gap-1.5 ml-1 xl:ml-4 shrink-0">
             <!-- Dashboard (Direct Link with Capsule Active State) -->
             <a
               routerLink="/app/dashboard"
               routerLinkActive="bg-[#0F172A] text-white font-semibold shadow-xs"
               [routerLinkActiveOptions]="{ exact: true }"
               (click)="closeMegaMenu()"
-              class="h-[38px] px-4 rounded-full text-xs font-medium text-[#334155] hover:text-[#0F172A] hover:bg-slate-100 transition-all flex items-center gap-1.5"
+              class="h-[38px] px-3 xl:px-4 rounded-full text-xs font-medium text-[#334155] hover:text-[#0F172A] hover:bg-slate-100 transition-all flex items-center gap-1"
             >
               Dashboard
             </a>
@@ -247,7 +247,10 @@ export interface PageSearchItem {
           </nav>
 
           <!-- GLOBAL NAV PAGE & ENTITY SEARCH BAR -->
-          <div #searchContainer class="relative hidden sm:block w-44 md:w-60 lg:w-72 z-40 ml-2">
+          <div
+            #searchContainer
+            class="relative hidden md:block w-32 lg:w-44 xl:w-72 z-40 ml-1 xl:ml-2 shrink"
+          >
             <div class="relative flex items-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -533,7 +536,7 @@ export interface PageSearchItem {
         </div>
 
         <!-- RIGHT: BRANCH SELECTOR, NOTIFICATIONS, ZAAKIY, USER -->
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-1.5 sm:gap-2 xl:gap-3 shrink-0">
           <!-- HELP MENU GROUP DROPDOWN (FAQ, Terms, Privacy Policy & Legal Docs) -->
           <div #helpMenuContainer class="relative hidden sm:block">
             <button
@@ -765,7 +768,7 @@ export interface PageSearchItem {
             title="Keyboard shortcuts"
             aria-label="Show keyboard shortcuts"
             (click)="toggleShortcutHelp()"
-            class="hidden sm:inline-flex w-9 h-9 rounded-full bg-white border border-[#E2E8F0] text-[#334155] hover:text-[#0F172A] hover:bg-slate-50 flex items-center justify-center transition shrink-0 cursor-pointer shadow-2xs"
+            class="hidden xl:inline-flex w-9 h-9 rounded-full bg-white border border-[#E2E8F0] text-[#334155] hover:text-[#0F172A] hover:bg-slate-50 flex items-center justify-center transition shrink-0 cursor-pointer shadow-2xs"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -786,7 +789,7 @@ export interface PageSearchItem {
           </button>
 
           <!-- Branch Selector -->
-          <bm-branch-switcher></bm-branch-switcher>
+          <bm-branch-switcher class="shrink-0"></bm-branch-switcher>
 
           <!-- Notification Bell Icon Button -->
           <button
@@ -815,7 +818,7 @@ export interface PageSearchItem {
             type="button"
             (click)="openZaakiy()"
             title="Zaakiy AI Assistant"
-            class="hidden sm:inline-flex items-center gap-1.5 h-9 px-3 rounded-full bg-[#ECFDF5] text-[#047857] hover:bg-[#D1FAE5] transition text-xs font-semibold shrink-0 cursor-pointer border border-[#A7F3D0]/50"
+            class="hidden xl:inline-flex items-center gap-1.5 h-9 px-3 rounded-full bg-[#ECFDF5] text-[#047857] hover:bg-[#D1FAE5] transition text-xs font-semibold shrink-0 cursor-pointer border border-[#A7F3D0]/50"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -1959,8 +1962,10 @@ export interface PageSearchItem {
       }
 
       <!-- MAIN WORKSPACE CONTENT AREA -->
-      <main class="flex-1 flex flex-col h-full min-w-0 bg-[#F8FAFC] overflow-y-auto">
-        <div class="flex-1 max-w-[1740px] w-full mx-auto px-4 sm:px-6 md:px-8 py-6">
+      <main
+        class="flex-1 flex flex-col h-full min-w-0 max-w-full bg-[#F8FAFC] overflow-y-auto overflow-x-hidden"
+      >
+        <div class="flex-1 max-w-[1740px] w-full mx-auto px-3 sm:px-6 md:px-8 py-4 sm:py-6">
           <router-outlet></router-outlet>
         </div>
 

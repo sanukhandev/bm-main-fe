@@ -19,9 +19,10 @@ import { Branch } from '../../../core/branch-context/branch.models';
         <span class="w-2 h-2 rounded-full bg-[#285746] shrink-0"></span>
         <span class="font-bold text-[#193D32]">{{ activeBranch()?.code || 'N/A' }}</span>
         <span class="text-[#74776F]">•</span>
-        <span class="max-w-[130px] truncate text-[#343834] font-medium">{{
-          activeBranch()?.name || 'No Branch'
-        }}</span>
+        <span
+          class="max-w-[70px] sm:max-w-[110px] xl:max-w-[140px] truncate text-[#343834] font-medium"
+          >{{ activeBranch()?.name || 'No Branch' }}</span
+        >
 
         @if (availableBranches().length > 1) {
           <svg

@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse, PaginatedResponse, ListQueryParams } from './api.models';
 import { Branch } from '../branch-context/branch.models';
-import { UserAdmin, RoleAdmin } from '../../shared/models/admin.models';
+import { UserAdmin, UserAdminPayload, RoleAdmin } from '../../shared/models/admin.models';
 
 @Injectable({
   providedIn: 'root',
@@ -39,12 +39,16 @@ export class AdministrationApiService {
     });
   }
 
-  createUser(data: Partial<UserAdmin>): Observable<ApiResponse<UserAdmin>> {
+  createUser(data: UserAdminPayload): Observable<ApiResponse<UserAdmin>> {
     return this.http.post<ApiResponse<UserAdmin>>('/api/v1/admin/users', data);
   }
 
-  updateUser(id: number, data: Partial<UserAdmin>): Observable<ApiResponse<UserAdmin>> {
+  updateUser(id: number, data: UserAdminPayload): Observable<ApiResponse<UserAdmin>> {
     return this.http.patch<ApiResponse<UserAdmin>>(`/api/v1/admin/users/${id}`, data);
+  }
+
+  updateUserStatus(id: number, status: 'active' | 'inactive' | 'suspended'): Observable<ApiResponse<UserAdmin>> {
+    return this.http.patch<ApiResponse<UserAdmin>>(`/api/v1/admin/users/${id}/status`, { status });
   }
 
   // Roles

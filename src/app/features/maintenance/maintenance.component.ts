@@ -10,6 +10,8 @@ import { BmStatusBadgeComponent } from '../../shared/components/bm-status-badge/
 import { BmLoadingStateComponent } from '../../shared/components/bm-loading-state/bm-loading-state.component';
 import { BmSpinnerComponent } from '../../shared/components/bm-spinner/bm-spinner.component';
 import { BmSearchInputComponent } from '../../shared/components/bm-search-input/bm-search-input.component';
+import { BmPaginationComponent } from '../../shared/components/bm-pagination/bm-pagination.component';
+import { PaginationMeta } from '../../core/api/api.models';
 import { formatUaePhone, uaePhoneValidator } from '../../shared/utils/uae-formatters';
 
 @Component({
@@ -23,6 +25,7 @@ import { formatUaePhone, uaePhoneValidator } from '../../shared/utils/uae-format
     BmLoadingStateComponent,
     BmSpinnerComponent,
     BmSearchInputComponent,
+    BmPaginationComponent,
   ],
   template: `
     <div class="max-w-7xl mx-auto space-y-6">
@@ -41,7 +44,7 @@ import { formatUaePhone, uaePhoneValidator } from '../../shared/utils/uae-format
             >Create Work Order</a
           >
         } @else {
-          <button class="bm-btn bm-btn-primary" (click)="showForm.set(true)">
+          <button class="bm-btn bm-btn-primary cursor-pointer" (click)="showForm.set(true)">
             Create {{ section() === 'vendors' ? 'Vendor' : 'Inventory Item' }}
           </button>
         }
@@ -74,19 +77,68 @@ import { formatUaePhone, uaePhoneValidator } from '../../shared/utils/uae-format
         >
       </div>
 
-      <!-- Toolbar Search -->
-      <div class="bm-card p-4 flex items-center justify-between gap-4">
-        <bm-search-input
-          [value]="searchQuery()"
-          [placeholder]="
-            section() === 'vendors'
-              ? 'Search vendor name, phone, email...'
-              : section() === 'inventory'
-                ? 'Search SKU, item name...'
-                : 'Search work order no, title, property, vendor...'
-          "
-          (searchChange)="searchQuery.set($event)"
-        ></bm-search-input>
+      <!-- Toolbar Search & Filters -->
+      <div class="bm-card p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+          <bm-search-input
+            [value]="searchQuery()"
+            [placeholder]="
+              section() === 'vendors'
+                ? 'Search vendor name, phone, email...'
+                : section() === 'inventory'
+                  ? 'Search SKU, item name...'
+                  : 'Search work order no, title, property, vendor...'
+            "
+            (searchChange)="onSearchChange($event)"
+          ></bm-search-input>
+
+          <!-- Status Filter -->
+          <select
+            [value]="selectedStatus()"
+            (change)="onStatusChange($event)"
+            class="bm-input !w-auto text-xs font-medium"
+          >
+            <option value="all">All Statuses</option>
+            @if (section() === 'work-orders') {
+              <option value="open">Open</option>
+              <option value="assigned">Assigned</option>
+              <option value="in_progress">In Progress</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            } @else {
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              @if (section() === 'vendors') {
+                <option value="archived">Archived</option>
+              }
+            }
+          </select>
+
+          <!-- Priority Filter for Work Orders -->
+          @if (section() === 'work-orders') {
+            <select
+              [value]="selectedPriority()"
+              (change)="onPriorityChange($event)"
+              class="bm-input !w-auto text-xs font-medium"
+            >
+              <option value="all">All Priorities</option>
+              <option value="low">Low</option>
+              <option value="normal">Normal</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
+            </select>
+          }
+        </div>
+
+        @if (hasActiveFilters()) {
+          <button
+            type="button"
+            (click)="clearFilters()"
+            class="text-xs text-emerald-700 hover:text-emerald-800 font-medium cursor-pointer"
+          >
+            Clear Filters
+          </button>
+        }
       </div>
 
       @if (error()) {
@@ -111,7 +163,7 @@ import { formatUaePhone, uaePhoneValidator } from '../../shared/utils/uae-format
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
-                  @for (row of filteredVendors(); track row.id) {
+                  @for (row of paginatedVendors(); track row.id) {
                     <tr class="hover:bg-slate-50/60 transition-colors">
                       <td class="py-3.5 px-4 font-semibold text-slate-900">{{ row.name }}</td>
                       <td class="py-3.5 px-4 text-slate-700 tabular-nums">
@@ -125,13 +177,20 @@ import { formatUaePhone, uaePhoneValidator } from '../../shared/utils/uae-format
                   } @empty {
                     <tr>
                       <td colspan="4" class="p-10 text-center text-slate-500 font-medium">
-                        No vendors found matching search.
+                        No vendors found matching your filters.
                       </td>
                     </tr>
                   }
                 </tbody>
               </table>
             </div>
+
+            @if (filteredVendors().length > 0) {
+              <bm-pagination
+                [meta]="paginationMeta()"
+                (pageChange)="currentPage.set($event)"
+              ></bm-pagination>
+            }
           </div>
         }
 
@@ -151,7 +210,7 @@ import { formatUaePhone, uaePhoneValidator } from '../../shared/utils/uae-format
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
-                  @for (row of filteredInventory(); track row.id) {
+                  @for (row of paginatedInventory(); track row.id) {
                     <tr class="hover:bg-slate-50/60 transition-colors">
                       <td class="py-3.5 px-4 font-semibold text-emerald-700 tabular-nums">
                         {{ row.sku }}
@@ -168,13 +227,20 @@ import { formatUaePhone, uaePhoneValidator } from '../../shared/utils/uae-format
                   } @empty {
                     <tr>
                       <td colspan="5" class="p-10 text-center text-slate-500 font-medium">
-                        No inventory items found matching search.
+                        No inventory items found matching your filters.
                       </td>
                     </tr>
                   }
                 </tbody>
               </table>
             </div>
+
+            @if (filteredInventory().length > 0) {
+              <bm-pagination
+                [meta]="paginationMeta()"
+                (pageChange)="currentPage.set($event)"
+              ></bm-pagination>
+            }
           </div>
         }
 
@@ -196,7 +262,7 @@ import { formatUaePhone, uaePhoneValidator } from '../../shared/utils/uae-format
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
-                  @for (row of filteredWorkOrders(); track row.id) {
+                  @for (row of paginatedWorkOrders(); track row.id) {
                     <tr class="hover:bg-slate-50/60 transition-colors">
                       <td class="py-3.5 px-4 font-semibold tabular-nums">
                         <a
@@ -233,13 +299,20 @@ import { formatUaePhone, uaePhoneValidator } from '../../shared/utils/uae-format
                   } @empty {
                     <tr>
                       <td colspan="7" class="p-10 text-center text-slate-500 font-medium">
-                        No work orders found matching search.
+                        No work orders found matching your filters.
                       </td>
                     </tr>
                   }
                 </tbody>
               </table>
             </div>
+
+            @if (filteredWorkOrders().length > 0) {
+              <bm-pagination
+                [meta]="paginationMeta()"
+                (pageChange)="currentPage.set($event)"
+              ></bm-pagination>
+            }
           </div>
         }
       }
@@ -464,6 +537,10 @@ export class MaintenanceComponent {
   section = signal('work-orders');
   title = signal('Work Orders');
   searchQuery = signal('');
+  selectedStatus = signal<string>('all');
+  selectedPriority = signal<string>('all');
+  currentPage = signal(1);
+  pageSize = signal(10);
   loading = signal(true);
   showForm = signal(false);
   saving = signal(false);
@@ -475,34 +552,86 @@ export class MaintenanceComponent {
 
   filteredVendors = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
-    if (!q) return this.vendors();
-    return this.vendors().filter(
-      (v) =>
+    const st = this.selectedStatus();
+    return this.vendors().filter((v) => {
+      if (st !== 'all' && (v.status || '').toLowerCase() !== st) return false;
+      if (!q) return true;
+      return (
         (v.name || '').toLowerCase().includes(q) ||
         (v.phone || '').toLowerCase().includes(q) ||
-        (v.email || '').toLowerCase().includes(q),
-    );
+        (v.email || '').toLowerCase().includes(q)
+      );
+    });
   });
 
   filteredInventory = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
-    if (!q) return this.inventory();
-    return this.inventory().filter(
-      (i) => (i.sku || '').toLowerCase().includes(q) || (i.name || '').toLowerCase().includes(q),
-    );
+    const st = this.selectedStatus();
+    return this.inventory().filter((i) => {
+      if (st !== 'all' && (i.status || '').toLowerCase() !== st) return false;
+      if (!q) return true;
+      return (i.sku || '').toLowerCase().includes(q) || (i.name || '').toLowerCase().includes(q);
+    });
   });
 
   filteredWorkOrders = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
-    if (!q) return this.workOrders();
-    return this.workOrders().filter(
-      (w) =>
+    const st = this.selectedStatus();
+    const pr = this.selectedPriority();
+    return this.workOrders().filter((w) => {
+      if (st !== 'all' && (w.status || '').toLowerCase() !== st) return false;
+      if (pr !== 'all' && (w.priority || '').toLowerCase() !== pr) return false;
+      if (!q) return true;
+      return (
         (w.work_order_no || '').toLowerCase().includes(q) ||
         (w.title || '').toLowerCase().includes(q) ||
         (w.property?.name || '').toLowerCase().includes(q) ||
-        (w.vendor?.name || '').toLowerCase().includes(q),
-    );
+        (w.vendor?.name || '').toLowerCase().includes(q)
+      );
+    });
   });
+
+  currentFilteredRows = computed(() => {
+    if (this.section() === 'vendors') return this.filteredVendors();
+    if (this.section() === 'inventory') return this.filteredInventory();
+    return this.filteredWorkOrders();
+  });
+
+  paginationMeta = computed<PaginationMeta>(() => {
+    const total = this.currentFilteredRows().length;
+    const page = this.currentPage();
+    const size = this.pageSize();
+    const lastPage = Math.max(1, Math.ceil(total / size));
+    const from = total === 0 ? 0 : (page - 1) * size + 1;
+    const to = Math.min(total, page * size);
+    return { current_page: page, per_page: size, total, last_page: lastPage, from, to };
+  });
+
+  paginatedVendors = computed(() => {
+    const page = this.currentPage();
+    const size = this.pageSize();
+    const start = (page - 1) * size;
+    return this.filteredVendors().slice(start, start + size);
+  });
+
+  paginatedInventory = computed(() => {
+    const page = this.currentPage();
+    const size = this.pageSize();
+    const start = (page - 1) * size;
+    return this.filteredInventory().slice(start, start + size);
+  });
+
+  paginatedWorkOrders = computed(() => {
+    const page = this.currentPage();
+    const size = this.pageSize();
+    const start = (page - 1) * size;
+    return this.filteredWorkOrders().slice(start, start + size);
+  });
+
+  hasActiveFilters = computed(
+    () =>
+      !!this.searchQuery() || this.selectedStatus() !== 'all' || this.selectedPriority() !== 'all',
+  );
 
   vendorForm = this.fb.nonNullable.group({
     name: ['', Validators.required],
@@ -537,6 +666,7 @@ export class MaintenanceComponent {
     this.route.data.subscribe((data) => {
       this.section.set(data['section'] || 'work-orders');
       this.title.set(data['title'] || 'Work Orders');
+      this.clearFilters();
       this.load();
     });
   }
@@ -617,6 +747,30 @@ export class MaintenanceComponent {
         .getProperties({ per_page: 100, status: 'active' })
         .subscribe({ next: (r) => this.properties.set(r.data) });
     }
+  }
+
+  onSearchChange(q: string): void {
+    this.searchQuery.set(q);
+    this.currentPage.set(1);
+  }
+
+  onStatusChange(event: Event): void {
+    const val = (event.target as HTMLSelectElement).value;
+    this.selectedStatus.set(val);
+    this.currentPage.set(1);
+  }
+
+  onPriorityChange(event: Event): void {
+    const val = (event.target as HTMLSelectElement).value;
+    this.selectedPriority.set(val);
+    this.currentPage.set(1);
+  }
+
+  clearFilters(): void {
+    this.searchQuery.set('');
+    this.selectedStatus.set('all');
+    this.selectedPriority.set('all');
+    this.currentPage.set(1);
   }
 
   saveVendor() {

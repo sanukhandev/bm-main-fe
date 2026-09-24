@@ -6,6 +6,8 @@ import { Invoice, Quotation } from '../../shared/models/billing.models';
 import { BmLoadingStateComponent } from '../../shared/components/bm-loading-state/bm-loading-state.component';
 import { BmStatusBadgeComponent } from '../../shared/components/bm-status-badge/bm-status-badge.component';
 import { BmSearchInputComponent } from '../../shared/components/bm-search-input/bm-search-input.component';
+import { BmPaginationComponent } from '../../shared/components/bm-pagination/bm-pagination.component';
+import { PaginationMeta } from '../../core/api/api.models';
 
 @Component({
   selector: 'bm-billing',
@@ -16,6 +18,7 @@ import { BmSearchInputComponent } from '../../shared/components/bm-search-input/
     BmLoadingStateComponent,
     BmStatusBadgeComponent,
     BmSearchInputComponent,
+    BmPaginationComponent,
   ],
   template: `
     <div class="max-w-7xl mx-auto space-y-6">
@@ -35,12 +38,39 @@ import { BmSearchInputComponent } from '../../shared/components/bm-search-input/
       </div>
 
       <!-- Toolbar Filters -->
-      <div class="bm-card p-4 flex items-center justify-between gap-4">
-        <bm-search-input
-          [value]="searchQuery()"
-          placeholder="Search document no, title, work order, total..."
-          (searchChange)="searchQuery.set($event)"
-        ></bm-search-input>
+      <div class="bm-card p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+          <bm-search-input
+            [value]="searchQuery()"
+            placeholder="Search document no, title, work order, total..."
+            (searchChange)="onSearchChange($event)"
+          ></bm-search-input>
+
+          <select
+            [value]="selectedStatus()"
+            (change)="onStatusChange($event)"
+            class="bm-input !w-auto text-xs font-medium"
+          >
+            <option value="all">All Statuses</option>
+            <option value="draft">Draft</option>
+            <option value="issued">Issued / Sent</option>
+            <option value="paid">Paid</option>
+            <option value="partially_paid">Partially Paid</option>
+            <option value="overdue">Overdue</option>
+            <option value="converted">Converted</option>
+            <option value="voided">Voided</option>
+          </select>
+        </div>
+
+        @if (hasActiveFilters()) {
+          <button
+            type="button"
+            (click)="clearFilters()"
+            class="text-xs text-emerald-700 hover:text-emerald-800 font-medium cursor-pointer"
+          >
+            Clear Filters
+          </button>
+        }
       </div>
 
       @if (error()) {
@@ -67,7 +97,7 @@ import { BmSearchInputComponent } from '../../shared/components/bm-search-input/
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100">
-                @for (row of filteredRows(); track row.id) {
+                @for (row of paginatedRows(); track row.id) {
                   <tr class="hover:bg-slate-50/60 transition-colors">
                     <td class="py-3.5 px-4 font-semibold text-emerald-700 tabular-nums">
                       {{ number(row) }}
@@ -135,7 +165,7 @@ import { BmSearchInputComponent } from '../../shared/components/bm-search-input/
                         }
                         @if (type() === 'quotations' && row.status !== 'converted') {
                           <button
-                            class="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200/60 inline-flex items-center justify-center transition shadow-2xs"
+                            class="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200/60 inline-flex items-center justify-center transition shadow-2xs cursor-pointer"
                             (click)="convert(row.id)"
                             title="Convert to Invoice"
                           >
@@ -156,7 +186,7 @@ import { BmSearchInputComponent } from '../../shared/components/bm-search-input/
                           </button>
                         }
                         <button
-                          class="w-8 h-8 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200/60 inline-flex items-center justify-center transition shadow-2xs"
+                          class="w-8 h-8 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200/60 inline-flex items-center justify-center transition shadow-2xs cursor-pointer"
                           (click)="remove(row.id)"
                           title="Void Record"
                         >
@@ -181,13 +211,20 @@ import { BmSearchInputComponent } from '../../shared/components/bm-search-input/
                 } @empty {
                   <tr>
                     <td colspan="7" class="p-12 text-center text-slate-500 font-medium">
-                      No {{ type() }} records found matching your search.
+                      No {{ type() }} records found matching your filters.
                     </td>
                   </tr>
                 }
               </tbody>
             </table>
           </div>
+
+          @if (filteredRows().length > 0) {
+            <bm-pagination
+              [meta]="paginationMeta()"
+              (pageChange)="currentPage.set($event)"
+            ></bm-pagination>
+          }
         </div>
       }
     </div>
@@ -200,13 +237,18 @@ export class BillingComponent {
   type = signal<'quotations' | 'invoices'>('quotations');
   rows = signal<(Quotation | Invoice)[]>([]);
   searchQuery = signal('');
+  selectedStatus = signal<string>('all');
+  currentPage = signal(1);
+  pageSize = signal(10);
   loading = signal(true);
   error = signal<string | null>(null);
 
   filteredRows = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
-    if (!q) return this.rows();
+    const st = this.selectedStatus();
     return this.rows().filter((row) => {
+      if (st !== 'all' && (row.status || '').toLowerCase() !== st) return false;
+      if (!q) return true;
       const num = this.number(row).toLowerCase();
       const title = (row.title || '').toLowerCase();
       const workOrder = (row.work_order?.work_order_no || '').toLowerCase();
@@ -224,9 +266,29 @@ export class BillingComponent {
     });
   });
 
+  paginationMeta = computed<PaginationMeta>(() => {
+    const total = this.filteredRows().length;
+    const page = this.currentPage();
+    const size = this.pageSize();
+    const lastPage = Math.max(1, Math.ceil(total / size));
+    const from = total === 0 ? 0 : (page - 1) * size + 1;
+    const to = Math.min(total, page * size);
+    return { current_page: page, per_page: size, total, last_page: lastPage, from, to };
+  });
+
+  paginatedRows = computed(() => {
+    const page = this.currentPage();
+    const size = this.pageSize();
+    const start = (page - 1) * size;
+    return this.filteredRows().slice(start, start + size);
+  });
+
+  hasActiveFilters = computed(() => !!this.searchQuery() || this.selectedStatus() !== 'all');
+
   constructor() {
     this.route.data.subscribe((data) => {
       this.type.set(data['type'] || 'quotations');
+      this.currentPage.set(1);
       this.load();
     });
   }
@@ -255,6 +317,23 @@ export class BillingComponent {
         error: failure,
       });
     }
+  }
+
+  onSearchChange(q: string): void {
+    this.searchQuery.set(q);
+    this.currentPage.set(1);
+  }
+
+  onStatusChange(event: Event): void {
+    const val = (event.target as HTMLSelectElement).value;
+    this.selectedStatus.set(val);
+    this.currentPage.set(1);
+  }
+
+  clearFilters(): void {
+    this.searchQuery.set('');
+    this.selectedStatus.set('all');
+    this.currentPage.set(1);
   }
 
   convert(id: number): void {

@@ -541,15 +541,18 @@ export interface PageSearchItem {
           <div #helpMenuContainer class="relative hidden sm:block">
             <button
               type="button"
-              (click)="toggleHelpMenu()"
-              [class.bg-slate-100]="helpMenuOpen()"
-              [class.text-slate-900]="helpMenuOpen()"
+              (click)="toggleHelpMenu($event)"
+              [class.bg-[#0F172A]]="helpMenuOpen()"
+              [class.text-white]="helpMenuOpen()"
+              [class.font-semibold]="helpMenuOpen()"
               title="Help & Legal Documents"
-              class="h-9 px-3 rounded-full bg-white border border-[#E2E8F0] text-xs font-semibold text-[#334155] hover:text-[#0F172A] hover:bg-slate-50 transition flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0"
+              class="h-[38px] px-3.5 rounded-full bg-white border border-[#E2E8F0] text-xs font-medium text-[#334155] hover:text-[#0F172A] hover:bg-slate-100 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4 text-slate-500"
+                class="h-4 w-4"
+                [class.text-white]="helpMenuOpen()"
+                [class.text-slate-500]="!helpMenuOpen()"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -564,7 +567,9 @@ export interface PageSearchItem {
               <span>Help</span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="h-3.5 w-3.5 text-slate-400 transition-transform duration-200"
+                class="h-3.5 w-3.5 transition-transform duration-200"
+                [class.text-white]="helpMenuOpen()"
+                [class.text-slate-400]="!helpMenuOpen()"
                 [class.rotate-180]="helpMenuOpen()"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -2336,11 +2341,15 @@ export class LayoutComponent {
     this.activeMegaMenu.set(null);
   }
 
-  toggleHelpMenu(): void {
-    this.helpMenuOpen.update((open) => !open);
+  toggleHelpMenu(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    const next = !this.helpMenuOpen();
     this.closeMegaMenu();
     this.closeSearch();
     this.closeShortcutHelp();
+    this.helpMenuOpen.set(next);
   }
 
   closeHelpMenu(): void {

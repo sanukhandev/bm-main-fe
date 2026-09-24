@@ -6,13 +6,14 @@ import { loadingInterceptor } from './core/interceptors/loading.interceptor';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { branchInterceptor } from './core/interceptors/branch.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
+import { apiBaseUrlInterceptor } from './core/interceptors/api-base-url.interceptor';
 import { AuthService } from './core/auth/auth.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideHttpClient(
-      withInterceptors([loadingInterceptor, authInterceptor, branchInterceptor, errorInterceptor]),
+      withInterceptors([apiBaseUrlInterceptor, loadingInterceptor, authInterceptor, branchInterceptor, errorInterceptor]),
     ),
     provideAppInitializer(() => {
       const authService = inject(AuthService);

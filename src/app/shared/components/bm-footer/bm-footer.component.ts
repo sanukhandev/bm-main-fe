@@ -6,8 +6,16 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <footer class="py-4 text-center text-xs text-slate-500 font-medium select-none">
-      Created by <span class="font-zaakiy font-bold text-emerald-800">Zv3</span> and powered by <span class="font-zaakiy font-bold text-emerald-800">ZaakiyV3RSE</span> with all rights reserved to <span class="font-semibold text-slate-700">Deertwhales 2026</span>
+    <footer
+      class="py-4 text-center text-xs text-[#1B1E1C]/40 font-normal select-none tracking-wide"
+    >
+      <span class="font-medium text-[#1B1E1C]/55">Baithul Madeena Real Estate ERP</span>
+      <span class="mx-2 text-[#1B1E1C]/25">•</span>
+      Created by <span class="font-zaakiy font-semibold text-[#193D32]/60">Zv3</span>
+      <span class="mx-2 text-[#1B1E1C]/25">•</span>
+      Powered by <span class="font-zaakiy font-semibold text-[#193D32]/60">ZaakiyV3RSE</span>
+      <span class="mx-2 text-[#1B1E1C]/25">•</span>
+      © 2026 Desertwhales
     </footer>
   `,
 })

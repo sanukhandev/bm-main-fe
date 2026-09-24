@@ -9,11 +9,13 @@ import { CommonModule } from '@angular/common';
     <div
       class="bm-card p-6"
       [class.bm-gradient-card]="variant === 'gradient'"
-      [class.bg-white]="variant === 'default'"
+      [class.bg-[#FBFAF7]]="variant === 'default'"
     >
       @if (title) {
-        <div class="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
-          <h3 class="text-base font-semibold text-[#101214]">{{ title }}</h3>
+        <div class="mb-4 flex items-center justify-between border-b border-[#E5E0D8] pb-3">
+          <h3 class="text-xs font-semibold uppercase tracking-[0.08em] text-[#1B1E1C]">
+            {{ title }}
+          </h3>
           <ng-content select="[card-action]"></ng-content>
         </div>
       }

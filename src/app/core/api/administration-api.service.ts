@@ -34,7 +34,9 @@ export class AdministrationApiService {
         }
       });
     }
-    return this.http.get<PaginatedResponse<UserAdmin>>('/api/v1/admin/users', { params: httpParams });
+    return this.http.get<PaginatedResponse<UserAdmin>>('/api/v1/admin/users', {
+      params: httpParams,
+    });
   }
 
   createUser(data: Partial<UserAdmin>): Observable<ApiResponse<UserAdmin>> {

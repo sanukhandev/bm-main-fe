@@ -6,8 +6,22 @@ describe('BranchContextService', () => {
   let service: BranchContextService;
 
   const mockBranches: Branch[] = [
-    { id: 1, code: 'DXB', name: 'Dubai', timezone: 'Asia/Dubai', currency_code: 'AED', status: 'active' },
-    { id: 2, code: 'AUH', name: 'Abu Dhabi', timezone: 'Asia/Dubai', currency_code: 'AED', status: 'active' },
+    {
+      id: 1,
+      code: 'DXB',
+      name: 'Dubai',
+      timezone: 'Asia/Dubai',
+      currency_code: 'AED',
+      status: 'active',
+    },
+    {
+      id: 2,
+      code: 'AUH',
+      name: 'Abu Dhabi',
+      timezone: 'Asia/Dubai',
+      currency_code: 'AED',
+      status: 'active',
+    },
   ];
 
   beforeEach(() => {

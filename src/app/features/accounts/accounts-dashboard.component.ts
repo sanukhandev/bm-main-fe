@@ -186,18 +186,16 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
                   </span>
 
                   <div
-                    class="flex items-center gap-2 my-0.5"
+                    class="flex items-center gap-2.5 my-0.5 text-4xl sm:text-5xl lg:text-6xl font-serif font-normal tracking-tight tabular-nums"
                     [class.text-[#047857]]="!isNetMovementNegative()"
                     [class.text-[#DC2626]]="isNetMovementNegative()"
                   >
                     <dirham-symbol
-                      size="0.95em"
-                      weight="semibold"
-                      class="select-none inline-block align-middle"
+                      size="0.85em"
+                      weight="bold"
+                      class="select-none shrink-0"
                     ></dirham-symbol>
-                    <span
-                      class="text-4xl sm:text-5xl lg:text-6xl font-serif font-normal tracking-tight tabular-nums"
-                    >
+                    <span>
                       {{ formatMoney(snapshot()?.today_net_movement) }}
                     </span>
                   </div>

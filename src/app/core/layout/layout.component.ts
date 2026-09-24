@@ -534,6 +534,199 @@ export interface PageSearchItem {
 
         <!-- RIGHT: BRANCH SELECTOR, NOTIFICATIONS, ZAAKIY, USER -->
         <div class="flex items-center gap-3">
+          <!-- HELP MENU GROUP DROPDOWN (FAQ, Terms, Privacy Policy & Legal Docs) -->
+          <div #helpMenuContainer class="relative hidden sm:block">
+            <button
+              type="button"
+              (click)="toggleHelpMenu()"
+              [class.bg-slate-100]="helpMenuOpen()"
+              [class.text-slate-900]="helpMenuOpen()"
+              title="Help & Legal Documents"
+              class="h-9 px-3 rounded-full bg-white border border-[#E2E8F0] text-xs font-semibold text-[#334155] hover:text-[#0F172A] hover:bg-slate-50 transition flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4 text-slate-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.75"
+                  d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093V14m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span>Help</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-3.5 w-3.5 text-slate-400 transition-transform duration-200"
+                [class.rotate-180]="helpMenuOpen()"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+
+            <!-- HELP SUBMENU POPOVER -->
+            @if (helpMenuOpen()) {
+              <div
+                class="absolute top-11 right-0 z-50 w-64 bg-white border border-[#E2E8F0] rounded-2xl shadow-[0_16px_40px_rgba(15,23,42,0.12)] p-2 animate-fade-in space-y-0.5"
+                (click)="$event.stopPropagation()"
+              >
+                <div
+                  class="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider"
+                >
+                  Help & Support
+                </div>
+
+                <!-- FAQ & User Guide -->
+                <a
+                  routerLink="/app/faq"
+                  (click)="closeHelpMenu()"
+                  class="group flex items-center gap-2.5 p-2 rounded-xl hover:bg-slate-50 transition"
+                >
+                  <div
+                    class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093V14m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="text-xs font-semibold text-slate-900 group-hover:text-emerald-700">
+                      FAQ & User Guide
+                    </div>
+                    <div class="text-[10px] text-slate-500">System operations & answers</div>
+                  </div>
+                </a>
+
+                <div class="border-t border-slate-100 my-1"></div>
+
+                <div
+                  class="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider"
+                >
+                  Legal Documents
+                </div>
+
+                <!-- Terms of Use -->
+                <a
+                  routerLink="/app/privacy-terms"
+                  (click)="closeHelpMenu()"
+                  class="group flex items-center gap-2.5 p-2 rounded-xl hover:bg-slate-50 transition"
+                >
+                  <div
+                    class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="text-xs font-semibold text-slate-900 group-hover:text-blue-600">
+                      Terms of Use
+                    </div>
+                    <div class="text-[10px] text-slate-500">Enterprise license & terms</div>
+                  </div>
+                </a>
+
+                <!-- Privacy Policy -->
+                <a
+                  routerLink="/app/privacy-terms"
+                  (click)="closeHelpMenu()"
+                  class="group flex items-center gap-2.5 p-2 rounded-xl hover:bg-slate-50 transition"
+                >
+                  <div
+                    class="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="text-xs font-semibold text-slate-900 group-hover:text-indigo-600">
+                      Privacy Policy
+                    </div>
+                    <div class="text-[10px] text-slate-500">UAE Data protection policy</div>
+                  </div>
+                </a>
+
+                <!-- All Legal Docs (Print Edition) -->
+                <a
+                  routerLink="/app/privacy-terms"
+                  (click)="closeHelpMenu()"
+                  class="group flex items-center gap-2.5 p-2 rounded-xl hover:bg-slate-50 transition"
+                >
+                  <div
+                    class="w-7 h-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="text-xs font-semibold text-slate-900 group-hover:text-purple-600">
+                      All Legal Documents
+                    </div>
+                    <div class="text-[10px] text-slate-500">Full legal suite & printable</div>
+                  </div>
+                </a>
+              </div>
+            }
+          </div>
+
           <!-- Keyboard Shortcut Helper -->
           <button
             type="button"
@@ -1725,6 +1918,7 @@ export class LayoutComponent {
 
   @ViewChild('searchInput') searchInputRef?: ElementRef<HTMLInputElement>;
   @ViewChild('searchContainer') searchContainerRef?: ElementRef<HTMLElement>;
+  @ViewChild('helpMenuContainer') helpMenuContainerRef?: ElementRef<HTMLElement>;
 
   user = this.authService.currentUser;
   isSuperAdmin = this.authService.isSuperAdmin;
@@ -1733,6 +1927,7 @@ export class LayoutComponent {
   activeMegaMenu = signal<MegaMenuTab>(null);
   mobileDrawerOpen = signal(false);
   shortcutHelpOpen = signal(false);
+  helpMenuOpen = signal(false);
 
   readonly pageShortcuts = [
     { key: '1', label: 'Dashboard' },
@@ -2006,6 +2201,7 @@ export class LayoutComponent {
         this.closeMegaMenu();
         this.closeSearch();
         this.closeShortcutHelp();
+        this.closeHelpMenu();
       } else if (
         event instanceof NavigationEnd ||
         event instanceof NavigationCancel ||
@@ -2023,6 +2219,7 @@ export class LayoutComponent {
     } else {
       this.activeMegaMenu.set(tab);
       this.closeSearch();
+      this.closeHelpMenu();
     }
   }
 
@@ -2030,10 +2227,22 @@ export class LayoutComponent {
     this.activeMegaMenu.set(null);
   }
 
+  toggleHelpMenu(): void {
+    this.helpMenuOpen.update((open) => !open);
+    this.closeMegaMenu();
+    this.closeSearch();
+    this.closeShortcutHelp();
+  }
+
+  closeHelpMenu(): void {
+    this.helpMenuOpen.set(false);
+  }
+
   toggleShortcutHelp(): void {
     this.shortcutHelpOpen.update((open) => !open);
     this.closeMegaMenu();
     this.closeSearch();
+    this.closeHelpMenu();
   }
 
   closeShortcutHelp(): void {
@@ -2183,6 +2392,7 @@ export class LayoutComponent {
     this.closeMobileDrawer();
     this.closeSearch();
     this.closeShortcutHelp();
+    this.closeHelpMenu();
   }
 
   @HostListener('document:click', ['$event'])
@@ -2197,10 +2407,19 @@ export class LayoutComponent {
       this.closeSearch();
     }
 
+    if (
+      this.helpMenuOpen() &&
+      this.helpMenuContainerRef &&
+      !this.helpMenuContainerRef.nativeElement.contains(target)
+    ) {
+      this.closeHelpMenu();
+    }
+
     if (!this.elementRef.nativeElement.contains(event.target)) {
       this.closeMegaMenu();
       this.closeSearch();
       this.closeShortcutHelp();
+      this.closeHelpMenu();
     }
   }
 

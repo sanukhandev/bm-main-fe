@@ -588,6 +588,38 @@ export interface PageSearchItem {
                   Help & Support
                 </div>
 
+                <!-- About Application -->
+                <a
+                  routerLink="/app/about"
+                  (click)="closeHelpMenu()"
+                  class="group flex items-center gap-2.5 p-2 rounded-xl hover:bg-slate-50 transition"
+                >
+                  <div
+                    class="w-7 h-7 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="text-xs font-semibold text-slate-900 group-hover:text-teal-700">
+                      About Application
+                    </div>
+                    <div class="text-[10px] text-slate-500">System overview & developer info</div>
+                  </div>
+                </a>
+
                 <!-- FAQ & User Guide -->
                 <a
                   routerLink="/app/faq"
@@ -1884,6 +1916,36 @@ export interface PageSearchItem {
                   >Roles</a
                 >
               }
+
+              <div
+                class="pt-2 text-[10px] font-semibold text-[#64748B] uppercase tracking-wider px-3"
+              >
+                Help & Legal
+              </div>
+              <a
+                routerLink="/app/about"
+                (click)="closeMobileDrawer()"
+                class="block px-3 py-1.5 rounded-lg text-xs text-[#334155] hover:bg-slate-100"
+                >About Application</a
+              >
+              <a
+                routerLink="/app/faq"
+                (click)="closeMobileDrawer()"
+                class="block px-3 py-1.5 rounded-lg text-xs text-[#334155] hover:bg-slate-100"
+                >FAQ & Guide</a
+              >
+              <a
+                routerLink="/app/terms-of-use"
+                (click)="closeMobileDrawer()"
+                class="block px-3 py-1.5 rounded-lg text-xs text-[#334155] hover:bg-slate-100"
+                >Terms of Use</a
+              >
+              <a
+                routerLink="/app/privacy-policy"
+                (click)="closeMobileDrawer()"
+                class="block px-3 py-1.5 rounded-lg text-xs text-[#334155] hover:bg-slate-100"
+                >Privacy Policy</a
+              >
             </nav>
           </div>
 
@@ -2137,6 +2199,48 @@ export class LayoutComponent {
       category: 'Pages',
       url: '/app/faq',
       keywords: ['faq', 'help', 'guide', 'manual', 'how to', 'support', 'question'],
+    },
+    {
+      title: 'About Application',
+      subtitle: 'ERP Overview, Fujairah & Ajman branches, credits & AI details',
+      category: 'Pages',
+      url: '/app/about',
+      keywords: [
+        'about',
+        'application',
+        'system',
+        'developer',
+        'sanu khan',
+        'dwtech',
+        'desertwhales',
+        'zaakiy',
+        'fujairah',
+        'ajman',
+        'credits',
+      ],
+      badge: 'Info',
+    },
+    {
+      title: 'Terms of Use',
+      subtitle: 'Legal terms & service agreement for ERP platform',
+      category: 'Pages',
+      url: '/app/terms-of-use',
+      keywords: ['terms', 'terms of use', 'legal', 'conditions', 'agreement'],
+    },
+    {
+      title: 'Privacy Policy',
+      subtitle: 'Data protection, UAE laws & confidentiality policy',
+      category: 'Pages',
+      url: '/app/privacy-policy',
+      keywords: [
+        'privacy',
+        'privacy policy',
+        'gdpr',
+        'data',
+        'security',
+        'confidentiality',
+        'legal',
+      ],
     },
     {
       title: 'Financial Reports',

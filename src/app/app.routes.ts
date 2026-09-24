@@ -33,8 +33,12 @@ export const routes: Routes = [
       },
       {
         path: 'faq',
+        loadComponent: () => import('./features/help/faq.component').then((m) => m.FaqComponent),
+      },
+      {
+        path: 'about',
         loadComponent: () =>
-          import('./features/help/faq.component').then((m) => m.FaqComponent),
+          import('./features/help/about.component').then((m) => m.AboutComponent),
       },
       // Customers
       {

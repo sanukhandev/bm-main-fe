@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   template: `
     <span
-      class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium capitalize border shadow-2xs"
+      class="inline-flex items-center gap-1.5 px-2.5 h-[22px] rounded-full text-[11px] font-semibold capitalize border shadow-2xs whitespace-nowrap"
       [ngClass]="badgeClass()"
     >
       <span class="w-1.5 h-1.5 rounded-full" [ngClass]="dotClass()"></span>
@@ -21,7 +21,7 @@ export class BmStatusBadgeComponent {
   badgeClass = computed(() => {
     const s = (this.status || '').toLowerCase();
     switch (s) {
-      // Emerald Triage (Active, Approved, Commenced, Paid, Completed, Resolved, Occupied, Available, Inward, Credit, Owner)
+      // Approved / Active / Commenced / Paid / Completed / Resolved / Occupied / Available / Inward
       case 'active':
       case 'approved':
       case 'commenced':
@@ -33,10 +33,11 @@ export class BmStatusBadgeComponent {
       case 'inward':
       case 'credit':
       case 'owner':
-        return 'bg-emerald-50 text-emerald-700 border-emerald-200/80';
+        return 'bg-[#DDE5DD] text-[#193D32] border-[#285746]/20';
 
-      // Amber Triage (Draft, Pending Approval, Pending, In Progress, Open, Assigned, Cheque, Medium, Normal, Partially Paid)
+      // Pending / In Progress / Open / Assigned / Cheque / Medium / Normal
       case 'draft':
+        return 'bg-[#EAE6DE] text-[#74776F] border-[#D8D4CB]';
       case 'pending_approval':
       case 'pending':
       case 'in_progress':
@@ -46,9 +47,9 @@ export class BmStatusBadgeComponent {
       case 'medium':
       case 'normal':
       case 'partially_paid':
-        return 'bg-amber-50 text-amber-700 border-amber-200/80';
+        return 'bg-[#EEE6D5] text-[#A77A35] border-[#D6C49D]/30';
 
-      // Rose Triage (Terminated, Inactive, Overdue, Defaulted, Cancelled, Urgent, High, Outward, Debit, Under Maintenance, Unpaid, Void)
+      // Terminated / Inactive / Overdue / Defaulted / Cancelled / Urgent / High / Outward / Void
       case 'terminated':
       case 'inactive':
       case 'overdue':
@@ -61,9 +62,9 @@ export class BmStatusBadgeComponent {
       case 'under_maintenance':
       case 'unpaid':
       case 'void':
-        return 'bg-rose-50 text-rose-700 border-rose-200/80';
+        return 'bg-[#EDDEDF] text-[#A45454] border-[#B98D91]/30';
 
-      // Blue Triage (Tenant, Residential, Individual, Monthly, Quarterly, Bank Transfer, Low, Apartment, Villa, Sent)
+      // Tenant / Individual / Monthly / Quarterly / Bank Transfer / Low
       case 'tenant':
       case 'residential':
       case 'individual':
@@ -74,9 +75,9 @@ export class BmStatusBadgeComponent {
       case 'villa':
       case 'low':
       case 'sent':
-        return 'bg-blue-50 text-blue-700 border-blue-200/80';
+        return 'bg-[#DDE5E6] text-[#567C83] border-[#829A9E]/30';
 
-      // Purple Triage (Commercial, Organization, Semi Annual, Annual, Shop, Office, Warehouse, Space, Labor Camp, Land, Converted)
+      // Commercial / Organization
       case 'commercial':
       case 'organization':
       case 'semi_annual':
@@ -88,9 +89,9 @@ export class BmStatusBadgeComponent {
       case 'labor_camp':
       case 'land':
       case 'converted':
-        return 'bg-purple-50 text-purple-700 border-purple-200/80';
+        return 'bg-[#E6E5D8] text-[#969875] border-[#969875]/30';
 
-      // Slate Triage (Expired, Archived, Vacant, Closed, Cash, Service, Inventory)
+      // Expired / Archived / Vacant / Closed / Cash
       case 'expired':
       case 'archived':
       case 'vacant':
@@ -99,7 +100,7 @@ export class BmStatusBadgeComponent {
       case 'service':
       case 'inventory':
       default:
-        return 'bg-slate-100 text-slate-700 border-slate-200/80';
+        return 'bg-[#E2DED5] text-[#74776F] border-[#D8D4CB]';
     }
   });
 
@@ -117,9 +118,8 @@ export class BmStatusBadgeComponent {
       case 'inward':
       case 'credit':
       case 'owner':
-        return 'bg-emerald-500';
+        return 'bg-[#285746]';
 
-      case 'draft':
       case 'pending_approval':
       case 'pending':
       case 'in_progress':
@@ -128,7 +128,7 @@ export class BmStatusBadgeComponent {
       case 'cheque':
       case 'medium':
       case 'normal':
-        return 'bg-amber-500';
+        return 'bg-[#A77A35]';
 
       case 'terminated':
       case 'inactive':
@@ -140,7 +140,7 @@ export class BmStatusBadgeComponent {
       case 'outward':
       case 'debit':
       case 'under_maintenance':
-        return 'bg-rose-500';
+        return 'bg-[#A45454]';
 
       case 'tenant':
       case 'residential':
@@ -151,22 +151,10 @@ export class BmStatusBadgeComponent {
       case 'apartment':
       case 'villa':
       case 'low':
-        return 'bg-blue-500';
-
-      case 'commercial':
-      case 'organization':
-      case 'semi_annual':
-      case 'annual':
-      case 'shop':
-      case 'office':
-      case 'warehouse':
-      case 'space':
-      case 'labor_camp':
-      case 'land':
-        return 'bg-purple-500';
+        return 'bg-[#567C83]';
 
       default:
-        return 'bg-slate-400';
+        return 'bg-[#74776F]';
     }
   });
 

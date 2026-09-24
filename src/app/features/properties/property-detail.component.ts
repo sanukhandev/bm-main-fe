@@ -29,12 +29,18 @@ import { Property } from '../../shared/models/property.models';
     } @else if (property()) {
       <bm-page-header
         [title]="property()!.name"
-        [subtitle]="'Property Code: ' + property()!.property_code + ' | Unit: ' + property()!.unit_number"
+        [subtitle]="
+          'Property Code: ' +
+          property()!.property_code +
+          ' | Property / Unit No.: ' +
+          property()!.unit_number
+        "
       >
-        <a routerLink="/app/properties" class="bm-btn bm-btn-secondary text-xs">
-          Back to List
-        </a>
-        <a [routerLink]="['/app/properties', property()!.id, 'edit']" class="bm-btn bm-btn-primary text-xs">
+        <a routerLink="/app/properties" class="bm-btn bm-btn-secondary text-xs"> Back to List </a>
+        <a
+          [routerLink]="['/app/properties', property()!.id, 'edit']"
+          class="bm-btn bm-btn-primary text-xs"
+        >
           Edit Property
         </a>
       </bm-page-header>
@@ -45,12 +51,16 @@ import { Property } from '../../shared/models/property.models';
             <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-xs">
               <div>
                 <div class="text-slate-400 font-medium">Property Code</div>
-                <div class="font-semibold text-slate-800 mt-1 tabular-nums">{{ property()!.property_code }}</div>
+                <div class="font-semibold text-slate-800 mt-1 tabular-nums">
+                  {{ property()!.property_code }}
+                </div>
               </div>
 
               <div>
-                <div class="text-slate-400 font-medium">Unit / Asset Number</div>
-                <div class="font-semibold text-slate-800 mt-1 tabular-nums">{{ property()!.unit_number }}</div>
+                <div class="text-slate-400 font-medium">Property / Unit No.</div>
+                <div class="font-semibold text-slate-800 mt-1 tabular-nums">
+                  {{ property()!.unit_number }}
+                </div>
               </div>
 
               <div>
@@ -62,12 +72,16 @@ import { Property } from '../../shared/models/property.models';
 
               <div>
                 <div class="text-slate-400 font-medium">Building / Complex</div>
-                <div class="font-semibold text-slate-800 mt-1">{{ property()!.building_name || '—' }}</div>
+                <div class="font-semibold text-slate-800 mt-1">
+                  {{ property()!.building_name || '—' }}
+                </div>
               </div>
 
               <div>
                 <div class="text-slate-400 font-medium">Area Size</div>
-                <div class="font-semibold text-slate-800 mt-1 tabular-nums">{{ property()!.area || '—' }} sq ft</div>
+                <div class="font-semibold text-slate-800 mt-1 tabular-nums">
+                  {{ property()!.area || '—' }} sq ft
+                </div>
               </div>
 
               <div>
@@ -86,7 +100,8 @@ import { Property } from '../../shared/models/property.models';
                 <div>{{ property()!.address_line_2 }}</div>
               }
               <div class="font-medium text-slate-900">
-                {{ property()!.city || '' }} {{ property()!.state_or_emirate ? ', ' + property()!.state_or_emirate : '' }}
+                {{ property()!.city || '' }}
+                {{ property()!.state_or_emirate ? ', ' + property()!.state_or_emirate : '' }}
               </div>
             </div>
           </bm-card>
@@ -103,11 +118,16 @@ import { Property } from '../../shared/models/property.models';
               @if (ownerCustomer()) {
                 <div>
                   <div class="text-slate-400 font-medium">Customer Code</div>
-                  <div class="font-semibold text-slate-800 mt-1 tabular-nums">{{ ownerCustomer()?.customer_code }}</div>
+                  <div class="font-semibold text-slate-800 mt-1 tabular-nums">
+                    {{ ownerCustomer()?.customer_code }}
+                  </div>
                 </div>
 
                 <div class="border-t border-slate-100 pt-3">
-                  <a [routerLink]="['/app/customers', ownerCustomer()?.id]" class="text-emerald-700 hover:text-emerald-900 font-semibold text-xs">
+                  <a
+                    [routerLink]="['/app/customers', ownerCustomer()?.id]"
+                    class="text-emerald-700 hover:text-emerald-900 font-semibold text-xs"
+                  >
                     View Owner Master Profile &rarr;
                   </a>
                 </div>
@@ -131,11 +151,13 @@ export class PropertyDetailComponent implements OnInit {
     this.loadProperty();
   }
 
-  loadProperty(): void {
+  loadProperty(silent = false): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (!id) return;
 
-    this.isLoading.set(true);
+    if (!silent && !this.property()) {
+      this.isLoading.set(true);
+    }
     this.error.set(null);
 
     this.api.getProperty(id).subscribe({

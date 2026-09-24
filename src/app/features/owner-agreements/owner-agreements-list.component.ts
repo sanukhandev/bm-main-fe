@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -31,18 +31,129 @@ import { PaginationMeta } from '../../core/api/api.models';
     BmConfirmDialogComponent,
   ],
   template: `
-    <bm-page-header title="Owner Agreements" subtitle="Property management agreements with property owners">
+    <bm-page-header
+      title="Owner Agreements"
+      subtitle="Property management agreements with property owners"
+    >
       <a routerLink="/app/owner-agreements/new" class="bm-btn bm-btn-primary text-xs">
         + Draft Owner Agreement
       </a>
     </bm-page-header>
+
+    <!-- Top KPI Summary Strip (NO NESTED CARDS - Clean text and icons) -->
+    <div class="bm-card p-5 mb-6">
+      <div
+        class="grid grid-cols-2 md:grid-cols-4 gap-6 divide-y md:divide-y-0 md:divide-x divide-slate-100"
+      >
+        <div class="space-y-1">
+          <div
+            class="flex items-center gap-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 text-emerald-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            <span>Total Contracts</span>
+          </div>
+          <div class="text-2xl font-bold text-slate-900 tabular-nums">
+            {{ paginationMeta()?.total || agreements().length }}
+          </div>
+        </div>
+
+        <div class="space-y-1 pt-4 md:pt-0 md:pl-6">
+          <div
+            class="flex items-center gap-1.5 text-xs font-semibold text-emerald-700 uppercase tracking-wider"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 text-emerald-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span>Active / Commenced</span>
+          </div>
+          <div class="text-2xl font-bold text-emerald-700 tabular-nums">
+            {{ activeCount() }}
+          </div>
+        </div>
+
+        <div class="space-y-1 pt-4 md:pt-0 md:pl-6">
+          <div
+            class="flex items-center gap-1.5 text-xs font-semibold text-amber-700 uppercase tracking-wider"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 text-amber-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span>Draft / Pending</span>
+          </div>
+          <div class="text-2xl font-bold text-amber-700 tabular-nums">
+            {{ pendingCount() }}
+          </div>
+        </div>
+
+        <div class="space-y-1 pt-4 md:pt-0 md:pl-6">
+          <div
+            class="flex items-center gap-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 text-emerald-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span>Contracted Value</span>
+          </div>
+          <div class="text-2xl font-bold text-slate-900 tabular-nums">
+            <span class="text-xs font-medium text-slate-400 mr-1">AED</span>
+            <span>{{ totalPortfolioValue() | number: '1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Toolbar Filters -->
     <div class="bm-card p-4 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
       <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
         <bm-search-input
           [value]="searchQuery()"
-          placeholder="Search agreement number..."
+          placeholder="Search agreement no, owner, property..."
           (searchChange)="onSearchChange($event)"
         ></bm-search-input>
 
@@ -56,13 +167,19 @@ import { PaginationMeta } from '../../core/api/api.models';
           <option value="pending_approval">Pending Approval</option>
           <option value="approved">Approved</option>
           <option value="commenced">Commenced</option>
+          <option value="on_hold">On Hold</option>
           <option value="expired">Expired</option>
           <option value="terminated">Terminated</option>
+          <option value="cancelled">Cancelled</option>
         </select>
       </div>
 
       @if (hasActiveFilters()) {
-        <button type="button" (click)="clearFilters()" class="text-xs text-emerald-700 hover:text-emerald-800 font-medium">
+        <button
+          type="button"
+          (click)="clearFilters()"
+          class="text-xs text-emerald-700 hover:text-emerald-800 font-medium"
+        >
           Clear Filters
         </button>
       }
@@ -85,7 +202,9 @@ import { PaginationMeta } from '../../core/api/api.models';
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse text-xs">
             <thead>
-              <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
+              <tr
+                class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]"
+              >
                 <th class="py-3.5 px-4">Agreement No</th>
                 <th class="py-3.5 px-4">Owner</th>
                 <th class="py-3.5 px-4">Property Count</th>
@@ -100,7 +219,10 @@ import { PaginationMeta } from '../../core/api/api.models';
               @for (agr of agreements(); track agr.id) {
                 <tr class="hover:bg-slate-50/60 transition-colors">
                   <td class="py-3.5 px-4 font-semibold text-slate-800 tabular-nums">
-                    <a [routerLink]="['/app/owner-agreements', agr.id]" class="hover:text-emerald-600 transition-colors">
+                    <a
+                      [routerLink]="['/app/owner-agreements', agr.id]"
+                      class="hover:text-emerald-600 transition-colors"
+                    >
                       {{ agr.agreement_no }}
                     </a>
                   </td>
@@ -114,7 +236,7 @@ import { PaginationMeta } from '../../core/api/api.models';
                     {{ agr.start_date }} &rarr; {{ agr.end_date }}
                   </td>
                   <td class="py-3.5 px-4 font-semibold text-slate-900 tabular-nums">
-                    {{ agr.currency_code }} {{ agr.total_amount | number:'1.2-2' }}
+                    {{ agr.currency_code }} {{ agr.total_amount | number: '1.2-2' }}
                   </td>
                   <td class="py-3.5 px-4">
                     <bm-status-badge [status]="agr.payment_mode"></bm-status-badge>
@@ -130,9 +252,25 @@ import { PaginationMeta } from '../../core/api/api.models';
                         aria-label="View Agreement Details"
                         class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200/60 inline-flex items-center justify-center transition shadow-2xs"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                          />
                         </svg>
                       </a>
 
@@ -144,8 +282,19 @@ import { PaginationMeta } from '../../core/api/api.models';
                           aria-label="Edit Draft Agreement"
                           class="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-slate-900 border border-slate-200 inline-flex items-center justify-center transition shadow-2xs"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                            />
                           </svg>
                         </a>
                       }
@@ -158,8 +307,19 @@ import { PaginationMeta } from '../../core/api/api.models';
                           aria-label="Terminate Agreement"
                           class="w-8 h-8 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 hover:text-rose-800 border border-rose-200/60 inline-flex items-center justify-center transition shadow-2xs"
                         >
-                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+                            />
                           </svg>
                         </button>
                       }
@@ -171,14 +331,21 @@ import { PaginationMeta } from '../../core/api/api.models';
           </table>
         </div>
 
-        <bm-pagination [meta]="paginationMeta()" (pageChange)="onPageChange($event)"></bm-pagination>
+        <bm-pagination
+          [meta]="paginationMeta()"
+          (pageChange)="onPageChange($event)"
+        ></bm-pagination>
       </div>
     }
 
     <bm-confirm-dialog
       [isOpen]="terminateDialogOpen()"
       title="Terminate Owner Agreement"
-      [message]="'Are you sure you want to terminate owner agreement ' + selectedAgreement()?.agreement_no + '?'"
+      [message]="
+        'Are you sure you want to terminate owner agreement ' +
+        selectedAgreement()?.agreement_no +
+        '?'
+      "
       confirmLabel="Terminate Agreement"
       [isDanger]="true"
       [isSubmitting]="isTerminating()"
@@ -206,6 +373,19 @@ export class OwnerAgreementsListComponent implements OnInit, OnDestroy {
   selectedAgreement = signal<OwnerAgreement | null>(null);
   isTerminating = signal(false);
 
+  activeCount = computed(
+    () =>
+      this.agreements().filter((a) => a.status === 'commenced' || a.status === 'approved').length,
+  );
+  pendingCount = computed(
+    () =>
+      this.agreements().filter((a) => a.status === 'pending_approval' || a.status === 'draft')
+        .length,
+  );
+  totalPortfolioValue = computed(() =>
+    this.agreements().reduce((acc, a) => acc + (Number(a.total_amount) || 0), 0),
+  );
+
   private branchSub?: Subscription;
 
   ngOnInit(): void {
@@ -221,8 +401,10 @@ export class OwnerAgreementsListComponent implements OnInit, OnDestroy {
     });
   }
 
-  loadAgreements(): void {
-    this.isLoading.set(true);
+  loadAgreements(silent = false): void {
+    if (!silent && this.agreements().length === 0) {
+      this.isLoading.set(true);
+    }
     this.error.set(null);
 
     this.api
@@ -296,7 +478,8 @@ export class OwnerAgreementsListComponent implements OnInit, OnDestroy {
   getPropertyCount(agr: OwnerAgreement): number {
     if (!agr.properties) return 0;
     if (Array.isArray(agr.properties)) return agr.properties.length;
-    if ('data' in agr.properties && Array.isArray(agr.properties.data)) return agr.properties.data.length;
+    if ('data' in agr.properties && Array.isArray(agr.properties.data))
+      return agr.properties.data.length;
     return 0;
   }
 

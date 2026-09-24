@@ -11,53 +11,59 @@ import { BmSpinnerComponent } from '../bm-spinner/bm-spinner.component';
       @if (type === 'table') {
         <!-- Table Skeleton Loader -->
         <div class="space-y-4 animate-pulse">
-          <div class="flex items-center justify-between gap-4 pb-2 border-b border-slate-100">
-            <div class="h-6 bg-slate-200/80 rounded-lg w-1/4"></div>
+          <div class="flex items-center justify-between gap-4 pb-2 border-b border-slate-200">
+            <div class="h-6 bg-slate-200 rounded-lg w-1/4"></div>
             <div class="flex items-center gap-2">
-              <div class="h-9 bg-slate-200/70 rounded-xl w-32"></div>
-              <div class="h-9 bg-slate-200/70 rounded-xl w-24"></div>
+              <div class="h-9 bg-slate-200 rounded-lg w-32"></div>
+              <div class="h-9 bg-slate-200 rounded-lg w-24"></div>
             </div>
           </div>
-          
-          <div class="overflow-hidden border border-slate-100 rounded-xl bg-white shadow-xs">
-            <div class="h-10 bg-slate-100/70 flex items-center justify-between px-4">
-              <div class="h-4 bg-slate-200 rounded w-1/6"></div>
-              <div class="h-4 bg-slate-200 rounded w-1/4"></div>
-              <div class="h-4 bg-slate-200 rounded w-1/5"></div>
-              <div class="h-4 bg-slate-200 rounded w-1/6"></div>
+
+          <div class="overflow-hidden border border-slate-200 rounded-2xl bg-white shadow-xs">
+            <div
+              class="h-10 bg-slate-50 flex items-center justify-between px-4 border-b border-slate-100"
+            >
+              <div class="h-3 bg-slate-200 rounded w-1/6"></div>
+              <div class="h-3 bg-slate-200 rounded w-1/4"></div>
+              <div class="h-3 bg-slate-200 rounded w-1/5"></div>
+              <div class="h-3 bg-slate-200 rounded w-1/6"></div>
             </div>
             <div class="divide-y divide-slate-100">
               @for (i of rowsArray; track i) {
-                <div class="h-14 flex items-center justify-between px-4 hover:bg-slate-50/50 transition-colors">
+                <div class="h-14 flex items-center justify-between px-4">
                   <div class="flex items-center gap-3 w-1/4">
-                    <div class="w-8 h-8 rounded-full bg-slate-200/80 shrink-0"></div>
-                    <div class="h-4 bg-slate-200/90 rounded w-3/4"></div>
+                    <div class="w-7 h-7 rounded-lg bg-slate-200 shrink-0"></div>
+                    <div class="h-3.5 bg-slate-200 rounded w-3/4"></div>
                   </div>
-                  <div class="h-4 bg-slate-200/70 rounded w-1/4"></div>
-                  <div class="h-6 bg-emerald-100/60 rounded-full w-20"></div>
-                  <div class="h-4 bg-slate-200/70 rounded w-1/6"></div>
+                  <div class="h-3.5 bg-slate-200 rounded w-1/4"></div>
+                  <div
+                    class="h-5 bg-emerald-50 text-emerald-700 border border-emerald-200/60 rounded-full w-20"
+                  ></div>
+                  <div class="h-3.5 bg-slate-200 rounded w-1/6"></div>
                 </div>
               }
             </div>
           </div>
 
           <div class="flex items-center justify-between pt-2">
-            <div class="h-4 bg-slate-200/60 rounded w-48"></div>
-            <div class="h-8 bg-slate-200/60 rounded-lg w-36"></div>
+            <div class="h-3.5 bg-slate-200 rounded w-48"></div>
+            <div class="h-8 bg-slate-200 rounded-lg w-36"></div>
           </div>
         </div>
       } @else if (type === 'kpi') {
         <!-- KPI Metrics Skeleton -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-pulse">
           @for (i of [1, 2, 3, 4]; track i) {
-            <div class="p-5 bg-white border border-slate-200/80 rounded-2xl shadow-xs flex flex-col justify-between h-32 relative overflow-hidden">
+            <div
+              class="p-5 bg-white border border-slate-200 rounded-2xl flex flex-col justify-between h-32 relative overflow-hidden shadow-xs"
+            >
               <div class="flex items-center justify-between">
-                <div class="h-4 bg-slate-200/80 rounded w-1/2"></div>
-                <div class="w-10 h-10 rounded-xl bg-emerald-50"></div>
+                <div class="h-3.5 bg-slate-200 rounded w-1/2"></div>
+                <div class="w-8 h-8 rounded-lg bg-emerald-500/20"></div>
               </div>
               <div class="space-y-2">
-                <div class="h-8 bg-slate-200/90 rounded-lg w-3/4"></div>
-                <div class="h-3 bg-slate-200/60 rounded w-2/3"></div>
+                <div class="h-7 bg-slate-200 rounded-lg w-3/4"></div>
+                <div class="h-3 bg-slate-200 rounded w-2/3"></div>
               </div>
             </div>
           }
@@ -65,20 +71,20 @@ import { BmSpinnerComponent } from '../bm-spinner/bm-spinner.component';
       } @else if (type === 'form') {
         <!-- Form Fields Skeleton Loader -->
         <div class="space-y-6 animate-pulse">
-          <div class="p-6 bg-white border border-slate-200/80 rounded-2xl shadow-xs space-y-5">
+          <div class="p-6 bg-white border border-slate-200 rounded-2xl space-y-5 shadow-xs">
             <div class="flex items-center gap-3 border-b border-slate-100 pb-4">
-              <div class="w-10 h-10 rounded-xl bg-emerald-100/80"></div>
+              <div class="w-9 h-9 rounded-lg bg-emerald-500/20"></div>
               <div class="space-y-1.5 flex-1">
-                <div class="h-5 bg-slate-200/80 rounded w-1/4"></div>
-                <div class="h-3.5 bg-slate-200/60 rounded w-1/3"></div>
+                <div class="h-4 bg-slate-200 rounded w-1/4"></div>
+                <div class="h-3 bg-slate-200 rounded w-1/3"></div>
               </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
               @for (i of [1, 2, 3, 4]; track i) {
                 <div class="space-y-2">
-                  <div class="h-4 bg-slate-200/80 rounded w-1/3"></div>
-                  <div class="h-11 bg-slate-100 rounded-xl border border-slate-200/50 w-full"></div>
+                  <div class="h-3 bg-slate-200 rounded w-1/3"></div>
+                  <div class="h-10 bg-slate-50 rounded-lg border border-slate-200 w-full"></div>
                 </div>
               }
             </div>
@@ -87,28 +93,30 @@ import { BmSpinnerComponent } from '../bm-spinner/bm-spinner.component';
       } @else if (type === 'detail') {
         <!-- Detail Document Skeleton Loader -->
         <div class="space-y-6 animate-pulse">
-          <div class="p-6 bg-white border border-slate-200/80 rounded-2xl shadow-xs space-y-6">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+          <div class="p-6 bg-white border border-slate-200 rounded-2xl space-y-6 shadow-xs">
+            <div
+              class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5"
+            >
               <div class="space-y-2">
-                <div class="h-7 bg-slate-200/90 rounded-lg w-64"></div>
-                <div class="h-4 bg-slate-200/60 rounded w-48"></div>
+                <div class="h-6 bg-slate-200 rounded-lg w-64"></div>
+                <div class="h-3.5 bg-slate-200 rounded w-48"></div>
               </div>
               <div class="flex items-center gap-2">
-                <div class="h-10 bg-slate-200/70 rounded-xl w-28"></div>
-                <div class="h-10 bg-slate-200/70 rounded-xl w-28"></div>
+                <div class="h-9 bg-slate-200 rounded-lg w-28"></div>
+                <div class="h-9 bg-slate-200 rounded-lg w-28"></div>
               </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               @for (i of [1, 2, 3]; track i) {
-                <div class="p-4 bg-slate-50 rounded-xl space-y-2 border border-slate-100">
-                  <div class="h-3.5 bg-slate-200/70 rounded w-1/3"></div>
-                  <div class="h-6 bg-slate-200/90 rounded w-2/3"></div>
+                <div class="p-4 bg-slate-50/80 rounded-xl space-y-2 border border-slate-200">
+                  <div class="h-3 bg-slate-200 rounded w-1/3"></div>
+                  <div class="h-5 bg-slate-200 rounded w-2/3"></div>
                 </div>
               }
             </div>
 
-            <div class="h-48 bg-slate-50 rounded-xl border border-slate-100"></div>
+            <div class="h-48 bg-slate-50/80 rounded-xl border border-slate-200"></div>
           </div>
         </div>
       } @else if (type === 'spinner') {
@@ -118,9 +126,11 @@ import { BmSpinnerComponent } from '../bm-spinner/bm-spinner.component';
         </div>
       } @else {
         <!-- General Card Skeleton Loader -->
-        <div class="p-6 bg-white border border-slate-200/80 rounded-2xl shadow-xs space-y-4 animate-pulse">
-          <div class="h-6 bg-slate-200/80 rounded w-1/3"></div>
-          <div class="h-24 bg-slate-100 rounded-xl border border-slate-100 w-full"></div>
+        <div
+          class="p-6 bg-white border border-slate-200 rounded-2xl space-y-4 animate-pulse shadow-xs"
+        >
+          <div class="h-5 bg-slate-200 rounded w-1/3"></div>
+          <div class="h-24 bg-slate-50 rounded-lg border border-slate-200 w-full"></div>
         </div>
       }
     </div>

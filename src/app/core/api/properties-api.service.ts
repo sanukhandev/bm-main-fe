@@ -23,6 +23,17 @@ export class PropertiesApiService {
     return this.http.get<PaginatedResponse<Property>>(this.baseUrl, { params: httpParams });
   }
 
+  getAvailableProperties(params: ListQueryParams): Observable<PaginatedResponse<Property>> {
+    let httpParams = new HttpParams();
+    Object.keys(params).forEach((key) => {
+      if (params[key] !== undefined && params[key] !== null && params[key] !== '')
+        httpParams = httpParams.set(key, String(params[key]));
+    });
+    return this.http.get<PaginatedResponse<Property>>(`${this.baseUrl}/available`, {
+      params: httpParams,
+    });
+  }
+
   getProperty(id: number): Observable<ApiResponse<Property>> {
     return this.http.get<ApiResponse<Property>>(`${this.baseUrl}/${id}`);
   }

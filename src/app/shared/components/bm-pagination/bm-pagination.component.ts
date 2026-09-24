@@ -8,14 +8,16 @@ import { PaginationMeta } from '../../../core/api/api.models';
   imports: [CommonModule],
   template: `
     @if (meta && meta.total > 0) {
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 py-3.5 px-6 bg-white border-t border-slate-100 text-xs text-slate-500">
+      <div
+        class="flex flex-col sm:flex-row items-center justify-between gap-4 py-3.5 px-6 bg-[#FBFAF7] border-t border-[#E5E0D8] text-xs text-[#1B1E1C]/60 font-medium"
+      >
         <div>
           Showing
-          <span class="font-semibold text-slate-900 tabular-nums">{{ meta.from || 1 }}</span>
+          <span class="font-semibold text-[#1B1E1C] tabular-nums">{{ meta.from || 1 }}</span>
           to
-          <span class="font-semibold text-slate-900 tabular-nums">{{ meta.to || meta.total }}</span>
+          <span class="font-semibold text-[#1B1E1C] tabular-nums">{{ meta.to || meta.total }}</span>
           of
-          <span class="font-semibold text-slate-900 tabular-nums">{{ meta.total }}</span>
+          <span class="font-semibold text-[#1B1E1C] tabular-nums">{{ meta.total }}</span>
           results
         </div>
 
@@ -27,10 +29,21 @@ import { PaginationMeta } from '../../../core/api/api.models';
             [disabled]="meta.current_page <= 1"
             title="Previous Page"
             aria-label="Previous Page"
-            class="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white shadow-2xs"
+            class="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-[#E5E0D8] bg-[#FBFAF7] hover:bg-[#F2EFE9] text-[#1B1E1C] text-xs font-semibold transition disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
             <span class="hidden md:inline">Previous</span>
           </button>
@@ -39,20 +52,22 @@ import { PaginationMeta } from '../../../core/api/api.models';
           <div class="flex items-center gap-1">
             @for (p of pageNumbers; track $index) {
               @if (p === '...') {
-                <span class="w-8 h-8 flex items-center justify-center text-slate-400 font-medium select-none">...</span>
+                <span
+                  class="w-8 h-8 flex items-center justify-center text-[#1B1E1C]/40 font-medium select-none"
+                  >...</span
+                >
               } @else {
                 <button
                   type="button"
                   (click)="onPageChange(+p)"
-                  [class.bg-[#132a13]]="meta.current_page === p"
+                  [class.bg-[#193D32]]="meta.current_page === p"
                   [class.text-white]="meta.current_page === p"
                   [class.font-semibold]="meta.current_page === p"
-                  [class.shadow-2xs]="meta.current_page === p"
-                  [class.bg-white]="meta.current_page !== p"
-                  [class.text-slate-700]="meta.current_page !== p"
-                  [class.hover:bg-slate-100]="meta.current_page !== p"
+                  [class.bg-[#FBFAF7]]="meta.current_page !== p"
+                  [class.text-[#1B1E1C]]="meta.current_page !== p"
+                  [class.hover:bg-[#F2EFE9]]="meta.current_page !== p"
                   [class.border]="meta.current_page !== p"
-                  [class.border-slate-200]="meta.current_page !== p"
+                  [class.border-[#E5E0D8]]="meta.current_page !== p"
                   class="w-8 h-8 rounded-lg text-xs transition flex items-center justify-center tabular-nums"
                 >
                   {{ p }}
@@ -68,11 +83,22 @@ import { PaginationMeta } from '../../../core/api/api.models';
             [disabled]="meta.current_page >= meta.last_page"
             title="Next Page"
             aria-label="Next Page"
-            class="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white shadow-2xs"
+            class="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-[#E5E0D8] bg-[#FBFAF7] hover:bg-[#F2EFE9] text-[#1B1E1C] text-xs font-semibold transition disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <span class="hidden md:inline">Next</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
             </svg>
           </button>
         </div>

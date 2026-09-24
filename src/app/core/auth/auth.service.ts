@@ -21,8 +21,12 @@ export class AuthService {
   readonly currentUser = this.currentUserSignal.asReadonly();
   readonly isInitializing = this.isInitializingSignal.asReadonly();
   readonly isAuthenticated = computed(() => !!this.currentUserSignal());
-  readonly isSuperAdmin = computed(() => this.currentUserSignal()?.roles.includes('super_admin') ?? false);
-  readonly isBranchAdmin = computed(() => this.currentUserSignal()?.roles.includes('branch_admin') ?? false);
+  readonly isSuperAdmin = computed(
+    () => this.currentUserSignal()?.roles.includes('super_admin') ?? false,
+  );
+  readonly isBranchAdmin = computed(
+    () => this.currentUserSignal()?.roles.includes('branch_admin') ?? false,
+  );
 
   getCsrfCookie(): Observable<unknown> {
     return this.http.get('/sanctum/csrf-cookie', { withCredentials: true });
@@ -30,9 +34,7 @@ export class AuthService {
 
   initializeAuth(): Observable<User | null> {
     this.isInitializingSignal.set(true);
-    return this.loadCurrentUser().pipe(
-      finalize(() => this.isInitializingSignal.set(false))
-    );
+    return this.loadCurrentUser().pipe(finalize(() => this.isInitializingSignal.set(false)));
   }
 
   loadCurrentUser(): Observable<User | null> {
@@ -46,20 +48,22 @@ export class AuthService {
         this.currentUserSignal.set(null);
         this.branchContext.clearContext();
         return of(null);
-      })
+      }),
     );
   }
 
   login(credentials: LoginCredentials): Observable<User> {
     return this.getCsrfCookie().pipe(
       switchMap(() =>
-        this.http.post<ApiResponse<User>>('/api/v1/auth/login', credentials, { withCredentials: true })
+        this.http.post<ApiResponse<User>>('/api/v1/auth/login', credentials, {
+          withCredentials: true,
+        }),
       ),
       map((res) => res.data),
       tap((user) => {
         this.currentUserSignal.set(user);
         this.branchContext.setAvailableBranches(user.branches || [], user.roles || []);
-      })
+      }),
     );
   }
 
@@ -70,11 +74,15 @@ export class AuthService {
         this.currentUserSignal.set(null);
         this.branchContext.clearContext();
         this.router.navigate(['/login']);
-      })
+      }),
     );
   }
 
   hasRole(role: string): boolean {
     return this.currentUserSignal()?.roles.includes(role) ?? false;
+  }
+
+  hasPermission(permission: string): boolean {
+    return this.currentUserSignal()?.permissions?.includes(permission) ?? this.isSuperAdmin();
   }
 }

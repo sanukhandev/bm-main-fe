@@ -7,16 +7,194 @@ import { PropertiesApiService } from '../../core/api/properties-api.service';
 import { InventoryItem, Vendor } from '../../shared/models/maintenance.models';
 import { Property } from '../../shared/models/property.models';
 
-@Component({ selector: 'bm-work-order-form', standalone: true, imports: [CommonModule, RouterLink, ReactiveFormsModule], template: `
-<div class="max-w-5xl mx-auto space-y-6"><a routerLink="/app/maintenance/work-orders" class="text-sm text-emerald-700">← Back to Work Orders</a><div><div class="text-xs font-semibold uppercase tracking-wider text-emerald-700">Maintenance</div><h1 class="text-3xl font-bold text-slate-900">Create Work Order</h1></div>@if (error()) { <div class="bm-card p-4 text-sm text-rose-700">{{ error() }}</div> }<form [formGroup]="form" (ngSubmit)="save()" class="bm-card p-6 space-y-5"><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><label class="text-sm font-medium">Property<select class="bm-input mt-1" formControlName="property_id"><option value="">Select property</option>@for (property of properties(); track property.id) { <option [value]="property.id">{{ property.property_code }} — {{ property.name }}</option> }</select></label><label class="text-sm font-medium">Vendor<select class="bm-input mt-1" formControlName="vendor_id"><option value="">Optional</option>@for (vendor of vendors(); track vendor.id) { <option [value]="vendor.id">{{ vendor.name }}</option> }</select></label><label class="text-sm font-medium">Title<input class="bm-input mt-1" formControlName="title"></label><label class="text-sm font-medium">Priority<select class="bm-input mt-1" formControlName="priority"><option value="low">Low</option><option value="normal">Normal</option><option value="high">High</option><option value="urgent">Urgent</option></select></label><label class="text-sm font-medium">Service Charge<input class="bm-input mt-1" type="number" min="0" step="0.01" formControlName="service_charge"></label></div><label class="text-sm font-medium block">Description<textarea class="bm-input mt-1 !h-auto p-3" rows="4" formControlName="description"></textarea></label><div formArrayName="lines" class="space-y-3"><div class="flex justify-between items-center"><h2 class="font-semibold">Line Items</h2><button type="button" class="text-emerald-700 text-sm font-semibold" (click)="addLine()">+ Add line</button></div>@for (line of lines.controls; track $index) { <div [formGroupName]="$index" class="grid grid-cols-1 md:grid-cols-[140px_1fr_180px_110px_130px_auto] gap-2"><select class="bm-input" formControlName="line_type"><option value="service">Service</option><option value="inventory">Inventory</option></select><input class="bm-input" placeholder="Particulars" formControlName="description"><select class="bm-input" formControlName="inventory_item_id"><option value="">Inventory item</option>@for (item of inventory(); track item.id) { <option [value]="item.id">{{ item.name }}</option> }</select><input class="bm-input" type="number" min="0.01" step="0.01" placeholder="Qty" formControlName="quantity"><input class="bm-input" type="number" min="0" step="0.01" placeholder="Unit cost" formControlName="unit_cost"><button type="button" class="text-rose-600 text-xs" (click)="removeLine($index)">Remove</button></div> }</div><div class="flex justify-end gap-3"><button type="button" class="bm-btn bm-btn-secondary" (click)="back()">Cancel</button><button class="bm-btn bm-btn-primary" [disabled]="form.invalid || saving()">{{ saving() ? 'Saving...' : 'Create Work Order' }}</button></div></form></div>` })
+@Component({
+  selector: 'bm-work-order-form',
+  standalone: true,
+  imports: [CommonModule, RouterLink, ReactiveFormsModule],
+  template: ` <div class="max-w-5xl mx-auto space-y-6">
+    <a routerLink="/app/maintenance/work-orders" class="text-sm text-emerald-700"
+      >← Back to Work Orders</a
+    >
+    <div>
+      <div class="text-xs font-semibold uppercase tracking-wider text-emerald-700">Maintenance</div>
+      <h1 class="text-3xl font-bold text-slate-900">Create Work Order</h1>
+    </div>
+    @if (error()) {
+      <div class="bm-card p-4 text-sm text-rose-700">{{ error() }}</div>
+    }
+    <form [formGroup]="form" (ngSubmit)="save()" class="bm-card p-6 space-y-5">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <label class="text-sm font-medium"
+          >Property<select class="bm-input mt-1" formControlName="property_id">
+            <option value="">Select property</option>
+            @for (property of properties(); track property.id) {
+              <option [value]="property.id">
+                {{ property.property_code }} — {{ property.name }}
+              </option>
+            }
+          </select></label
+        ><label class="text-sm font-medium"
+          >Vendor<select class="bm-input mt-1" formControlName="vendor_id">
+            <option value="">Optional</option>
+            @for (vendor of vendors(); track vendor.id) {
+              <option [value]="vendor.id">{{ vendor.name }}</option>
+            }
+          </select></label
+        ><label class="text-sm font-medium"
+          >Title<input class="bm-input mt-1" formControlName="title" /></label
+        ><label class="text-sm font-medium"
+          >Priority<select class="bm-input mt-1" formControlName="priority">
+            <option value="low">Low</option>
+            <option value="normal">Normal</option>
+            <option value="high">High</option>
+            <option value="urgent">Urgent</option>
+          </select></label
+        ><label class="text-sm font-medium"
+          >Service Charge<input
+            class="bm-input mt-1"
+            type="number"
+            min="0"
+            step="0.01"
+            formControlName="service_charge"
+        /></label>
+      </div>
+      <label class="text-sm font-medium block"
+        >Description<textarea
+          class="bm-input mt-1 !h-auto p-3"
+          rows="4"
+          formControlName="description"
+        ></textarea>
+      </label>
+      <div formArrayName="lines" class="space-y-3">
+        <div class="flex justify-between items-center">
+          <h2 class="font-semibold">Line Items</h2>
+          <button type="button" class="text-emerald-700 text-sm font-semibold" (click)="addLine()">
+            + Add line
+          </button>
+        </div>
+        @for (line of lines.controls; track $index) {
+          <div
+            [formGroupName]="$index"
+            class="grid grid-cols-1 md:grid-cols-[140px_1fr_180px_110px_130px_auto] gap-2"
+          >
+            <select class="bm-input" formControlName="line_type">
+              <option value="service">Service</option>
+              <option value="inventory">Inventory</option></select
+            ><input
+              class="bm-input"
+              placeholder="Particulars"
+              formControlName="description"
+            /><select class="bm-input" formControlName="inventory_item_id">
+              <option value="">Inventory item</option>
+              @for (item of inventory(); track item.id) {
+                <option [value]="item.id">{{ item.name }}</option>
+              }</select
+            ><input
+              class="bm-input"
+              type="number"
+              min="0.01"
+              step="0.01"
+              placeholder="Qty"
+              formControlName="quantity"
+            /><input
+              class="bm-input"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="Unit cost"
+              formControlName="unit_cost"
+            /><button type="button" class="text-rose-600 text-xs" (click)="removeLine($index)">
+              Remove
+            </button>
+          </div>
+        }
+      </div>
+      <div class="flex justify-end gap-3">
+        <button type="button" class="bm-btn bm-btn-secondary" (click)="back()">Cancel</button
+        ><button class="bm-btn bm-btn-primary" [disabled]="form.invalid || saving()">
+          {{ saving() ? 'Saving...' : 'Create Work Order' }}
+        </button>
+      </div>
+    </form>
+  </div>`,
+})
 export class WorkOrderFormComponent {
-  private api = inject(MaintenanceApiService); private propertiesApi = inject(PropertiesApiService); private router = inject(Router); private fb = inject(FormBuilder); saving = signal(false); error = signal<string | null>(null); properties = signal<Property[]>([]); vendors = signal<Vendor[]>([]); inventory = signal<InventoryItem[]>([]);
-  form = this.fb.nonNullable.group({ property_id: ['', Validators.required], vendor_id: [''], title: ['', Validators.required], description: [''], priority: ['normal', Validators.required], service_charge: [0, [Validators.required, Validators.min(0)]], lines: this.fb.array([this.line()]) });
-  constructor() { this.propertiesApi.getProperties({ per_page: 100, status: 'active' }).subscribe({ next: res => this.properties.set(res.data), error: err => this.error.set(err.message) }); this.api.vendors().subscribe({ next: res => this.vendors.set(res.data), error: err => this.error.set(err.message) }); this.api.inventory().subscribe({ next: res => this.inventory.set(res.data), error: err => this.error.set(err.message) }); }
-  get lines(): FormArray { return this.form.controls.lines; }
-  line() { return this.fb.nonNullable.group({ line_type: ['service', Validators.required], inventory_item_id: [''], description: ['', Validators.required], quantity: [1, [Validators.required, Validators.min(0.01)]], unit_cost: [0, [Validators.required, Validators.min(0)]] }); }
-  addLine(): void { this.lines.push(this.line()); }
-  removeLine(index: number): void { if (this.lines.length > 1) this.lines.removeAt(index); }
-  save(): void { if (this.form.invalid) return; this.saving.set(true); const value = this.form.getRawValue(); this.api.createWorkOrder({ ...value, property_id: Number(value.property_id), vendor_id: value.vendor_id ? Number(value.vendor_id) : null, service_charge: Number(value.service_charge), lines: value.lines.map(line => ({ ...line, inventory_item_id: line.inventory_item_id ? Number(line.inventory_item_id) : null, quantity: Number(line.quantity), unit_cost: Number(line.unit_cost) })) }).subscribe({ next: res => this.router.navigate(['/app/maintenance/work-orders', res.data.id]), error: err => { this.error.set(err.message || 'Unable to create work order.'); this.saving.set(false); } }); }
-  back(): void { this.router.navigate(['/app/maintenance/work-orders']); }
+  private api = inject(MaintenanceApiService);
+  private propertiesApi = inject(PropertiesApiService);
+  private router = inject(Router);
+  private fb = inject(FormBuilder);
+  saving = signal(false);
+  error = signal<string | null>(null);
+  properties = signal<Property[]>([]);
+  vendors = signal<Vendor[]>([]);
+  inventory = signal<InventoryItem[]>([]);
+  form = this.fb.nonNullable.group({
+    property_id: ['', Validators.required],
+    vendor_id: [''],
+    title: ['', Validators.required],
+    description: [''],
+    priority: ['normal', Validators.required],
+    service_charge: [0, [Validators.required, Validators.min(0)]],
+    lines: this.fb.array([this.line()]),
+  });
+  constructor() {
+    this.propertiesApi.getProperties({ per_page: 100, status: 'active' }).subscribe({
+      next: (res) => this.properties.set(res.data),
+      error: (err) => this.error.set(err.message),
+    });
+    this.api.vendors().subscribe({
+      next: (res) => this.vendors.set(res.data),
+      error: (err) => this.error.set(err.message),
+    });
+    this.api.inventory().subscribe({
+      next: (res) => this.inventory.set(res.data),
+      error: (err) => this.error.set(err.message),
+    });
+  }
+  get lines(): FormArray {
+    return this.form.controls.lines;
+  }
+  line() {
+    return this.fb.nonNullable.group({
+      line_type: ['service', Validators.required],
+      inventory_item_id: [''],
+      description: ['', Validators.required],
+      quantity: [1, [Validators.required, Validators.min(0.01)]],
+      unit_cost: [0, [Validators.required, Validators.min(0)]],
+    });
+  }
+  addLine(): void {
+    this.lines.push(this.line());
+  }
+  removeLine(index: number): void {
+    if (this.lines.length > 1) this.lines.removeAt(index);
+  }
+  save(): void {
+    if (this.form.invalid) return;
+    this.saving.set(true);
+    const value = this.form.getRawValue();
+    this.api
+      .createWorkOrder({
+        ...value,
+        property_id: Number(value.property_id),
+        vendor_id: value.vendor_id ? Number(value.vendor_id) : null,
+        service_charge: Number(value.service_charge),
+        lines: value.lines.map((line) => ({
+          ...line,
+          inventory_item_id: line.inventory_item_id ? Number(line.inventory_item_id) : null,
+          quantity: Number(line.quantity),
+          unit_cost: Number(line.unit_cost),
+        })),
+      })
+      .subscribe({
+        next: (res) => this.router.navigate(['/app/maintenance/work-orders', res.data.id]),
+        error: (err) => {
+          this.error.set(err.message || 'Unable to create work order.');
+          this.saving.set(false);
+        },
+      });
+  }
+  back(): void {
+    this.router.navigate(['/app/maintenance/work-orders']);
+  }
 }

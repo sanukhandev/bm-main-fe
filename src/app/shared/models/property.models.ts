@@ -1,14 +1,7 @@
 import { Customer } from './customer.models';
 
 export type PropertyType =
-  | 'apartment'
-  | 'villa'
-  | 'shop'
-  | 'office'
-  | 'space'
-  | 'labor_camp'
-  | 'warehouse'
-  | 'land';
+  'apartment' | 'villa' | 'shop' | 'office' | 'space' | 'labor_camp' | 'warehouse' | 'land';
 
 export type PropertyStatus = 'active' | 'inactive' | 'archived';
 
@@ -36,7 +29,7 @@ export interface Property {
 
 export interface CreatePropertyDto {
   owner_customer_id: number;
-  property_code: string;
+  property_code?: string;
   unit_number: string;
   property_type: PropertyType;
   name: string;

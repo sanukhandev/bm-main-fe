@@ -1,19 +1,27 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'bm-footer',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   template: `
     <footer
-      class="py-4 text-center text-xs text-[#1B1E1C]/40 font-normal select-none tracking-wide"
+      class="py-4 text-center text-xs text-[#1B1E1C]/40 font-normal select-none tracking-wide flex flex-wrap items-center justify-center gap-y-1"
     >
       <span class="font-medium text-[#1B1E1C]/55">Baithul Madeena Real Estate ERP</span>
       <span class="mx-2 text-[#1B1E1C]/25">•</span>
       Created by <span class="font-zaakiy font-semibold text-[#193D32]/60">Zv3</span>
       <span class="mx-2 text-[#1B1E1C]/25">•</span>
       Powered by <span class="font-zaakiy font-semibold text-[#193D32]/60">ZaakiyV3RSE</span>
+      <span class="mx-2 text-[#1B1E1C]/25">•</span>
+      <a
+        routerLink="/app/privacy-terms"
+        class="text-slate-500 hover:text-emerald-700 transition underline underline-offset-2 select-text cursor-pointer"
+      >
+        Privacy Policy & Terms
+      </a>
       <span class="mx-2 text-[#1B1E1C]/25">•</span>
       © 2026 Desertwhales
     </footer>

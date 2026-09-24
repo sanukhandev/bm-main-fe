@@ -22,6 +22,9 @@ describe('IntelligentReportApiService', () => {
         { provide: IntelligentReportApiService, useClass: IntelligentReportApiService },
       ],
     });
-    injector.get(IntelligentReportApiService).get({ period: 'custom', date_from: '2026-01-01', date_to: '2026-03-31', scope: 'overall' }).subscribe();
+    injector
+      .get(IntelligentReportApiService)
+      .get({ period: 'custom', date_from: '2026-01-01', date_to: '2026-03-31', scope: 'overall' })
+      .subscribe();
   });
 });

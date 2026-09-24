@@ -31,6 +31,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/zaakiy/zaakiy.component').then((m) => m.ZaakiyComponent),
       },
+      {
+        path: 'faq',
+        loadComponent: () =>
+          import('./features/help/faq.component').then((m) => m.FaqComponent),
+      },
       // Customers
       {
         path: 'customers',
@@ -365,6 +370,11 @@ export const routes: Routes = [
           import('./features/administration/roles/roles-list.component').then(
             (m) => m.RolesListComponent,
           ),
+      },
+      {
+        path: 'privacy-terms',
+        loadComponent: () =>
+          import('./features/legal/privacy-terms.component').then((m) => m.PrivacyTermsComponent),
       },
     ],
   },

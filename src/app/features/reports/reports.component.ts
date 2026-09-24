@@ -35,7 +35,9 @@ import { BmStatusBadgeComponent } from '../../shared/components/bm-status-badge/
       ></bm-page-header
     >
     <nav class="flex flex-wrap gap-2 mb-5" aria-label="Reports">
-      <a routerLink="/app/reports/intelligent" class="bm-btn bm-btn-primary text-xs">Intelligent Report</a>
+      <a routerLink="/app/reports/intelligent" class="bm-btn bm-btn-primary text-xs"
+        >Intelligent Report</a
+      >
       <a
         *ngFor="let report of visibleReportLinks()"
         [routerLink]="['/app/reports', report.type]"

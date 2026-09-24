@@ -13,7 +13,13 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideHttpClient(
-      withInterceptors([apiBaseUrlInterceptor, loadingInterceptor, authInterceptor, branchInterceptor, errorInterceptor]),
+      withInterceptors([
+        apiBaseUrlInterceptor,
+        loadingInterceptor,
+        authInterceptor,
+        branchInterceptor,
+        errorInterceptor,
+      ]),
     ),
     provideAppInitializer(() => {
       const authService = inject(AuthService);

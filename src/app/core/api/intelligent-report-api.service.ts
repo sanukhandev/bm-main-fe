@@ -2,11 +2,19 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-export type IntelligentReportPeriod = 'this_month' | 'last_month' | 'last_3_months' | 'last_6_months' | 'last_12_months' | 'this_year' | 'custom';
+export type IntelligentReportPeriod =
+  | 'this_month'
+  | 'last_month'
+  | 'last_3_months'
+  | 'last_6_months'
+  | 'last_12_months'
+  | 'this_year'
+  | 'custom';
 export type IntelligentReportScope = 'branch' | 'overall';
 
 export interface IntelligentReportSummary {
-  [key: string]: string | number | null | { count: number; amount: string } | { owner: number; tenant: number };
+  [key: string]:
+    string | number | null | { count: number; amount: string } | { owner: number; tenant: number };
   operational_profit_loss: string;
   operating_margin_percent: number | null;
   operating_income: string;
@@ -40,11 +48,28 @@ export interface IntelligentFinding {
 
 export interface IntelligentReportData {
   scope: { type: IntelligentReportScope; branch_id: number | null; label: string };
-  period: { key: IntelligentReportPeriod; from: string; to: string; granularity: string; comparison_from: string; comparison_to: string };
+  period: {
+    key: IntelligentReportPeriod;
+    from: string;
+    to: string;
+    granularity: string;
+    comparison_from: string;
+    comparison_to: string;
+  };
   summary: IntelligentReportSummary;
-  trends: { income_vs_cost: Array<{ period: string; income: string; cost: string }>; operational_result: Array<{ period: string; result: string }> };
+  trends: {
+    income_vs_cost: Array<{ period: string; income: string; cost: string }>;
+    operational_result: Array<{ period: string; result: string }>;
+  };
   findings: IntelligentFinding[];
-  branch_comparison: Array<{ branch_id: number; branch: string; operating_income: string; operating_cost: string; operational_result: string; margin: number | null }>;
+  branch_comparison: Array<{
+    branch_id: number;
+    branch: string;
+    operating_income: string;
+    operating_cost: string;
+    operational_result: string;
+    margin: number | null;
+  }>;
   accounting_note: string;
 }
 
@@ -52,15 +77,31 @@ export interface IntelligentReportData {
 export class IntelligentReportApiService {
   private http = inject(HttpClient);
 
-  get(filters: { period: IntelligentReportPeriod; date_from?: string; date_to?: string; scope?: IntelligentReportScope }): Observable<{ data: IntelligentReportData }> {
-    let params = new HttpParams().set('period', filters.period).set('scope', filters.scope || 'branch');
+  get(filters: {
+    period: IntelligentReportPeriod;
+    date_from?: string;
+    date_to?: string;
+    scope?: IntelligentReportScope;
+  }): Observable<{ data: IntelligentReportData }> {
+    let params = new HttpParams()
+      .set('period', filters.period)
+      .set('scope', filters.scope || 'branch');
     if (filters.date_from) params = params.set('date_from', filters.date_from);
     if (filters.date_to) params = params.set('date_to', filters.date_to);
-    return this.http.get<{ data: IntelligentReportData }>('/api/v1/reports/intelligent', { params });
+    return this.http.get<{ data: IntelligentReportData }>('/api/v1/reports/intelligent', {
+      params,
+    });
   }
 
-  pdf(filters: { period: IntelligentReportPeriod; date_from?: string; date_to?: string; scope?: IntelligentReportScope }): Observable<Blob> {
-    let params = new HttpParams().set('period', filters.period).set('scope', filters.scope || 'branch');
+  pdf(filters: {
+    period: IntelligentReportPeriod;
+    date_from?: string;
+    date_to?: string;
+    scope?: IntelligentReportScope;
+  }): Observable<Blob> {
+    let params = new HttpParams()
+      .set('period', filters.period)
+      .set('scope', filters.scope || 'branch');
     if (filters.date_from) params = params.set('date_from', filters.date_from);
     if (filters.date_to) params = params.set('date_to', filters.date_to);
     return this.http.get('/api/v1/reports/intelligent/pdf', { params, responseType: 'blob' });

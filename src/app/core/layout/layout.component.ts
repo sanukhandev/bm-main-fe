@@ -1937,6 +1937,13 @@ export class LayoutComponent {
       badge: 'Analytics',
     },
     {
+      title: 'Help & FAQ',
+      subtitle: 'Answers for daily ERP tasks and workflows',
+      category: 'Pages',
+      url: '/app/faq',
+      keywords: ['faq', 'help', 'guide', 'manual', 'how to', 'support', 'question'],
+    },
+    {
       title: 'Financial Reports',
       subtitle: 'Operational & audit reports',
       category: 'Pages',

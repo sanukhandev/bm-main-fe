@@ -102,10 +102,10 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
                     >Petty Cash Balance</span
                   >
                   <div
-                    class="text-2xl sm:text-3xl font-bold text-[#0F172A] tabular-nums tracking-tight flex items-baseline"
+                    class="text-2xl sm:text-3xl font-bold text-[#0F172A] tabular-nums tracking-tight flex items-center"
                   >
                     <dirham-symbol
-                      size="18"
+                      size="0.95em"
                       weight="bold"
                       class="mr-1.5 text-[#64748B] select-none"
                     ></dirham-symbol>
@@ -139,10 +139,10 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
                     >Pending Cheques (In)</span
                   >
                   <div
-                    class="text-2xl sm:text-3xl font-bold text-[#0F172A] tabular-nums tracking-tight flex items-baseline"
+                    class="text-2xl sm:text-3xl font-bold text-[#0F172A] tabular-nums tracking-tight flex items-center"
                   >
                     <dirham-symbol
-                      size="18"
+                      size="0.95em"
                       weight="bold"
                       class="mr-1.5 text-[#64748B] select-none"
                     ></dirham-symbol>
@@ -186,12 +186,12 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
                   </span>
 
                   <div
-                    class="flex items-baseline gap-2 my-0.5"
+                    class="flex items-center gap-2 my-0.5"
                     [class.text-[#047857]]="!isNetMovementNegative()"
                     [class.text-[#DC2626]]="isNetMovementNegative()"
                   >
                     <dirham-symbol
-                      size="28"
+                      size="0.95em"
                       weight="semibold"
                       class="select-none inline-block align-middle"
                     ></dirham-symbol>
@@ -248,10 +248,10 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
                     >Today's Inward</span
                   >
                   <div
-                    class="text-2xl sm:text-3xl font-bold text-[#047857] tabular-nums tracking-tight flex items-baseline"
+                    class="text-2xl sm:text-3xl font-bold text-[#047857] tabular-nums tracking-tight flex items-center"
                   >
                     <dirham-symbol
-                      size="20"
+                      size="0.95em"
                       weight="bold"
                       class="mr-1.5 select-none text-[#047857]/80"
                     ></dirham-symbol>
@@ -285,10 +285,10 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
                     >Today's Outward</span
                   >
                   <div
-                    class="text-2xl sm:text-3xl font-bold text-[#DC2626] tabular-nums tracking-tight flex items-baseline"
+                    class="text-2xl sm:text-3xl font-bold text-[#DC2626] tabular-nums tracking-tight flex items-center"
                   >
                     <dirham-symbol
-                      size="20"
+                      size="0.95em"
                       weight="bold"
                       class="mr-1.5 select-none text-[#DC2626]/80"
                     ></dirham-symbol>
@@ -390,30 +390,30 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
 
               <!-- Frameless Position Stats -->
               <div class="py-4 space-y-4">
-                <div class="flex items-baseline justify-between">
+                <div class="flex items-center justify-between">
                   <span class="text-xs font-semibold text-[#64748B]">Month Total Inward</span>
-                  <div class="flex items-baseline text-2xl font-bold text-[#047857] tabular-nums">
-                    <dirham-symbol size="18" weight="bold" class="mr-1.5"></dirham-symbol>
+                  <div class="flex items-center text-2xl font-bold text-[#047857] tabular-nums">
+                    <dirham-symbol size="0.95em" weight="bold" class="mr-1.5"></dirham-symbol>
                     <span>{{ formatMoney(snapshot()?.month_inward) }}</span>
                   </div>
                 </div>
 
-                <div class="flex items-baseline justify-between border-t border-slate-100 pt-3">
+                <div class="flex items-center justify-between border-t border-slate-100 pt-3">
                   <span class="text-xs font-semibold text-[#64748B]">Month Total Outward</span>
-                  <div class="flex items-baseline text-2xl font-bold text-[#DC2626] tabular-nums">
-                    <dirham-symbol size="18" weight="bold" class="mr-1.5"></dirham-symbol>
+                  <div class="flex items-center text-2xl font-bold text-[#DC2626] tabular-nums">
+                    <dirham-symbol size="0.95em" weight="bold" class="mr-1.5"></dirham-symbol>
                     <span>{{ formatMoney(snapshot()?.month_outward) }}</span>
                   </div>
                 </div>
 
-                <div class="flex items-baseline justify-between border-t border-slate-100 pt-3">
+                <div class="flex items-center justify-between border-t border-slate-100 pt-3">
                   <span class="text-xs font-bold text-[#0F172A]">Month Net Cash Flow</span>
                   <div
-                    class="flex items-baseline text-2xl font-bold tabular-nums"
+                    class="flex items-center text-2xl font-bold tabular-nums"
                     [class.text-[#047857]]="!isMonthNetNegative()"
                     [class.text-[#DC2626]]="isMonthNetNegative()"
                   >
-                    <dirham-symbol size="18" weight="bold" class="mr-1.5"></dirham-symbol>
+                    <dirham-symbol size="0.95em" weight="bold" class="mr-1.5"></dirham-symbol>
                     <span>{{ formatMoney(snapshot()?.month_net_movement) }}</span>
                   </div>
                 </div>
@@ -505,9 +505,9 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
                     >Tenant Outstanding Receivables</span
                   >
                   <div
-                    class="flex items-baseline text-2xl font-bold text-[#DC2626] tabular-nums mt-0.5"
+                    class="flex items-center text-2xl font-bold text-[#DC2626] tabular-nums mt-0.5"
                   >
-                    <dirham-symbol size="18" weight="bold" class="mr-1.5"></dirham-symbol>
+                    <dirham-symbol size="0.95em" weight="bold" class="mr-1.5"></dirham-symbol>
                     <span>{{ formatMoney(snapshot()?.tenant_outstanding_receivable) }}</span>
                   </div>
                   <span class="text-[10px] font-medium text-[#DC2626]">Overdue & Pending Rent</span>
@@ -518,10 +518,10 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
                     >Owner Outstanding Payables</span
                   >
                   <div
-                    class="flex items-baseline text-2xl font-bold text-[#334155] tabular-nums mt-0.5"
+                    class="flex items-center text-2xl font-bold text-[#334155] tabular-nums mt-0.5"
                   >
                     <dirham-symbol
-                      size="18"
+                      size="0.95em"
                       weight="bold"
                       class="mr-1.5 text-[#334155]"
                     ></dirham-symbol>
@@ -617,9 +617,9 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
                     >Inward Pending Deposit</span
                   >
                   <div
-                    class="flex items-baseline text-xl font-bold text-[#D97706] tabular-nums mt-0.5"
+                    class="flex items-center text-xl font-bold text-[#D97706] tabular-nums mt-0.5"
                   >
-                    <dirham-symbol size="16" weight="bold" class="mr-1"></dirham-symbol>
+                    <dirham-symbol size="0.95em" weight="bold" class="mr-1"></dirham-symbol>
                     <span>{{ formatMoney(snapshot()?.pending_cheque_inward) }}</span>
                   </div>
                 </div>
@@ -629,9 +629,9 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
                     >Outward Pending Clearance</span
                   >
                   <div
-                    class="flex items-baseline text-xl font-bold text-[#2563EB] tabular-nums mt-0.5"
+                    class="flex items-center text-xl font-bold text-[#2563EB] tabular-nums mt-0.5"
                   >
-                    <dirham-symbol size="16" weight="bold" class="mr-1"></dirham-symbol>
+                    <dirham-symbol size="0.95em" weight="bold" class="mr-1"></dirham-symbol>
                     <span>{{ formatMoney(snapshot()?.pending_cheque_outward) }}</span>
                   </div>
                 </div>
@@ -730,7 +730,7 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
                       >
                         <span class="inline-flex items-center justify-end">
                           <dirham-symbol
-                            size="12"
+                            size="0.95em"
                             weight="bold"
                             class="mr-1 text-[#64748B]"
                           ></dirham-symbol>

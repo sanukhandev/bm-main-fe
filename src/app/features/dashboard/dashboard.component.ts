@@ -149,10 +149,10 @@ import {
                     >Petty Cash Balance</span
                   >
                   <div
-                    class="text-2xl sm:text-3xl font-bold text-[#0F172A] tabular-nums tracking-tight flex items-baseline"
+                    class="text-2xl sm:text-3xl font-bold text-[#0F172A] tabular-nums tracking-tight flex items-center"
                   >
                     <dirham-symbol
-                      size="18"
+                      size="0.95em"
                       weight="bold"
                       class="mr-1.5 text-[#64748B] select-none"
                     ></dirham-symbol>
@@ -184,10 +184,10 @@ import {
                     >Pending Cheques (In)</span
                   >
                   <div
-                    class="text-2xl sm:text-3xl font-bold text-[#0F172A] tabular-nums tracking-tight flex items-baseline"
+                    class="text-2xl sm:text-3xl font-bold text-[#0F172A] tabular-nums tracking-tight flex items-center"
                   >
                     <dirham-symbol
-                      size="18"
+                      size="0.95em"
                       weight="bold"
                       class="mr-1.5 text-[#64748B] select-none"
                     ></dirham-symbol>
@@ -230,12 +230,12 @@ import {
 
                   <!-- Large Newsreader Serif Hero Number (Green if >= 0, Red if < 0) -->
                   <div
-                    class="flex items-baseline gap-2 my-0.5"
+                    class="flex items-center gap-2 my-0.5"
                     [class.text-[#047857]]="!isNetMovementNegative()"
                     [class.text-[#DC2626]]="isNetMovementNegative()"
                   >
                     <dirham-symbol
-                      size="28"
+                      size="0.95em"
                       weight="semibold"
                       class="select-none inline-block align-middle"
                     ></dirham-symbol>
@@ -288,10 +288,10 @@ import {
                     >Today's Inward</span
                   >
                   <div
-                    class="text-2xl sm:text-3xl font-bold text-[#047857] tabular-nums tracking-tight flex items-baseline"
+                    class="text-2xl sm:text-3xl font-bold text-[#047857] tabular-nums tracking-tight flex items-center"
                   >
                     <dirham-symbol
-                      size="20"
+                      size="0.95em"
                       weight="bold"
                       class="mr-1.5 select-none text-[#047857]/80"
                     ></dirham-symbol>
@@ -323,10 +323,10 @@ import {
                     >Today's Outward</span
                   >
                   <div
-                    class="text-2xl sm:text-3xl font-bold text-[#DC2626] tabular-nums tracking-tight flex items-baseline"
+                    class="text-2xl sm:text-3xl font-bold text-[#DC2626] tabular-nums tracking-tight flex items-center"
                   >
                     <dirham-symbol
-                      size="20"
+                      size="0.95em"
                       weight="bold"
                       class="mr-1.5 select-none text-[#DC2626]/80"
                     ></dirham-symbol>
@@ -525,21 +525,21 @@ import {
 
               <!-- Frameless Position Stats with Highlighted Numbers -->
               <div class="py-4 space-y-4">
-                <div class="flex items-baseline justify-between">
+                <div class="flex items-center justify-between">
                   <span class="text-xs font-semibold text-[#64748B]">Tenant Receivables</span>
-                  <div class="flex items-baseline text-2xl font-bold text-[#DC2626] tabular-nums">
-                    <dirham-symbol size="18" weight="bold" class="mr-1.5"></dirham-symbol>
+                  <div class="flex items-center text-2xl font-bold text-[#DC2626] tabular-nums">
+                    <dirham-symbol size="0.95em" weight="bold" class="mr-1.5"></dirham-symbol>
                     <span>{{
                       formatMoney(accountsSnapshot()?.tenant_outstanding_receivable)
                     }}</span>
                   </div>
                 </div>
 
-                <div class="flex items-baseline justify-between border-t border-slate-100 pt-3">
+                <div class="flex items-center justify-between border-t border-slate-100 pt-3">
                   <span class="text-xs font-semibold text-[#64748B]">Owner Payables</span>
-                  <div class="flex items-baseline text-2xl font-bold text-[#334155] tabular-nums">
+                  <div class="flex items-center text-2xl font-bold text-[#334155] tabular-nums">
                     <dirham-symbol
-                      size="18"
+                      size="0.95em"
                       weight="bold"
                       class="mr-1.5 text-[#334155]"
                     ></dirham-symbol>
@@ -553,9 +553,9 @@ import {
                       >Month Inward</span
                     >
                     <div
-                      class="flex items-baseline text-xl font-bold text-[#047857] tabular-nums mt-0.5"
+                      class="flex items-center text-xl font-bold text-[#047857] tabular-nums mt-0.5"
                     >
-                      <dirham-symbol size="16" weight="bold" class="mr-1"></dirham-symbol>
+                      <dirham-symbol size="0.95em" weight="bold" class="mr-1"></dirham-symbol>
                       <span>{{ formatMoney(accountsSnapshot()?.month_inward) }}</span>
                     </div>
                   </div>
@@ -564,9 +564,9 @@ import {
                       >Month Outward</span
                     >
                     <div
-                      class="flex items-baseline text-xl font-bold text-[#DC2626] tabular-nums mt-0.5"
+                      class="flex items-center text-xl font-bold text-[#DC2626] tabular-nums mt-0.5"
                     >
-                      <dirham-symbol size="16" weight="bold" class="mr-1"></dirham-symbol>
+                      <dirham-symbol size="0.95em" weight="bold" class="mr-1"></dirham-symbol>
                       <span>{{ formatMoney(accountsSnapshot()?.month_outward) }}</span>
                     </div>
                   </div>
@@ -1237,7 +1237,7 @@ import {
                         >
                           <span class="inline-flex items-center justify-end">
                             <dirham-symbol
-                              size="12"
+                              size="0.95em"
                               weight="bold"
                               class="mr-1 text-[#64748B]"
                             ></dirham-symbol>
@@ -1318,7 +1318,7 @@ import {
                   <div class="text-[11px] text-[#64748B] mt-0.5">
                     Cheques totaling
                     <dirham-symbol
-                      size="12"
+                      size="0.95em"
                       weight="bold"
                       class="mx-0.5 inline-block align-middle"
                     ></dirham-symbol
@@ -1355,7 +1355,7 @@ import {
                   <div class="text-[11px] text-[#64748B] mt-0.5">
                     Closing petty cash stands at
                     <dirham-symbol
-                      size="12"
+                      size="0.95em"
                       weight="bold"
                       class="mx-0.5 inline-block align-middle"
                     ></dirham-symbol

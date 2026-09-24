@@ -140,6 +140,23 @@ body {
   padding-right: 2.25rem !important;
 }
 
+/* UAE Dirham symbol vertical alignment & font-proportional scaling */
+dirham-symbol {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  vertical-align: middle !important;
+  line-height: 1 !important;
+  position: relative !important;
+  top: -0.06em !important;
+}
+
+dirham-symbol svg {
+  display: block !important;
+  width: 1em !important;
+  height: 1em !important;
+}
+
 .bm-btn {
   display: inline-flex;
   align-items: center;

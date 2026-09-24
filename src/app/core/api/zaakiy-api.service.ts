@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BranchContextService } from '../branch-context/branch-context.service';
+import { apiUrl } from '../config/runtime-config';
 
 export type ZaakiyRole = 'user' | 'model';
 
@@ -37,7 +38,7 @@ export class ZaakiyApiService {
       if (token) headers['X-XSRF-TOKEN'] = token;
       if (branchId) headers['X-Branch-Id'] = String(branchId);
 
-      void fetch('/api/v1/ai/zaakiy/chat', {
+      void fetch(apiUrl('/api/v1/ai/zaakiy/chat'), {
         method: 'POST',
         credentials: 'include',
         headers,

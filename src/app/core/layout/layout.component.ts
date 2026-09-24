@@ -20,7 +20,8 @@ import {
 } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
 import { BmLoadingService } from '../services/bm-loading.service';
-import { BmBranchSwitcherComponent } from '../../shared/components/bm-branch-switcher/bm-branch-switcher.component';
+import { BranchContextService } from '../branch-context/branch-context.service';
+import { Branch } from '../branch-context/branch.models';
 import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.component';
 
 export type MegaMenuTab = 'operations' | 'agreements' | 'accounts' | 'reports' | 'admin' | null;
@@ -46,14 +47,7 @@ export interface PageSearchItem {
 @Component({
   selector: 'bm-layout',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterOutlet,
-    RouterLink,
-    RouterLinkActive,
-    BmBranchSwitcherComponent,
-    BmFooterComponent,
-  ],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, BmFooterComponent],
   template: `
     <div
       class="h-screen w-full max-w-full flex flex-col overflow-hidden bg-[#F8FAFC] relative font-sans text-[#0F172A] select-none"
@@ -73,27 +67,127 @@ export interface PageSearchItem {
       <header
         class="h-[70px] shrink-0 border-b border-[#E2E8F0] bg-white px-3 sm:px-4 md:px-6 xl:px-8 flex items-center justify-between z-40 relative shadow-2xs max-w-full"
       >
-        <!-- LEFT: BRANDING MONOGRAM & TITLE -->
+        <!-- LEFT: BRANDING MONOGRAM & TITLE (WITH LOGO BRANCH SWITCHER) -->
         <div class="flex items-center gap-2 sm:gap-4 xl:gap-6 min-w-0 shrink-0">
-          <a
-            routerLink="/app/dashboard"
-            (click)="closeMegaMenu()"
-            class="flex items-center gap-2.5 sm:gap-3 group shrink-0"
-          >
-            <div
-              class="w-9 h-9 rounded-xl bg-[#0F172A] text-white flex items-center justify-center font-bold text-xs tracking-wider shadow-xs group-hover:scale-105 transition-transform shrink-0"
+          <div class="relative flex items-center">
+            <button
+              type="button"
+              (click)="toggleLogoBranchDropdown($event)"
+              class="flex items-center gap-2.5 sm:gap-3 group shrink-0 text-left cursor-pointer p-1 -ml-1 rounded-xl hover:bg-slate-100/80 transition"
+              [title]="
+                availableBranches().length > 1
+                  ? 'Click to switch operating branch'
+                  : 'Baithul Madeena ERP'
+              "
             >
-              BM
-            </div>
-            <div class="hidden sm:block overflow-hidden whitespace-nowrap">
-              <div class="font-bold text-[#0F172A] tracking-tight text-sm leading-tight">
-                Baithul Madeena
+              <div
+                class="w-9 h-9 rounded-xl bg-[#0F172A] text-white flex items-center justify-center font-bold text-xs tracking-wider shadow-xs group-hover:scale-105 transition-transform shrink-0"
+              >
+                BM
               </div>
-              <div class="text-[10px] text-[#64748B] font-semibold tracking-widest uppercase">
-                Real Estate ERP
+              <div class="hidden sm:block overflow-hidden whitespace-nowrap">
+                <div
+                  class="font-bold text-[#0F172A] tracking-tight text-sm leading-tight flex items-center gap-1.5"
+                >
+                  <span>Baithul Madeena</span>
+                  @if (activeBranch()) {
+                    <span
+                      class="text-[10px] px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 font-bold border border-emerald-200/60 uppercase tracking-wider flex items-center gap-1"
+                    >
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                      {{ activeBranch()?.code }}
+                      @if (availableBranches().length > 1) {
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-3 w-3 text-emerald-600 transition-transform duration-200"
+                          [class.rotate-180]="logoBranchDropdownOpen()"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      }
+                    </span>
+                  }
+                </div>
+                <div
+                  class="text-[10px] text-[#64748B] font-semibold tracking-widest uppercase flex items-center gap-1"
+                >
+                  <span>Real Estate ERP</span>
+                  @if (activeBranch() && availableBranches().length > 1) {
+                    <span class="text-[9px] text-emerald-600 font-normal lowercase"
+                      >• switch branch</span
+                    >
+                  }
+                </div>
               </div>
-            </div>
-          </a>
+            </button>
+
+            <!-- Logo Branch Switcher Dropdown Popover -->
+            @if (logoBranchDropdownOpen() && availableBranches().length > 1) {
+              <div
+                class="absolute top-12 left-0 z-50 w-64 bg-white border border-[#E2E8F0] rounded-2xl shadow-[0_20px_50px_rgba(15,23,42,0.18)] p-2 animate-scale-up"
+                (click)="$event.stopPropagation()"
+              >
+                <div
+                  class="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between border-b border-slate-100 pb-2 mb-1"
+                >
+                  <span>Switch Operating Branch</span>
+                  <span
+                    class="text-emerald-700 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded text-[9px]"
+                    >{{ availableBranches().length }} Active</span
+                  >
+                </div>
+                <div class="space-y-1 max-h-60 overflow-y-auto">
+                  @for (branch of availableBranches(); track branch.id) {
+                    <button
+                      type="button"
+                      (click)="selectLogoBranch(branch)"
+                      class="w-full text-left p-2.5 rounded-xl transition flex items-center justify-between cursor-pointer group"
+                      [class.bg-emerald-50]="branch.id === activeBranch()?.id"
+                      [class.border]="branch.id === activeBranch()?.id"
+                      [class.border-emerald-200]="branch.id === activeBranch()?.id"
+                      [class.hover:bg-slate-50]="branch.id !== activeBranch()?.id"
+                    >
+                      <div>
+                        <div
+                          class="text-xs font-bold text-slate-900 flex items-center gap-1.5 group-hover:text-emerald-800"
+                        >
+                          <span class="text-emerald-700 font-extrabold">[{{ branch.code }}]</span>
+                          <span>{{ branch.name }}</span>
+                        </div>
+                        <div class="text-[10px] text-slate-500 font-medium mt-0.5">
+                          {{ branch.currency_code || 'AED' }} • {{ branch.timezone || 'UAE' }}
+                        </div>
+                      </div>
+                      @if (branch.id === activeBranch()?.id) {
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4 text-emerald-600 shrink-0"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2.5"
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      }
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          </div>
 
           <!-- DESKTOP CENTER PRIMARY NAVIGATION LINKS -->
           <nav class="hidden lg:flex items-center gap-1 xl:gap-1.5 ml-1 xl:ml-4 shrink-0">
@@ -245,300 +339,10 @@ export interface PageSearchItem {
               </button>
             }
           </nav>
-
-          <!-- GLOBAL SPOTLIGHT SEARCH TRIGGER BUTTON -->
-          <button
-            type="button"
-            (click)="openSearch()"
-            title="Search Spotlight (Ctrl K)"
-            class="hidden md:flex items-center justify-between h-[38px] w-36 lg:w-48 xl:w-64 px-3 rounded-full bg-slate-100/90 border border-slate-200 text-xs text-slate-500 hover:bg-white hover:border-slate-300 hover:shadow-2xs transition-all cursor-pointer ml-1 xl:ml-2 shrink-0 group"
-          >
-            <div class="flex items-center gap-2 truncate">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4 text-slate-400 group-hover:text-emerald-600 transition-colors shrink-0"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-              <span class="truncate font-medium">Search Spotlight...</span>
-            </div>
-            <kbd
-              class="hidden sm:inline-flex items-center gap-0.5 text-[10px] font-bold text-slate-400 border border-slate-200 rounded px-1.5 py-0.5 bg-white shadow-2xs shrink-0 group-hover:border-slate-300"
-            >
-              <span>Ctrl K</span>
-            </kbd>
-          </button>
         </div>
 
-        <!-- RIGHT: BRANCH SELECTOR, NOTIFICATIONS, ZAAKIY, USER -->
+        <!-- RIGHT: NOTIFICATIONS, USER CLUSTER & MOBILE TOGGLE -->
         <div class="flex items-center gap-1.5 sm:gap-2 xl:gap-3 shrink-0">
-          <!-- HELP MENU GROUP DROPDOWN (FAQ, Terms, Privacy Policy & Legal Docs) -->
-          <div #helpMenuContainer class="relative hidden sm:block z-50">
-            <button
-              type="button"
-              (click)="toggleHelpMenu($event)"
-              [class.bg-[#0F172A]]="helpMenuOpen()"
-              [class.text-white]="helpMenuOpen()"
-              [class.font-semibold]="helpMenuOpen()"
-              title="Help & Legal Documents"
-              class="h-[38px] px-3.5 rounded-full bg-white border border-[#E2E8F0] text-xs font-medium text-[#334155] hover:text-[#0F172A] hover:bg-slate-100 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs shrink-0"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4"
-                [class.text-white]="helpMenuOpen()"
-                [class.text-slate-500]="!helpMenuOpen()"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="1.75"
-                  d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093V14m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span>Help</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-3.5 w-3.5 transition-transform duration-200"
-                [class.text-white]="helpMenuOpen()"
-                [class.text-slate-400]="!helpMenuOpen()"
-                [class.rotate-180]="helpMenuOpen()"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </button>
-
-            <!-- HELP SUBMENU POPOVER -->
-            @if (helpMenuOpen()) {
-              <div
-                class="absolute top-11 right-0 z-50 w-64 bg-white border border-[#E2E8F0] rounded-2xl shadow-[0_20px_50px_rgba(15,23,42,0.18)] p-2 animate-fade-in space-y-0.5"
-                (click)="$event.stopPropagation()"
-              >
-                <div
-                  class="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider"
-                >
-                  Help & Support
-                </div>
-
-                <!-- About Application -->
-                <a
-                  routerLink="/app/about"
-                  (click)="closeHelpMenu()"
-                  class="group flex items-center gap-2.5 p-2 rounded-xl hover:bg-slate-50 transition"
-                >
-                  <div
-                    class="w-7 h-7 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <div class="text-xs font-semibold text-slate-900 group-hover:text-teal-700">
-                      About Application
-                    </div>
-                    <div class="text-[10px] text-slate-500">System overview & developer info</div>
-                  </div>
-                </a>
-
-                <!-- FAQ & User Guide -->
-                <a
-                  routerLink="/app/faq"
-                  (click)="closeHelpMenu()"
-                  class="group flex items-center gap-2.5 p-2 rounded-xl hover:bg-slate-50 transition"
-                >
-                  <div
-                    class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093V14m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <div class="text-xs font-semibold text-slate-900 group-hover:text-emerald-700">
-                      FAQ & User Guide
-                    </div>
-                    <div class="text-[10px] text-slate-500">System operations & answers</div>
-                  </div>
-                </a>
-
-                <div class="border-t border-slate-100 my-1"></div>
-
-                <div
-                  class="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider"
-                >
-                  Legal Documents
-                </div>
-
-                <!-- Terms of Use -->
-                <a
-                  routerLink="/app/privacy-terms"
-                  (click)="closeHelpMenu()"
-                  class="group flex items-center gap-2.5 p-2 rounded-xl hover:bg-slate-50 transition"
-                >
-                  <div
-                    class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <div class="text-xs font-semibold text-slate-900 group-hover:text-blue-600">
-                      Terms of Use
-                    </div>
-                    <div class="text-[10px] text-slate-500">Enterprise license & terms</div>
-                  </div>
-                </a>
-
-                <!-- Privacy Policy -->
-                <a
-                  routerLink="/app/privacy-terms"
-                  (click)="closeHelpMenu()"
-                  class="group flex items-center gap-2.5 p-2 rounded-xl hover:bg-slate-50 transition"
-                >
-                  <div
-                    class="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <div class="text-xs font-semibold text-slate-900 group-hover:text-indigo-600">
-                      Privacy Policy
-                    </div>
-                    <div class="text-[10px] text-slate-500">UAE Data protection policy</div>
-                  </div>
-                </a>
-
-                <!-- All Legal Docs (Print Edition) -->
-                <a
-                  routerLink="/app/privacy-terms"
-                  (click)="closeHelpMenu()"
-                  class="group flex items-center gap-2.5 p-2 rounded-xl hover:bg-slate-50 transition"
-                >
-                  <div
-                    class="w-7 h-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <div class="text-xs font-semibold text-slate-900 group-hover:text-purple-600">
-                      All Legal Documents
-                    </div>
-                    <div class="text-[10px] text-slate-500">Full legal suite & printable</div>
-                  </div>
-                </a>
-              </div>
-            }
-          </div>
-
-          <!-- Keyboard Shortcut Helper -->
-          <button
-            type="button"
-            title="Keyboard shortcuts"
-            aria-label="Show keyboard shortcuts"
-            (click)="toggleShortcutHelp()"
-            class="hidden xl:inline-flex w-9 h-9 rounded-full bg-white border border-[#E2E8F0] text-[#334155] hover:text-[#0F172A] hover:bg-slate-50 flex items-center justify-center transition shrink-0 cursor-pointer shadow-2xs"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-4 w-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.75"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <rect x="2" y="4" width="20" height="16" rx="2" />
-              <path
-                d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M7 16h10"
-              />
-            </svg>
-          </button>
-
-          <!-- Branch Selector -->
-          <bm-branch-switcher class="shrink-0"></bm-branch-switcher>
-
           <!-- Notification Bell Icon Button -->
           <button
             type="button"
@@ -559,30 +363,6 @@ export interface PageSearchItem {
                 d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
               />
             </svg>
-          </button>
-
-          <!-- Zaakiy AI Assistant Button -->
-          <button
-            type="button"
-            (click)="openZaakiy()"
-            title="Zaakiy AI Assistant"
-            class="hidden xl:inline-flex items-center gap-1.5 h-9 px-3 rounded-full bg-[#ECFDF5] text-[#047857] hover:bg-[#D1FAE5] transition text-xs font-semibold shrink-0 cursor-pointer border border-[#A7F3D0]/50"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-3.5 w-3.5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M13 10V3L4 14h7v7l9-11h-7z"
-              />
-            </svg>
-            <span>Zaakiy</span>
           </button>
 
           <!-- User Avatar & Logout Cluster -->
@@ -659,7 +439,7 @@ export interface PageSearchItem {
           role="dialog"
           aria-modal="true"
           aria-labelledby="shortcut-help-title"
-          class="fixed top-[78px] right-4 md:right-8 z-50 w-[330px] max-w-[calc(100vw-2rem)] rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-[0_16px_40px_rgba(15,23,42,0.14)] animate-fade-in"
+          class="fixed bottom-16 left-5 z-50 w-[330px] max-w-[calc(100vw-2rem)] rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-[0_16px_40px_rgba(15,23,42,0.18)] animate-fade-in"
           (click)="$event.stopPropagation()"
         >
           <div class="flex items-start justify-between gap-4 mb-4">
@@ -2065,6 +1845,306 @@ export interface PageSearchItem {
           <bm-footer></bm-footer>
         </div>
       </main>
+      <!-- LEFT BOTTOM FLOATING WIDGET (Help Icon, Keyboard Shortcuts & Search Spotlight) -->
+      <div
+        class="fixed bottom-5 left-5 z-40 flex items-center gap-1 bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-[0_10px_30px_rgba(15,23,42,0.14)] rounded-full p-1.5"
+      >
+        <!-- Help Submenu Trigger (Icon Only) -->
+        <div #helpMenuContainer class="relative">
+          <button
+            type="button"
+            (click)="toggleHelpMenu($event)"
+            [class.bg-[#0F172A]]="helpMenuOpen()"
+            [class.text-white]="helpMenuOpen()"
+            [class.text-slate-600]="!helpMenuOpen()"
+            title="Help & Legal Documents"
+            class="w-9 h-9 rounded-full hover:bg-slate-100 flex items-center justify-center transition cursor-pointer"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.75"
+                d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093V14m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </button>
+
+          <!-- HELP SUBMENU POPOVER (Floats above left widget) -->
+          @if (helpMenuOpen()) {
+            <div
+              class="absolute bottom-12 left-0 z-50 w-64 bg-white border border-[#E2E8F0] rounded-2xl shadow-[0_20px_50px_rgba(15,23,42,0.20)] p-2 animate-fade-in space-y-0.5"
+              (click)="$event.stopPropagation()"
+            >
+              <div
+                class="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider"
+              >
+                Help & Support
+              </div>
+
+              <!-- About Application -->
+              <a
+                routerLink="/app/about"
+                (click)="closeHelpMenu()"
+                class="group flex items-center gap-2.5 p-2 rounded-xl hover:bg-slate-50 transition"
+              >
+                <div
+                  class="w-7 h-7 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <div class="text-xs font-semibold text-slate-900 group-hover:text-teal-700">
+                    About Application
+                  </div>
+                  <div class="text-[10px] text-slate-500">System overview & developer info</div>
+                </div>
+              </a>
+
+              <!-- FAQ & User Guide -->
+              <a
+                routerLink="/app/faq"
+                (click)="closeHelpMenu()"
+                class="group flex items-center gap-2.5 p-2 rounded-xl hover:bg-slate-50 transition"
+              >
+                <div
+                  class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093V14m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <div class="text-xs font-semibold text-slate-900 group-hover:text-emerald-700">
+                    FAQ & User Guide
+                  </div>
+                  <div class="text-[10px] text-slate-500">System operations & answers</div>
+                </div>
+              </a>
+
+              <div class="border-t border-slate-100 my-1"></div>
+
+              <div
+                class="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider"
+              >
+                Legal Documents
+              </div>
+
+              <!-- Terms of Use -->
+              <a
+                routerLink="/app/privacy-terms"
+                (click)="closeHelpMenu()"
+                class="group flex items-center gap-2.5 p-2 rounded-xl hover:bg-slate-50 transition"
+              >
+                <div
+                  class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <div class="text-xs font-semibold text-slate-900 group-hover:text-blue-600">
+                    Terms of Use
+                  </div>
+                  <div class="text-[10px] text-slate-500">Enterprise license & terms</div>
+                </div>
+              </a>
+
+              <!-- Privacy Policy -->
+              <a
+                routerLink="/app/privacy-terms"
+                (click)="closeHelpMenu()"
+                class="group flex items-center gap-2.5 p-2 rounded-xl hover:bg-slate-50 transition"
+              >
+                <div
+                  class="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <div class="text-xs font-semibold text-slate-900 group-hover:text-indigo-600">
+                    Privacy Policy
+                  </div>
+                  <div class="text-[10px] text-slate-500">UAE Data protection policy</div>
+                </div>
+              </a>
+
+              <!-- All Legal Docs -->
+              <a
+                routerLink="/app/privacy-terms"
+                (click)="closeHelpMenu()"
+                class="group flex items-center gap-2.5 p-2 rounded-xl hover:bg-slate-50 transition"
+              >
+                <div
+                  class="w-7 h-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <div class="text-xs font-semibold text-slate-900 group-hover:text-purple-600">
+                    All Legal Documents
+                  </div>
+                  <div class="text-[10px] text-slate-500">Full legal suite & printable</div>
+                </div>
+              </a>
+            </div>
+          }
+        </div>
+
+        <div class="w-px h-4 bg-slate-200 my-auto"></div>
+
+        <!-- Keyboard Shortcuts Trigger Button -->
+        <button
+          type="button"
+          title="Keyboard shortcuts (Ctrl + /)"
+          aria-label="Show keyboard shortcuts"
+          (click)="toggleShortcutHelp()"
+          [class.bg-[#0F172A]]="shortcutHelpOpen()"
+          [class.text-white]="shortcutHelpOpen()"
+          [class.text-slate-600]="!shortcutHelpOpen()"
+          class="w-9 h-9 rounded-full hover:bg-slate-100 flex items-center justify-center transition cursor-pointer"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.75"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="2" y="4" width="20" height="16" rx="2" />
+            <path
+              d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M7 16h10"
+            />
+          </svg>
+        </button>
+
+        <div class="w-px h-4 bg-slate-200 my-auto"></div>
+
+        <!-- Spotlight Search Trigger Button -->
+        <button
+          type="button"
+          title="Search Spotlight (Ctrl + K)"
+          (click)="openSearch()"
+          class="w-9 h-9 rounded-full hover:bg-slate-100 text-slate-600 flex items-center justify-center transition cursor-pointer"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 text-emerald-600"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <!-- RIGHT BOTTOM FLOATING WIDGET (Zaakiy AI Assistant) -->
+      <button
+        type="button"
+        (click)="openZaakiy()"
+        title="Zaakiy AI Assistant"
+        class="fixed bottom-5 right-5 z-40 h-11 px-4 rounded-full bg-[#0F172A] hover:bg-[#1E293B] text-white shadow-[0_10px_30px_rgba(15,23,42,0.25)] border border-slate-700/60 flex items-center gap-2.5 cursor-pointer transition-all duration-200 hover:scale-105 group"
+      >
+        <div
+          class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 group-hover:rotate-12 transition-transform"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 10V3L4 14h7v7l9-11h-7z"
+            />
+          </svg>
+        </div>
+        <span class="text-xs font-bold tracking-wide">Zaakiy AI</span>
+        <span
+          class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"
+        ></span>
+      </button>
     </div>
   `,
 })
@@ -2072,6 +2152,7 @@ export class LayoutComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
   private elementRef = inject(ElementRef);
+  private branchContext = inject(BranchContextService);
   loadingService = inject(BmLoadingService);
 
   @ViewChild('searchInput') searchInputRef?: ElementRef<HTMLInputElement>;
@@ -2081,6 +2162,10 @@ export class LayoutComponent {
   user = this.authService.currentUser;
   isSuperAdmin = this.authService.isSuperAdmin;
   hasPermission = (permission: string): boolean => this.authService.hasPermission(permission);
+
+  activeBranch = this.branchContext.activeBranch;
+  availableBranches = this.branchContext.availableBranches;
+  logoBranchDropdownOpen = signal(false);
 
   activeMegaMenu = signal<MegaMenuTab>(null);
   mobileDrawerOpen = signal(false);
@@ -2402,6 +2487,7 @@ export class LayoutComponent {
         this.closeSearch();
         this.closeShortcutHelp();
         this.closeHelpMenu();
+        this.closeLogoBranchDropdown();
       } else if (
         event instanceof NavigationEnd ||
         event instanceof NavigationCancel ||
@@ -2410,6 +2496,36 @@ export class LayoutComponent {
         this.loadingService.setRouteLoading(false);
       }
     });
+  }
+
+  toggleLogoBranchDropdown(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    if (this.availableBranches().length <= 1) {
+      this.router.navigate(['/app/dashboard']);
+      return;
+    }
+    const next = !this.logoBranchDropdownOpen();
+    this.closeMegaMenu();
+    this.closeSearch();
+    this.closeShortcutHelp();
+    this.closeHelpMenu();
+    this.logoBranchDropdownOpen.set(next);
+  }
+
+  closeLogoBranchDropdown(): void {
+    this.logoBranchDropdownOpen.set(false);
+  }
+
+  selectLogoBranch(branch: Branch): void {
+    if (branch.id === this.activeBranch()?.id) {
+      this.closeLogoBranchDropdown();
+      return;
+    }
+    this.branchContext.setActiveBranch(branch);
+    this.closeLogoBranchDropdown();
+    window.location.reload();
   }
 
   toggleMegaMenu(tab: MegaMenuTab, event: Event): void {
@@ -2600,6 +2716,7 @@ export class LayoutComponent {
     this.closeSearch();
     this.closeShortcutHelp();
     this.closeHelpMenu();
+    this.closeLogoBranchDropdown();
   }
 
   @HostListener('document:click', ['$event'])
@@ -2627,6 +2744,7 @@ export class LayoutComponent {
       this.closeSearch();
       this.closeShortcutHelp();
       this.closeHelpMenu();
+      this.closeLogoBranchDropdown();
     }
   }
 

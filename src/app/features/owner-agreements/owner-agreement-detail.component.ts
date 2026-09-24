@@ -27,8 +27,14 @@ import { OwnerAgreement, AgreementInstallment } from '../../shared/models/agreem
   styles: [
     `
       @media print {
-        .agreement-screen { display: none !important; }
-        :host { display: block !important; color: #000 !important; background: #fff !important; }
+        .agreement-screen {
+          display: none !important;
+        }
+        :host {
+          display: block !important;
+          color: #000 !important;
+          background: #fff !important;
+        }
       }
     `,
   ],

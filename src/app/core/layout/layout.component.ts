@@ -246,15 +246,17 @@ export interface PageSearchItem {
             }
           </nav>
 
-          <!-- GLOBAL NAV PAGE & ENTITY SEARCH BAR -->
-          <div
-            #searchContainer
-            class="relative hidden md:block w-32 lg:w-44 xl:w-72 z-40 ml-1 xl:ml-2 shrink"
+          <!-- GLOBAL SPOTLIGHT SEARCH TRIGGER BUTTON -->
+          <button
+            type="button"
+            (click)="openSearch()"
+            title="Search Spotlight (Ctrl K)"
+            class="hidden md:flex items-center justify-between h-[38px] w-36 lg:w-48 xl:w-64 px-3 rounded-full bg-slate-100/90 border border-slate-200 text-xs text-slate-500 hover:bg-white hover:border-slate-300 hover:shadow-2xs transition-all cursor-pointer ml-1 xl:ml-2 shrink-0 group"
           >
-            <div class="relative flex items-center">
+            <div class="flex items-center gap-2 truncate">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4 text-slate-400 absolute left-3 pointer-events-none"
+                class="h-4 w-4 text-slate-400 group-hover:text-emerald-600 transition-colors shrink-0"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -266,273 +268,14 @@ export interface PageSearchItem {
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
               </svg>
-              <input
-                #searchInput
-                type="text"
-                [value]="searchQuery()"
-                (input)="onSearchInput($event)"
-                (focus)="openSearch()"
-                (keydown)="onSearchKeydown($event)"
-                placeholder="Search pages and records... (Ctrl K)"
-                class="w-full h-9 pl-9 pr-9 rounded-full bg-slate-100/90 border border-slate-200 text-xs text-[#0F172A] placeholder-slate-400 focus:outline-none focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 transition-all shadow-2xs"
-              />
-              @if (searchQuery()) {
-                <button
-                  type="button"
-                  (click)="clearSearch()"
-                  class="absolute right-2.5 !text-[0px] text-slate-400 hover:text-[#0F172A] text-xs font-bold w-4 h-4 flex items-center justify-center rounded-full hover:bg-slate-200 transition cursor-pointer"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-3 w-3"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    aria-hidden="true"
-                  >
-                    <path stroke-linecap="round" d="M6 6l12 12M18 6L6 18" />
-                  </svg>
-                  ✕
-                </button>
-              } @else {
-                <kbd
-                  class="absolute right-2.5 text-[10px] font-semibold text-slate-400 border border-slate-200 rounded px-1.5 py-0.5 bg-white pointer-events-none shadow-2xs"
-                >
-                  Ctrl K
-                </kbd>
-              }
+              <span class="truncate font-medium">Search Spotlight...</span>
             </div>
-
-            <!-- SEARCH RESULTS POPOVER DROPDOWN -->
-            @if (isSearchOpen()) {
-              <div
-                class="absolute top-11 left-0 right-0 z-50 w-full sm:w-[360px] md:w-[420px] bg-white border border-[#E2E8F0] rounded-2xl shadow-[0_16px_40px_rgba(15,23,42,0.12)] p-2 max-h-[400px] overflow-y-auto animate-fade-in divide-y divide-slate-100"
-              >
-                @if (filteredSearchResults().length > 0) {
-                  <div class="py-1">
-                    <div
-                      class="px-3 py-1.5 text-[10px] font-bold text-[#64748B] uppercase tracking-wider flex justify-between items-center"
-                    >
-                      <span>ERP Quick Jump ({{ filteredSearchResults().length }})</span>
-                      <span class="text-[9px] font-normal text-slate-400 !text-[0px]"
-                        ><svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          class="h-3 w-3 inline-block"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="1.75"
-                          aria-hidden="true"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M8 9l4-4 4 4M8 15l4 4 4-4"
-                          />
-                        </svg>
-                        >Press ↑↓ to navigate</span
-                      >
-                    </div>
-
-                    <div class="space-y-0.5">
-                      @for (
-                        item of filteredSearchResults();
-                        track item.url + item.title;
-                        let idx = $index
-                      ) {
-                        <button
-                          type="button"
-                          (click)="selectSearchResult(item)"
-                          [class.bg-slate-100]="selectedIndex() === idx"
-                          [class.border-slate-300]="selectedIndex() === idx"
-                          class="w-full text-left p-2.5 rounded-xl hover:bg-slate-100/90 transition flex items-center justify-between group border border-transparent cursor-pointer"
-                        >
-                          <div class="flex items-center gap-2.5 min-w-0">
-                            <!-- Category Badge -->
-                            <div
-                              class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 !text-[0px] font-bold"
-                              [class.bg-[#ECFDF5]]="
-                                item.category === 'Customers' || item.category === 'Pages'
-                              "
-                              [class.text-[#047857]]="
-                                item.category === 'Customers' || item.category === 'Pages'
-                              "
-                              [class.bg-[#EFF6FF]]="item.category === 'Properties'"
-                              [class.text-[#2563EB]]="item.category === 'Properties'"
-                              [class.bg-[#FFFBEB]]="
-                                item.category === 'Agreements' || item.category === 'Actions'
-                              "
-                              [class.text-[#D97706]]="
-                                item.category === 'Agreements' || item.category === 'Actions'
-                              "
-                              [class.bg-[#FEF2F2]]="item.category === 'Financials'"
-                              [class.text-[#DC2626]]="item.category === 'Financials'"
-                              [class.bg-slate-100]="item.category === 'System'"
-                              [class.text-slate-700]="item.category === 'System'"
-                            >
-                              @if (item.category === 'Customers') {
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  class="h-4 w-4"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  stroke-width="1.75"
-                                  aria-hidden="true"
-                                >
-                                  <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M15 19a6 5 0 00-12 0m6-8a4 4 0 100-8 4 4 0 000 8zm5-3a3 3 0 110-6m0 9a5 5 0 014 2"
-                                  />
-                                </svg>
-                                👤
-                              } @else if (item.category === 'Properties') {
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  class="h-4 w-4"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  stroke-width="1.75"
-                                  aria-hidden="true"
-                                >
-                                  <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-4h6v4M9 10h.01M15 10h.01M9 13h.01M15 13h.01"
-                                  />
-                                </svg>
-                                🏢
-                              } @else if (item.category === 'Actions') {
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  class="h-4 w-4"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  stroke-width="1.75"
-                                  aria-hidden="true"
-                                >
-                                  <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"
-                                  />
-                                </svg>
-                                ⚡
-                              } @else if (item.category === 'Agreements') {
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  class="h-4 w-4"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  stroke-width="1.75"
-                                  aria-hidden="true"
-                                >
-                                  <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M6 3h9l3 3v15H6V3zm9 0v4h3M9 12h6M9 16h6M9 8h2"
-                                  />
-                                </svg>
-                                📄
-                              } @else if (item.category === 'Financials') {
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  class="h-4 w-4"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  stroke-width="1.75"
-                                  aria-hidden="true"
-                                >
-                                  <circle cx="12" cy="12" r="8" />
-                                  <path
-                                    stroke-linecap="round"
-                                    d="M12 8v8M15 10.5c0-1-1-1.5-3-1.5s-3 .5-3 1.5 1 1.5 3 1.5 3 1.5 3 1.5-1 1.5-3 1.5-3-.5-3-1.5"
-                                  />
-                                </svg>
-                                💰
-                              } @else {
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  class="h-4 w-4"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  stroke-width="1.75"
-                                  aria-hidden="true"
-                                >
-                                  <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M12 3v2m0 14v2M3 12h2m14 0h2m-4.2-6.8l1.4-1.4M6.8 17.2l-1.4 1.4m0-13.6l1.4 1.4m10.4 10.4l1.4 1.4M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                                  />
-                                </svg>
-                                ⚙️
-                              }
-                            </div>
-                            <div class="min-w-0">
-                              <div
-                                class="text-xs font-semibold text-[#0F172A] truncate group-hover:text-[#047857] flex items-center gap-1.5"
-                              >
-                                <span>{{ item.title }}</span>
-                                @if (item.badge) {
-                                  <span
-                                    class="text-[9px] px-1.5 py-0.2 rounded-full font-bold uppercase tracking-wider bg-emerald-100 text-[#047857]"
-                                  >
-                                    {{ item.badge }}
-                                  </span>
-                                }
-                              </div>
-                              @if (item.subtitle) {
-                                <div class="text-[10px] text-[#64748B] truncate">
-                                  {{ item.subtitle }}
-                                </div>
-                              }
-                            </div>
-                          </div>
-
-                          <div
-                            class="!text-[0px] font-medium text-slate-400 group-hover:text-[#0F172A] shrink-0 pl-2"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              class="h-3.5 w-3.5"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-width="1.75"
-                              aria-hidden="true"
-                            >
-                              <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M5 12h14m-6-6l6 6-6 6"
-                              />
-                            </svg>
-                            →
-                          </div>
-                        </button>
-                      }
-                    </div>
-                  </div>
-                } @else {
-                  <div class="py-6 text-center">
-                    <div class="text-xs text-[#64748B] font-medium">
-                      No results found for "{{ searchQuery() }}"
-                    </div>
-                    <div class="text-[10px] text-slate-400 mt-1">
-                      Try "Owner", "Tenant", "Property", "Lease", "Inward", or "Receipt"
-                    </div>
-                  </div>
-                }
-              </div>
-            }
-          </div>
+            <kbd
+              class="hidden sm:inline-flex items-center gap-0.5 text-[10px] font-bold text-slate-400 border border-slate-200 rounded px-1.5 py-0.5 bg-white shadow-2xs shrink-0 group-hover:border-slate-300"
+            >
+              <span>Ctrl K</span>
+            </kbd>
+          </button>
         </div>
 
         <!-- RIGHT: BRANCH SELECTOR, NOTIFICATIONS, ZAAKIY, USER -->
@@ -966,6 +709,321 @@ export interface PageSearchItem {
             </div>
           </div>
         </section>
+      }
+
+      <!-- MAC SPOTLIGHT COMMAND PALETTE OVERLAY MODAL -->
+      @if (isSearchOpen()) {
+        <!-- Backdrop Overlay -->
+        <div
+          class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-start justify-center p-3 sm:p-4 pt-12 sm:pt-24 animate-fade-in"
+          (click)="closeSearch()"
+        >
+          <!-- Spotlight Card Modal -->
+          <div
+            class="w-full max-w-2xl bg-white rounded-2xl sm:rounded-3xl shadow-[0_25px_75px_rgba(15,23,42,0.28)] border border-slate-200/90 overflow-hidden flex flex-col max-h-[85vh] sm:max-h-[620px] animate-scale-up"
+            (click)="$event.stopPropagation()"
+          >
+            <!-- Spotlight Header Search Input -->
+            <div
+              class="px-4 py-3.5 sm:px-5 border-b border-slate-100 flex items-center gap-3 bg-slate-50/50 shrink-0"
+            >
+              <div
+                class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+
+              <input
+                #searchInput
+                type="text"
+                [value]="searchQuery()"
+                (input)="onSearchInput($event)"
+                (keydown)="onSearchKeydown($event)"
+                placeholder="Type a command, page name, or search term..."
+                class="w-full bg-transparent text-sm sm:text-base font-medium text-slate-900 placeholder-slate-400 outline-none border-none focus:ring-0"
+              />
+
+              @if (searchQuery()) {
+                <button
+                  type="button"
+                  (click)="clearSearch()"
+                  class="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/70 transition shrink-0"
+                  title="Clear query"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path stroke-linecap="round" d="M6 6l12 12M18 6L6 18" />
+                  </svg>
+                </button>
+              }
+
+              <button
+                type="button"
+                (click)="closeSearch()"
+                class="px-2 py-1 rounded-md text-[11px] font-bold text-slate-400 hover:text-slate-700 bg-slate-200/60 hover:bg-slate-200 transition shrink-0 cursor-pointer"
+              >
+                ESC
+              </button>
+            </div>
+
+            <!-- Spotlight Results List -->
+            <div class="flex-1 overflow-y-auto p-2 sm:p-3 space-y-1">
+              @if (filteredSearchResults().length > 0) {
+                <div
+                  class="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider flex justify-between items-center"
+                >
+                  <span>Spotlight Suggestions ({{ filteredSearchResults().length }})</span>
+                  <span>Press ↑↓ to navigate</span>
+                </div>
+
+                @for (
+                  item of filteredSearchResults();
+                  track item.url + item.title;
+                  let idx = $index
+                ) {
+                  <button
+                    type="button"
+                    (click)="selectSearchResult(item)"
+                    (mouseenter)="selectedIndex.set(idx)"
+                    [class.bg-emerald-50/80]="selectedIndex() === idx"
+                    [class.border-emerald-200]="selectedIndex() === idx"
+                    [class.shadow-xs]="selectedIndex() === idx"
+                    class="w-full text-left p-3 rounded-xl transition flex items-center justify-between group border border-transparent cursor-pointer"
+                  >
+                    <div class="flex items-center gap-3.5 min-w-0">
+                      <!-- Category Icon Box -->
+                      <div
+                        class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 font-bold text-xs shadow-2xs"
+                        [class.bg-emerald-100/80]="
+                          item.category === 'Pages' || item.category === 'Customers'
+                        "
+                        [class.text-emerald-800]="
+                          item.category === 'Pages' || item.category === 'Customers'
+                        "
+                        [class.bg-blue-100/80]="item.category === 'Properties'"
+                        [class.text-blue-800]="item.category === 'Properties'"
+                        [class.bg-amber-100/80]="
+                          item.category === 'Agreements' || item.category === 'Actions'
+                        "
+                        [class.text-amber-800]="
+                          item.category === 'Agreements' || item.category === 'Actions'
+                        "
+                        [class.bg-rose-100/80]="item.category === 'Financials'"
+                        [class.text-rose-800]="item.category === 'Financials'"
+                        [class.bg-purple-100/80]="item.category === 'Reports'"
+                        [class.text-purple-800]="item.category === 'Reports'"
+                        [class.bg-slate-100]="item.category === 'System'"
+                        [class.text-slate-800]="item.category === 'System'"
+                      >
+                        @if (item.category === 'Customers') {
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                            />
+                          </svg>
+                        } @else if (item.category === 'Properties') {
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                            />
+                          </svg>
+                        } @else if (item.category === 'Agreements') {
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                            />
+                          </svg>
+                        } @else if (item.category === 'Financials') {
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                        } @else if (item.category === 'Actions') {
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M13 10V3L4 14h7v7l9-11h-7z"
+                            />
+                          </svg>
+                        } @else {
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                            />
+                          </svg>
+                        }
+                      </div>
+
+                      <div class="min-w-0">
+                        <div
+                          class="text-xs sm:text-sm font-semibold text-slate-900 group-hover:text-emerald-800 flex items-center gap-2"
+                        >
+                          <span>{{ item.title }}</span>
+                          @if (item.badge) {
+                            <span
+                              class="text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800"
+                            >
+                              {{ item.badge }}
+                            </span>
+                          }
+                        </div>
+                        @if (item.subtitle) {
+                          <div class="text-xs text-slate-500 truncate mt-0.5">
+                            {{ item.subtitle }}
+                          </div>
+                        }
+                      </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 shrink-0 pl-2">
+                      <span
+                        class="text-[10px] font-medium uppercase tracking-wider px-2 py-1 rounded bg-slate-100 text-slate-500 group-hover:bg-emerald-100 group-hover:text-emerald-800"
+                      >
+                        {{ item.category }}
+                      </span>
+                      @if (selectedIndex() === idx) {
+                        <span class="text-xs font-bold text-emerald-600">↵</span>
+                      }
+                    </div>
+                  </button>
+                }
+              } @else {
+                <div class="py-12 text-center">
+                  <div
+                    class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                  </div>
+                  <div class="text-sm font-semibold text-slate-700">
+                    No results found for "{{ searchQuery() }}"
+                  </div>
+                  <div class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
+                    Try searching for "Owner", "Tenant", "Lease", "Inward", "Petty Cash", "Work
+                    Order", or "Intelligent Report".
+                  </div>
+                </div>
+              }
+            </div>
+
+            <!-- Spotlight Footer Legend -->
+            <div
+              class="px-4 py-2.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 shrink-0"
+            >
+              <div class="flex items-center gap-4 text-[11px]">
+                <span
+                  ><kbd
+                    class="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-semibold text-slate-600"
+                    >↑↓</kbd
+                  >
+                  navigate</span
+                >
+                <span
+                  ><kbd
+                    class="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-semibold text-slate-600"
+                    >↵</kbd
+                  >
+                  select</span
+                >
+                <span
+                  ><kbd
+                    class="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-semibold text-slate-600"
+                    >ESC</kbd
+                  >
+                  close</span
+                >
+              </div>
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest"
+                >Baithul Madeena Spotlight</span
+              >
+            </div>
+          </div>
+        </div>
       }
 
       <!-- MEGA MENU POPOVER PANELS (Desktop floating below top nav) -->
@@ -1808,6 +1866,34 @@ export interface PageSearchItem {
             </div>
 
             <nav class="space-y-1 overflow-y-auto max-h-[calc(100vh-160px)]">
+              <button
+                type="button"
+                (click)="closeMobileDrawer(); openSearch()"
+                class="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-slate-100 text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition mb-2 cursor-pointer border border-slate-200/60"
+              >
+                <span class="flex items-center gap-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4 text-emerald-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                  <span>Search Spotlight...</span>
+                </span>
+                <kbd
+                  class="text-[10px] bg-white border border-slate-200 rounded px-1.5 py-0.5 text-slate-500 font-bold"
+                  >Ctrl K</kbd
+                >
+              </button>
+
               <a
                 routerLink="/app/dashboard"
                 (click)="closeMobileDrawer()"
@@ -2385,6 +2471,9 @@ export class LayoutComponent {
   openSearch(): void {
     this.isSearchOpen.set(true);
     this.closeMegaMenu();
+    this.closeHelpMenu();
+    this.closeShortcutHelp();
+    setTimeout(() => this.searchInputRef?.nativeElement.focus(), 50);
   }
 
   closeSearch(): void {

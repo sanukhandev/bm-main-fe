@@ -13,7 +13,7 @@ import { CommonModule } from '@angular/common';
       <span class="mx-2 text-[#1B1E1C]/25">•</span>
       Created by <span class="font-zaakiy font-semibold text-[#193D32]/60">Zv3</span>
       <span class="mx-2 text-[#1B1E1C]/25">•</span>
-      Powered by <span class="font-zaakiy font-semibold text-[#193D32]/60">ZaakiyV3rse</span>
+      Powered by <span class="font-zaakiy font-semibold text-[#193D32]/60">ZaakiyV3RSE</span>
       <span class="mx-2 text-[#1B1E1C]/25">•</span>
       © 2026 Desertwhales
     </footer>

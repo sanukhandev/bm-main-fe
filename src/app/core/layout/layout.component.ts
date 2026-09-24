@@ -240,10 +240,7 @@ export interface PageSearchItem {
           </nav>
 
           <!-- GLOBAL NAV PAGE & ENTITY SEARCH BAR -->
-          <div
-            class="relative hidden sm:block w-44 md:w-60 lg:w-72 z-40 ml-2"
-            (click)="$event.stopPropagation()"
-          >
+          <div #searchContainer class="relative hidden sm:block w-44 md:w-60 lg:w-72 z-40 ml-2">
             <div class="relative flex items-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -267,7 +264,7 @@ export interface PageSearchItem {
                 (focus)="openSearch()"
                 (keydown)="onSearchKeydown($event)"
                 placeholder="Search pages and records... (Ctrl K)"
-                class="w-full h-9 pl-9 pr-9 rounded-full bg-slate-100/90 border border-slate-200 text-xs text-[#0F172A] placeholder-slate-400 focus:outline-none focus:bg-white focus:border-[#0F172A] focus:ring-1 focus:ring-[#0F172A] transition-all shadow-2xs"
+                class="w-full h-9 pl-9 pr-9 rounded-full bg-slate-100/90 border border-slate-200 text-xs text-[#0F172A] placeholder-slate-400 focus:outline-none focus:bg-white focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 transition-all shadow-2xs"
               />
               @if (searchQuery()) {
                 <button
@@ -1107,6 +1104,38 @@ export interface PageSearchItem {
                   </div>
                 </div>
               </a>
+              <a
+                routerLink="/app/reports/intelligent"
+                (click)="closeMegaMenu()"
+                class="group flex items-start gap-3 p-3 rounded-xl hover:bg-[#F8FAFC] transition border border-transparent hover:border-[#E2E8F0]"
+              >
+                <div
+                  class="w-9 h-9 rounded-xl bg-[#ECFDF5] text-[#047857] flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <div class="text-sm font-semibold text-[#0F172A] group-hover:text-[#047857]">
+                    Intelligent Report
+                  </div>
+                  <div class="text-xs text-[#64748B] mt-0.5">
+                    Management intelligence & leakage insights
+                  </div>
+                </div>
+              </a>
             </div>
           }
 
@@ -1627,6 +1656,7 @@ export class LayoutComponent {
   loadingService = inject(BmLoadingService);
 
   @ViewChild('searchInput') searchInputRef?: ElementRef<HTMLInputElement>;
+  @ViewChild('searchContainer') searchContainerRef?: ElementRef<HTMLElement>;
 
   user = this.authService.currentUser;
   isSuperAdmin = this.authService.isSuperAdmin;
@@ -2074,6 +2104,16 @@ export class LayoutComponent {
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
+    const target = event.target as Node;
+
+    if (
+      this.isSearchOpen() &&
+      this.searchContainerRef &&
+      !this.searchContainerRef.nativeElement.contains(target)
+    ) {
+      this.closeSearch();
+    }
+
     if (!this.elementRef.nativeElement.contains(event.target)) {
       this.closeMegaMenu();
       this.closeSearch();

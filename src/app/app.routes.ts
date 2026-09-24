@@ -231,6 +231,14 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'reports/intelligent',
+        canActivate: [accountsViewGuard],
+        loadComponent: () =>
+          import('./features/reports/intelligent-report.component').then(
+            (m) => m.IntelligentReportComponent,
+          ),
+      },
+      {
         path: 'reports/:type',
         loadComponent: () =>
           import('./features/reports/reports.component').then((m) => m.ReportsComponent),

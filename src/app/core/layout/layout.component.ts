@@ -29,7 +29,14 @@ export interface PageSearchItem {
   title: string;
   subtitle?: string;
   category:
-    'Pages' | 'Actions' | 'Customers' | 'Properties' | 'Agreements' | 'Financials' | 'System';
+    | 'Pages'
+    | 'Actions'
+    | 'Customers'
+    | 'Properties'
+    | 'Agreements'
+    | 'Financials'
+    | 'Reports'
+    | 'System';
   url: string;
   keywords: string[];
   badge?: string;
@@ -1281,14 +1288,14 @@ export interface PageSearchItem {
 
           <!-- REPORTS MEGA MENU -->
           @if (activeMegaMenu() === 'reports') {
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <a
                 routerLink="/app/reports/intelligent"
                 (click)="closeMegaMenu()"
-                class="group flex items-start gap-3 p-3 rounded-xl hover:bg-[#F8FAFC] transition border border-transparent hover:border-[#E2E8F0]"
+                class="group flex items-start gap-3.5 p-3.5 rounded-2xl bg-emerald-50/50 hover:bg-emerald-50 border border-emerald-100 hover:border-emerald-200 transition-all"
               >
                 <div
-                  class="w-9 h-9 rounded-xl bg-[#ECFDF5] text-[#047857] flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform"
+                  class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-xs group-hover:scale-105 transition-transform"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -1306,22 +1313,29 @@ export interface PageSearchItem {
                   </svg>
                 </div>
                 <div>
-                  <div class="text-sm font-semibold text-[#0F172A] group-hover:text-[#047857]">
-                    Intelligent Report
+                  <div class="flex items-center gap-2">
+                    <span class="text-sm font-bold text-slate-900 group-hover:text-emerald-700">
+                      Intelligent Report
+                    </span>
+                    <span
+                      class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold"
+                    >
+                      AI Insights
+                    </span>
                   </div>
-                  <div class="text-xs text-[#64748B] mt-0.5">
-                    Management intelligence, leakage & AI insights
-                  </div>
+                  <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                    Management intelligence, revenue leakage & AI metrics
+                  </p>
                 </div>
               </a>
 
               <a
                 routerLink="/app/reports/owner-agreements"
                 (click)="closeMegaMenu()"
-                class="group flex items-start gap-3 p-3 rounded-xl hover:bg-[#F8FAFC] transition border border-transparent hover:border-[#E2E8F0]"
+                class="group flex items-start gap-3.5 p-3.5 rounded-2xl hover:bg-slate-50 border border-slate-100 hover:border-slate-200 transition-all"
               >
                 <div
-                  class="w-9 h-9 rounded-xl bg-[#EFF6FF] text-[#2563EB] flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform"
+                  class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -1339,22 +1353,22 @@ export interface PageSearchItem {
                   </svg>
                 </div>
                 <div>
-                  <div class="text-sm font-semibold text-[#0F172A] group-hover:text-[#2563EB]">
+                  <span class="text-sm font-bold text-slate-900 group-hover:text-blue-600">
                     Core Operational Reports
-                  </div>
-                  <div class="text-xs text-[#64748B] mt-0.5">
-                    Agreements, receivables, payables & cash
-                  </div>
+                  </span>
+                  <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                    Master agreements, receivables, payables & cash metrics
+                  </p>
                 </div>
               </a>
 
               <a
                 routerLink="/app/accounts/reports"
                 (click)="closeMegaMenu()"
-                class="group flex items-start gap-3 p-3 rounded-xl hover:bg-[#F8FAFC] transition border border-transparent hover:border-[#E2E8F0]"
+                class="group flex items-start gap-3.5 p-3.5 rounded-2xl hover:bg-slate-50 border border-slate-100 hover:border-slate-200 transition-all"
               >
                 <div
-                  class="w-9 h-9 rounded-xl bg-[#F0FDF4] text-[#16A34A] flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform"
+                  class="w-10 h-10 rounded-xl bg-green-50 text-green-600 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -1372,12 +1386,12 @@ export interface PageSearchItem {
                   </svg>
                 </div>
                 <div>
-                  <div class="text-sm font-semibold text-[#0F172A] group-hover:text-[#16A34A]">
+                  <span class="text-sm font-bold text-slate-900 group-hover:text-green-600">
                     Financial Statements
-                  </div>
-                  <div class="text-xs text-[#64748B] mt-0.5">
-                    Income, expenditure & movement statements
-                  </div>
+                  </span>
+                  <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                    Income, expenditure & daily movement statements
+                  </p>
                 </div>
               </a>
 
@@ -1385,10 +1399,10 @@ export interface PageSearchItem {
                 <a
                   routerLink="/app/administration/audit"
                   (click)="closeMegaMenu()"
-                  class="group flex items-start gap-3 p-3 rounded-xl hover:bg-[#F8FAFC] transition border border-transparent hover:border-[#E2E8F0]"
+                  class="group flex items-start gap-3.5 p-3.5 rounded-2xl hover:bg-slate-50 border border-slate-100 hover:border-slate-200 transition-all"
                 >
                   <div
-                    class="w-9 h-9 rounded-xl bg-[#FEF2F2] text-[#DC2626] flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform"
+                    class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -1406,12 +1420,12 @@ export interface PageSearchItem {
                     </svg>
                   </div>
                   <div>
-                    <div class="text-sm font-semibold text-[#0F172A] group-hover:text-[#DC2626]">
+                    <span class="text-sm font-bold text-slate-900 group-hover:text-rose-600">
                       Audit Trail
-                    </div>
-                    <div class="text-xs text-[#64748B] mt-0.5">
-                      Review sensitive activity & system logs
-                    </div>
+                    </span>
+                    <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                      Sensitive activity & security logs
+                    </p>
                   </div>
                 </a>
               }

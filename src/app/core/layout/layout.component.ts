@@ -71,7 +71,7 @@ export interface PageSearchItem {
 
       <!-- TOP NAVIGATION BAR (Desktop & Mobile Header) -->
       <header
-        class="h-[70px] shrink-0 border-b border-[#E2E8F0] bg-white px-3 sm:px-4 md:px-6 xl:px-8 flex items-center justify-between z-30 relative shadow-2xs max-w-full overflow-hidden"
+        class="h-[70px] shrink-0 border-b border-[#E2E8F0] bg-white px-3 sm:px-4 md:px-6 xl:px-8 flex items-center justify-between z-40 relative shadow-2xs max-w-full"
       >
         <!-- LEFT: BRANDING MONOGRAM & TITLE -->
         <div class="flex items-center gap-2 sm:gap-4 xl:gap-6 min-w-0 shrink-0">
@@ -538,7 +538,7 @@ export interface PageSearchItem {
         <!-- RIGHT: BRANCH SELECTOR, NOTIFICATIONS, ZAAKIY, USER -->
         <div class="flex items-center gap-1.5 sm:gap-2 xl:gap-3 shrink-0">
           <!-- HELP MENU GROUP DROPDOWN (FAQ, Terms, Privacy Policy & Legal Docs) -->
-          <div #helpMenuContainer class="relative hidden sm:block">
+          <div #helpMenuContainer class="relative hidden sm:block z-50">
             <button
               type="button"
               (click)="toggleHelpMenu($event)"
@@ -587,7 +587,7 @@ export interface PageSearchItem {
             <!-- HELP SUBMENU POPOVER -->
             @if (helpMenuOpen()) {
               <div
-                class="absolute top-11 right-0 z-50 w-64 bg-white border border-[#E2E8F0] rounded-2xl shadow-[0_16px_40px_rgba(15,23,42,0.12)] p-2 animate-fade-in space-y-0.5"
+                class="absolute top-11 right-0 z-50 w-64 bg-white border border-[#E2E8F0] rounded-2xl shadow-[0_20px_50px_rgba(15,23,42,0.18)] p-2 animate-fade-in space-y-0.5"
                 (click)="$event.stopPropagation()"
               >
                 <div

@@ -14,9 +14,11 @@ import { BmLoadingStateComponent } from '../../shared/components/bm-loading-stat
 import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm-error-state.component';
 import { BmEmptyStateComponent } from '../../shared/components/bm-empty-state/bm-empty-state.component';
 import { BmStatusBadgeComponent } from '../../shared/components/bm-status-badge/bm-status-badge.component';
+import { BmPaginationComponent } from '../../shared/components/bm-pagination/bm-pagination.component';
 import { BmConfirmDialogComponent } from '../../shared/components/bm-confirm-dialog/bm-confirm-dialog.component';
 import { BmReceiptChequeModalComponent } from '../../shared/components/bm-receipt-cheque-modal/bm-receipt-cheque-modal.component';
 import { ChequeAction, chequeActions, InFlightGuard } from '../../shared/models/payment.models';
+import { PaginationMeta } from '../../core/api/api.models';
 
 @Component({
   selector: 'bm-account-transactions-list',
@@ -31,6 +33,7 @@ import { ChequeAction, chequeActions, InFlightGuard } from '../../shared/models/
     BmErrorStateComponent,
     BmEmptyStateComponent,
     BmStatusBadgeComponent,
+    BmPaginationComponent,
     BmConfirmDialogComponent,
     BmReceiptChequeModalComponent,
   ],
@@ -52,7 +55,7 @@ import { ChequeAction, chequeActions, InFlightGuard } from '../../shared/models/
         <select
           class="bm-input max-w-xs text-xs font-medium"
           [(ngModel)]="paymentMode"
-          (ngModelChange)="load()"
+          (ngModelChange)="load(); currentPage.set(1)"
           aria-label="Payment mode filter"
         >
           <option value="">All payment modes</option>
@@ -63,7 +66,7 @@ import { ChequeAction, chequeActions, InFlightGuard } from '../../shared/models/
         <select
           class="bm-input max-w-xs text-xs font-medium"
           [(ngModel)]="chequeStatus"
-          (ngModelChange)="load()"
+          (ngModelChange)="load(); currentPage.set(1)"
           aria-label="Cheque status filter"
         >
           <option value="">All cheque statuses</option>
@@ -73,7 +76,28 @@ import { ChequeAction, chequeActions, InFlightGuard } from '../../shared/models/
           <option value="bounced">Bounced</option>
           <option value="cancelled">Cancelled</option>
         </select>
+        <select
+          class="bm-input max-w-xs text-xs font-medium"
+          [value]="selectedDocStatus()"
+          (change)="selectedDocStatus.set($any($event.target).value); currentPage.set(1)"
+          aria-label="Document status filter"
+        >
+          <option value="">All Document Statuses</option>
+          <option value="posted">Posted</option>
+          <option value="draft">Draft</option>
+          <option value="voided">Voided</option>
+        </select>
       </div>
+
+      @if (hasActiveFilters()) {
+        <button
+          type="button"
+          (click)="clearFilters()"
+          class="text-xs text-emerald-700 hover:text-emerald-800 font-medium cursor-pointer"
+        >
+          Clear Filters
+        </button>
+      }
     </div>
     @if (loading()) {
       <bm-loading-state type="table"></bm-loading-state>
@@ -85,103 +109,111 @@ import { ChequeAction, chequeActions, InFlightGuard } from '../../shared/models/
         description="No financial documents match these search filters."
       ></bm-empty-state>
     } @else {
-      <div class="bm-card overflow-hidden overflow-x-auto">
-        <table class="w-full text-left text-xs">
-          <thead
-            class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]"
-          >
-            <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase">
-              <th class="p-4">Document</th>
-              <th class="p-4">Date</th>
-              <th class="p-4">Party</th>
-              <th class="p-4">Particulars</th>
-              <th class="p-4">Mode / Reference</th>
-              <th class="p-4">Amount</th>
-              <th class="p-4">Status</th>
-              <th class="p-4 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100">
-            @for (row of filteredRows(); track row.id) {
-              <tr class="hover:bg-slate-50/60 transition-colors">
-                <td class="p-4 font-semibold text-slate-800 tabular-nums">{{ row.document_no }}</td>
-                <td class="p-4 text-slate-600 tabular-nums">{{ row.transaction_date }}</td>
-                <td class="p-4 font-medium text-slate-900">
-                  {{ row.party?.display_name || 'Miscellaneous' }}
-                </td>
-                <td class="p-4 text-slate-600">{{ row.remarks || '—' }}</td>
-                <td class="p-4">
-                  <bm-status-badge [status]="row.payment_mode"></bm-status-badge>
-                  @if (row.payment_mode === 'cheque') {
-                    <div class="mt-1 text-[10px] font-medium text-slate-700">
-                      Cheque {{ row.cheque_no }} · {{ chequeLabel(row.cheque_status) }}
-                    </div>
-                    <div class="text-[10px] text-slate-500">
-                      {{ row.cheque_date }} · {{ row.bank_name || '—' }}
-                    </div>
-                  }
-                </td>
-                <td class="p-4 font-semibold text-slate-900 tabular-nums">
-                  AED {{ row.amount | number: '1.2-2' }}
-                </td>
-                <td class="p-4"><bm-status-badge [status]="row.status"></bm-status-badge></td>
-                <td class="p-4 text-right">
-                  <div class="flex items-center justify-end flex-wrap gap-2">
-                    <button
-                      type="button"
-                      class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 transition flex items-center gap-1 shadow-2xs"
-                      aria-label="View Receipt / Cheque Voucher"
-                      (click)="selectedVoucherRow.set(row)"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-3.5 w-3.5 text-slate-600"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                        />
-                      </svg>
-                      <span>Voucher</span>
-                    </button>
-                    @if (canVoid() && row.status === 'posted') {
-                      <button
-                        type="button"
-                        class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200/60 transition"
-                        aria-label="Void financial document"
-                        (click)="openVoid(row.id)"
-                      >
-                        Void
-                      </button>
-                    }
-                    @for (action of actionsFor(row); track action) {
-                      <button
-                        type="button"
-                        class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200/60 transition"
-                        [disabled]="actionBusy()"
-                        [attr.aria-label]="actionLabel(action) + ' cheque ' + row.cheque_no"
-                        (click)="openChequeAction(row, action)"
-                      >
-                        {{ actionLabel(action) }}
-                      </button>
-                    }
-                  </div>
-                </td>
+      <div class="bm-card overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr
+                class="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]"
+              >
+                <th class="p-4">Document</th>
+                <th class="p-4">Date</th>
+                <th class="p-4">Party</th>
+                <th class="p-4">Particulars</th>
+                <th class="p-4">Mode / Reference</th>
+                <th class="p-4">Amount</th>
+                <th class="p-4">Status</th>
+                <th class="p-4 text-right">Actions</th>
               </tr>
-            }
-          </tbody>
-        </table>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              @for (row of paginatedRows(); track row.id) {
+                <tr class="hover:bg-slate-50/60 transition-colors">
+                  <td class="p-4 font-semibold text-slate-800 tabular-nums">
+                    {{ row.document_no }}
+                  </td>
+                  <td class="p-4 text-slate-600 tabular-nums">{{ row.transaction_date }}</td>
+                  <td class="p-4 font-medium text-slate-900">
+                    {{ row.party?.display_name || 'Miscellaneous' }}
+                  </td>
+                  <td class="p-4 text-slate-600">{{ row.remarks || '—' }}</td>
+                  <td class="p-4">
+                    <bm-status-badge [status]="row.payment_mode"></bm-status-badge>
+                    @if (row.payment_mode === 'cheque') {
+                      <div class="mt-1 text-[10px] font-medium text-slate-700">
+                        Cheque {{ row.cheque_no }} · {{ chequeLabel(row.cheque_status) }}
+                      </div>
+                      <div class="text-[10px] text-slate-500">
+                        {{ row.cheque_date }} · {{ row.bank_name || '—' }}
+                      </div>
+                    }
+                  </td>
+                  <td class="p-4 font-semibold text-slate-900 tabular-nums">
+                    AED {{ row.amount | number: '1.2-2' }}
+                  </td>
+                  <td class="p-4"><bm-status-badge [status]="row.status"></bm-status-badge></td>
+                  <td class="p-4 text-right">
+                    <div class="flex items-center justify-end flex-wrap gap-2">
+                      <button
+                        type="button"
+                        class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 transition flex items-center gap-1 shadow-2xs"
+                        aria-label="View Receipt / Cheque Voucher"
+                        (click)="selectedVoucherRow.set(row)"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-3.5 w-3.5 text-slate-600"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                          />
+                        </svg>
+                        <span>Voucher</span>
+                      </button>
+                      @if (canVoid() && row.status === 'posted') {
+                        <button
+                          type="button"
+                          class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200/60 transition"
+                          aria-label="Void financial document"
+                          (click)="openVoid(row.id)"
+                        >
+                          Void
+                        </button>
+                      }
+                      @for (action of actionsFor(row); track action) {
+                        <button
+                          type="button"
+                          class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200/60 transition"
+                          [disabled]="actionBusy()"
+                          [attr.aria-label]="actionLabel(action) + ' cheque ' + row.cheque_no"
+                          (click)="openChequeAction(row, action)"
+                        >
+                          {{ actionLabel(action) }}
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <bm-pagination
+          [meta]="paginationMeta()"
+          (pageChange)="onPageChange($event)"
+        ></bm-pagination>
       </div>
     }
     <bm-confirm-dialog
@@ -299,10 +331,18 @@ export class AccountTransactionsListComponent implements OnInit {
   confirmRow = signal<AccountTransaction | null>(null);
   private requestGuard = new InFlightGuard();
 
+  selectedDocStatus = signal('');
+  currentPage = signal(1);
+  pageSize = signal(25);
+
   filteredRows = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
-    if (!q) return this.rows();
+    const docStatus = this.selectedDocStatus();
+
     return this.rows().filter((row) => {
+      if (docStatus && row.status !== docStatus) return false;
+      if (!q) return true;
+
       const partyName = row.party?.display_name?.toLowerCase() || '';
       const docNo = row.document_no?.toLowerCase() || '';
       const remarks = row.remarks?.toLowerCase() || '';
@@ -322,11 +362,57 @@ export class AccountTransactionsListComponent implements OnInit {
     });
   });
 
+  paginatedRows = computed(() => {
+    const items = this.filteredRows();
+    const page = this.currentPage();
+    const perPage = this.pageSize();
+    const start = (page - 1) * perPage;
+    return items.slice(start, start + perPage);
+  });
+
+  paginationMeta = computed<PaginationMeta>(() => {
+    const total = this.filteredRows().length;
+    const page = this.currentPage();
+    const perPage = this.pageSize();
+    const lastPage = Math.max(1, Math.ceil(total / perPage));
+    return {
+      current_page: page,
+      last_page: lastPage,
+      per_page: perPage,
+      total: total,
+      from: total > 0 ? (page - 1) * perPage + 1 : 0,
+      to: Math.min(total, page * perPage),
+    };
+  });
+
   canPost = () => this.auth.hasPermission('accounts.post');
   canVoid = () => this.auth.hasPermission('accounts.void');
 
   onSearchChange(val: string): void {
     this.searchQuery.set(val);
+    this.currentPage.set(1);
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage.set(page);
+  }
+
+  clearFilters(): void {
+    this.searchQuery.set('');
+    this.paymentMode = '';
+    this.chequeStatus = '';
+    this.selectedDocStatus.set('');
+    this.currentPage.set(1);
+    this.load();
+  }
+
+  hasActiveFilters(): boolean {
+    return !!(
+      this.searchQuery() ||
+      this.paymentMode ||
+      this.chequeStatus ||
+      this.selectedDocStatus()
+    );
   }
   ngOnInit(): void {
     this.direction.set(this.route.snapshot.data['direction']);

@@ -6,8 +6,10 @@ import { BmLoadingStateComponent } from '../../../shared/components/bm-loading-s
 import { BmErrorStateComponent } from '../../../shared/components/bm-error-state/bm-error-state.component';
 import { BmEmptyStateComponent } from '../../../shared/components/bm-empty-state/bm-empty-state.component';
 import { BmSearchInputComponent } from '../../../shared/components/bm-search-input/bm-search-input.component';
+import { BmPaginationComponent } from '../../../shared/components/bm-pagination/bm-pagination.component';
 import { AdministrationApiService } from '../../../core/api/administration-api.service';
 import { UserAdmin } from '../../../shared/models/admin.models';
+import { PaginationMeta } from '../../../core/api/api.models';
 
 @Component({
   selector: 'bm-users-list',
@@ -20,6 +22,7 @@ import { UserAdmin } from '../../../shared/models/admin.models';
     BmErrorStateComponent,
     BmEmptyStateComponent,
     BmSearchInputComponent,
+    BmPaginationComponent,
   ],
   template: `
     <bm-page-header
@@ -29,12 +32,48 @@ import { UserAdmin } from '../../../shared/models/admin.models';
     </bm-page-header>
 
     <!-- Toolbar Filters -->
-    <div class="bm-card p-4 mb-6 max-w-5xl flex items-center justify-between gap-4">
-      <bm-search-input
-        [value]="searchQuery()"
-        placeholder="Search user name, email, role, branch..."
-        (searchChange)="searchQuery.set($event)"
-      ></bm-search-input>
+    <div class="bm-card p-4 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+        <bm-search-input
+          [value]="searchQuery()"
+          placeholder="Search user name, email, role, branch..."
+          (searchChange)="onSearchChange($event)"
+        ></bm-search-input>
+
+        <select
+          [value]="selectedRole()"
+          (change)="onRoleChange($event)"
+          class="bm-input !w-auto text-xs font-medium"
+        >
+          <option value="all">All Roles</option>
+          <option value="super_admin">Super Admin</option>
+          <option value="branch_manager">Branch Manager</option>
+          <option value="accountant">Accountant</option>
+          <option value="property_manager">Property Manager</option>
+          <option value="receptionist">Receptionist</option>
+        </select>
+
+        <select
+          [value]="selectedStatus()"
+          (change)="onStatusChange($event)"
+          class="bm-input !w-auto text-xs font-medium"
+        >
+          <option value="all">All Statuses</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+          <option value="suspended">Suspended</option>
+        </select>
+      </div>
+
+      @if (hasActiveFilters()) {
+        <button
+          type="button"
+          (click)="clearFilters()"
+          class="text-xs text-emerald-700 hover:text-emerald-800 font-medium cursor-pointer"
+        >
+          Clear Filters
+        </button>
+      }
     </div>
 
     @if (isLoading()) {
@@ -47,7 +86,7 @@ import { UserAdmin } from '../../../shared/models/admin.models';
         description="No user records match your search criteria."
       ></bm-empty-state>
     } @else {
-      <div class="bm-card overflow-hidden max-w-5xl">
+      <div class="bm-card overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse text-xs">
             <thead>
@@ -62,7 +101,7 @@ import { UserAdmin } from '../../../shared/models/admin.models';
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
-              @for (u of filteredUsers(); track u.id) {
+              @for (u of paginatedUsers(); track u.id) {
                 <tr class="hover:bg-slate-50/60 transition-colors">
                   <td class="py-3.5 px-4 font-semibold text-slate-900">
                     {{ u.name }}
@@ -88,6 +127,13 @@ import { UserAdmin } from '../../../shared/models/admin.models';
             </tbody>
           </table>
         </div>
+
+        @if (filteredUsers().length > 0) {
+          <bm-pagination
+            [meta]="paginationMeta()"
+            (pageChange)="currentPage.set($event)"
+          ></bm-pagination>
+        }
       </div>
     }
   `,
@@ -97,27 +143,58 @@ export class UsersListComponent implements OnInit {
 
   users = signal<UserAdmin[]>([]);
   searchQuery = signal('');
+  selectedRole = signal<string>('all');
+  selectedStatus = signal<string>('all');
+  currentPage = signal(1);
+  pageSize = signal(10);
   isLoading = signal(true);
   error = signal<string | null>(null);
 
   filteredUsers = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
-    if (!q) return this.users();
+    const role = this.selectedRole();
+    const st = this.selectedStatus();
+
     return this.users().filter((u) => {
+      if (st !== 'all' && (u.status || '').toLowerCase() !== st) return false;
+      if (role !== 'all' && !(u.roles || []).includes(role)) return false;
+
+      if (!q) return true;
       const name = (u.name || '').toLowerCase();
       const email = (u.email || '').toLowerCase();
-      const roles = (u.roles || []).join(' ').toLowerCase();
+      const rolesStr = (u.roles || []).join(' ').toLowerCase();
       const branches = this.getBranchesSummary(u).toLowerCase();
       const status = (u.status || '').toLowerCase();
       return (
         name.includes(q) ||
         email.includes(q) ||
-        roles.includes(q) ||
+        rolesStr.includes(q) ||
         branches.includes(q) ||
         status.includes(q)
       );
     });
   });
+
+  paginationMeta = computed<PaginationMeta>(() => {
+    const total = this.filteredUsers().length;
+    const page = this.currentPage();
+    const size = this.pageSize();
+    const lastPage = Math.max(1, Math.ceil(total / size));
+    const from = total === 0 ? 0 : (page - 1) * size + 1;
+    const to = Math.min(total, page * size);
+    return { current_page: page, per_page: size, total, last_page: lastPage, from, to };
+  });
+
+  paginatedUsers = computed(() => {
+    const page = this.currentPage();
+    const size = this.pageSize();
+    const start = (page - 1) * size;
+    return this.filteredUsers().slice(start, start + size);
+  });
+
+  hasActiveFilters = computed(
+    () => !!this.searchQuery() || this.selectedRole() !== 'all' || this.selectedStatus() !== 'all',
+  );
 
   ngOnInit(): void {
     this.loadUsers();
@@ -139,6 +216,30 @@ export class UsersListComponent implements OnInit {
         this.isLoading.set(false);
       },
     });
+  }
+
+  onSearchChange(q: string): void {
+    this.searchQuery.set(q);
+    this.currentPage.set(1);
+  }
+
+  onRoleChange(event: Event): void {
+    const val = (event.target as HTMLSelectElement).value;
+    this.selectedRole.set(val);
+    this.currentPage.set(1);
+  }
+
+  onStatusChange(event: Event): void {
+    const val = (event.target as HTMLSelectElement).value;
+    this.selectedStatus.set(val);
+    this.currentPage.set(1);
+  }
+
+  clearFilters(): void {
+    this.searchQuery.set('');
+    this.selectedRole.set('all');
+    this.selectedStatus.set('all');
+    this.currentPage.set(1);
   }
 
   getBranchesSummary(u: UserAdmin): string {

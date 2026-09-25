@@ -157,39 +157,39 @@ dirham-symbol svg {
   height: 1em !important;
 }
 
-/* Fluid top wave animation for hero net movement state overlays */
-@keyframes waveFlowTop {
+/* Fluid bottom wave animation for hero net movement state overlays */
+@keyframes waveFlowBottom {
   0% {
     transform: scaleY(1) translateY(0);
   }
   50% {
-    transform: scaleY(1.15) translateY(6px);
+    transform: scaleY(1.15) translateY(-6px);
   }
   100% {
     transform: scaleY(1) translateY(0);
   }
 }
 
-@keyframes waveFlowTopSlow {
+@keyframes waveFlowBottomSlow {
   0% {
-    transform: scaleY(1.08) translateY(2px) scaleX(1);
+    transform: scaleY(1.08) translateY(-2px) scaleX(1);
   }
   50% {
-    transform: scaleY(0.92) translateY(8px) scaleX(1.02);
+    transform: scaleY(0.92) translateY(-8px) scaleX(1.02);
   }
   100% {
-    transform: scaleY(1.08) translateY(2px) scaleX(1);
+    transform: scaleY(1.08) translateY(-2px) scaleX(1);
   }
 }
 
-.animate-wave-top {
-  animation: waveFlowTop 7s ease-in-out infinite;
-  transform-origin: top center;
+.animate-wave-bottom {
+  animation: waveFlowBottom 7s ease-in-out infinite;
+  transform-origin: bottom center;
 }
 
-.animate-wave-top-slow {
-  animation: waveFlowTopSlow 11s ease-in-out infinite;
-  transform-origin: top center;
+.animate-wave-bottom-slow {
+  animation: waveFlowBottomSlow 11s ease-in-out infinite;
+  transform-origin: bottom center;
 }
 
 .bm-btn {

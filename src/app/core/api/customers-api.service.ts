@@ -35,7 +35,7 @@ export class CustomersApiService {
     return this.http.post<ApiResponse<Customer>>(this.baseUrl, dto);
   }
 
-  extractIdentity(document: File, role: 'owner' | 'tenant'): Observable<ApiResponse<IdentityExtraction>> {
+  extractIdentity(document: File, role: 'owner' | 'tenant' | 'vendor'): Observable<ApiResponse<IdentityExtraction>> {
     const form = new FormData();
     form.append('document', document);
     form.append('role', role);

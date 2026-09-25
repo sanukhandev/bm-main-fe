@@ -246,6 +246,17 @@ import {
                       />
                       <span>Leasing Tenant</span>
                     </label>
+                    <label
+                      class="inline-flex items-center gap-2.5 text-sm font-medium text-slate-800 cursor-pointer select-none"
+                    >
+                      <input
+                        type="checkbox"
+                        [checked]="hasRole('vendor')"
+                        (change)="toggleRole('vendor', $event)"
+                        class="rounded-md text-emerald-700 focus:ring-emerald-600 h-4.5 w-4.5 border-slate-300"
+                      />
+                      <span>Maintenance Vendor</span>
+                    </label>
                   </div>
                 </div>
               }
@@ -664,6 +675,7 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
     const wf = this.workflowRole();
     if (wf === 'owner') return '/app/customers/owners';
     if (wf === 'tenant') return '/app/customers/tenants';
+    if (wf === 'vendor') return '/app/customers/vendors';
     return '/app/customers';
   });
 
@@ -673,10 +685,12 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
     if (edit) {
       if (wf === 'owner') return 'Edit Owner';
       if (wf === 'tenant') return 'Edit Tenant';
+      if (wf === 'vendor') return 'Edit Vendor';
       return 'Edit Customer';
     }
     if (wf === 'owner') return 'Create Owner';
     if (wf === 'tenant') return 'Create Tenant';
+    if (wf === 'vendor') return 'Create Vendor';
     return 'Create Customer';
   });
 
@@ -686,10 +700,12 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
     if (edit) {
       if (wf === 'owner') return 'Update property owner master details.';
       if (wf === 'tenant') return 'Update tenant master details.';
+      if (wf === 'vendor') return 'Update maintenance vendor master details.';
       return 'Update master customer record.';
     }
     if (wf === 'owner') return 'Register a new property owner.';
     if (wf === 'tenant') return 'Register a new tenant.';
+    if (wf === 'vendor') return 'Register a new maintenance vendor.';
     return 'Register a new property owner or tenant.';
   });
 
@@ -706,6 +722,7 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
     const wf = this.workflowRole();
     if (wf === 'owner') return 'Creating Owner...';
     if (wf === 'tenant') return 'Creating Tenant...';
+    if (wf === 'vendor') return 'Creating Vendor...';
     return 'Creating Customer...';
   });
 
@@ -855,6 +872,8 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
       workflowRole = 'owner';
     } else if (url.includes('/tenants')) {
       workflowRole = 'tenant';
+    } else if (url.includes('/vendors')) {
+      workflowRole = 'vendor';
     }
 
     this.workflowRole.set(workflowRole);
@@ -893,8 +912,10 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
 
         if (roles.includes('owner') && !roles.includes('tenant')) {
           this.customerRole.set('owner');
-        } else if (roles.includes('tenant') && !roles.includes('owner')) {
+        } else if (roles.includes('tenant') && !roles.includes('owner') && !roles.includes('vendor')) {
           this.customerRole.set('tenant');
+        } else if (roles.includes('vendor') && !roles.includes('owner') && !roles.includes('tenant')) {
+          this.customerRole.set('vendor');
         }
 
          this.customerForm.patchValue({
@@ -953,7 +974,7 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
     }
 
     if (this.selectedRoles().length === 0) {
-      this.serverError.set('Please select at least one business role (Owner or Tenant).');
+      this.serverError.set('Please select at least one business role.');
       return;
     }
 

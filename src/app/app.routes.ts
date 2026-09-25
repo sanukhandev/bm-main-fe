@@ -91,6 +91,27 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'customers/vendors',
+        loadComponent: () =>
+          import('./features/customers/customers-list.component').then(
+            (m) => m.CustomersListComponent,
+          ),
+      },
+      {
+        path: 'customers/vendors/new',
+        loadComponent: () =>
+          import('./features/customers/customer-form.component').then(
+            (m) => m.CustomerFormComponent,
+          ),
+      },
+      {
+        path: 'customers/vendors/:id/edit',
+        loadComponent: () =>
+          import('./features/customers/customer-form.component').then(
+            (m) => m.CustomerFormComponent,
+          ),
+      },
+      {
         path: 'customers/new',
         loadComponent: () =>
           import('./features/customers/customer-form.component').then(

@@ -12,15 +12,41 @@ import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.c
   imports: [CommonModule, ReactiveFormsModule, BmFooterComponent],
   template: `
     <div
-      class="min-h-dvh min-h-screen w-full bg-[#193D32] bg-[radial-gradient(circle_at_85%_85%,rgba(156,175,159,0.15),transparent_40%)] flex items-center justify-center p-4 sm:p-6 lg:p-12 relative overflow-hidden font-sans"
+      class="min-h-dvh min-h-screen w-full bg-[#193D32] bg-[radial-gradient(circle_at_85%_85%,rgba(156,175,159,0.18),transparent_45%)] flex items-center justify-center p-4 sm:p-6 lg:p-12 relative overflow-hidden font-sans"
     >
-      <!-- Background Ambient Accents -->
+      <!-- Subtle Architectural Dot Matrix Pattern Overlay -->
       <div
-        class="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-[#9CAF9F]/10 blur-3xl pointer-events-none"
+        class="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.08)_1.5px,transparent_1.5px)] [background-size:24px_24px] pointer-events-none opacity-60 z-0"
+      ></div>
+
+      <!-- Subtle Structural Grid Line Overlay -->
+      <div
+        class="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none opacity-50 z-0"
+      ></div>
+
+      <!-- Background Ambient Glow Accents -->
+      <div
+        class="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-[#9CAF9F]/15 blur-3xl pointer-events-none z-0"
       ></div>
       <div
-        class="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-[#143229]/40 blur-3xl pointer-events-none"
+        class="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-[#143229]/60 blur-3xl pointer-events-none z-0"
       ></div>
+
+      <!-- Subtle Bottom Ambient Fluid Wave Silhouette -->
+      <div
+        class="absolute bottom-0 inset-x-0 h-64 pointer-events-none overflow-hidden opacity-20 z-0"
+      >
+        <svg
+          class="absolute bottom-0 w-full h-full text-[#9CAF9F] animate-wave-bottom-slow select-none"
+          viewBox="0 0 1440 120"
+          preserveAspectRatio="none"
+          fill="currentColor"
+        >
+          <path
+            d="M0,45 C200,85 400,35 600,65 C800,25 1000,70 1200,40 C1300,25 1380,60 1440,50 L1440,120 L0,120 Z"
+          ></path>
+        </svg>
+      </div>
 
       <!-- Main Login Container Panel -->
       <div

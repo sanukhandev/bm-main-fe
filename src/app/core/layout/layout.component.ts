@@ -891,6 +891,19 @@ export interface PageSearchItem {
                       </div>
                     </div>
                   </a>
+                  <a
+                    routerLink="/app/customers/vendors"
+                    (click)="closeMegaMenu()"
+                    class="group flex items-start gap-3 p-2 rounded-xl hover:bg-[#F8FAFC] transition"
+                  >
+                    <div class="w-7 h-7 rounded-lg bg-[#FFF7ED] text-[#C2410C] flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m-7 4h8m-9 4h10M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z" /></svg>
+                    </div>
+                    <div>
+                      <div class="text-xs font-semibold text-[#0F172A] group-hover:text-[#C2410C]">Vendors</div>
+                      <div class="text-[10px] text-[#64748B] leading-tight">Maintenance vendor directory</div>
+                    </div>
+                  </a>
                 </div>
 
                 <div
@@ -2221,6 +2234,13 @@ export class LayoutComponent {
       category: 'Customers',
       url: '/app/customers/tenants',
       keywords: ['tenant', 'tenants', 'renter', 'leaseholder', 'occupant'],
+    },
+    {
+      title: 'Vendor Directory',
+      subtitle: 'Maintenance vendors & contractors',
+      category: 'Customers',
+      url: '/app/customers/vendors',
+      keywords: ['vendor', 'vendors', 'supplier', 'contractor', 'maintenance'],
     },
     {
       title: 'Add New Tenant',

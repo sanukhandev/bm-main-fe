@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -21,6 +21,7 @@ import {
 @Component({
   selector: 'bm-tenant-agreement-form',
   standalone: true,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -31,7 +32,7 @@ import {
     BmComboboxComponent,
   ],
   template: `
-    <div class="max-w-[1240px] w-full mx-auto pb-12">
+    <div class="max-w-[1240px] w-full mx-auto pb-12 font-sans text-slate-900">
       <bm-page-header
         [title]="isEditMode() ? 'Edit Tenant Agreement' : 'Create Tenant Agreement'"
         [subtitle]="
@@ -81,32 +82,21 @@ import {
           }
 
           <!-- SECTION 1: Agreement Identity & Tenant Selection -->
-          <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
-            <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
+          <div
+            class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-2xs space-y-5"
+          >
+            <div class="flex items-center gap-3 pb-4 border-b border-slate-100">
               <div
-                class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0"
+                class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs shrink-0"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
+                01
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">
+                <h3 class="text-lg font-extrabold text-slate-900 tracking-tight">
                   Agreement Identity & Tenant
                 </h3>
                 <p class="text-xs text-slate-500 font-normal">
-                  Contract reference code and leasing tenant assignment
+                  Contract reference code and leasing tenant customer assignment
                 </p>
               </div>
             </div>
@@ -150,28 +140,17 @@ import {
           </div>
 
           <!-- SECTION 2: Lease Period -->
-          <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
-            <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
+          <div
+            class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-2xs space-y-5"
+          >
+            <div class="flex items-center gap-3 pb-4 border-b border-slate-100">
               <div
-                class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0"
+                class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs shrink-0"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
+                02
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">
+                <h3 class="text-lg font-extrabold text-slate-900 tracking-tight">
                   Lease Term & Period
                 </h3>
                 <p class="text-xs text-slate-500 font-normal">
@@ -217,33 +196,22 @@ import {
             </div>
           </div>
 
-          <!-- SECTION 3: Leased Property Asset Selection -->
-          <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
-            <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
+          <!-- SECTION 3: Source Owner Agreement & Leased Assets -->
+          <div
+            class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-2xs space-y-5"
+          >
+            <div class="flex items-center gap-3 pb-4 border-b border-slate-100">
               <div
-                class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0"
+                class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs shrink-0"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                  />
-                </svg>
+                03
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">
-                  Leased Property Asset
+                <h3 class="text-lg font-extrabold text-slate-900 tracking-tight">
+                  Source Owner Agreement & Leased Assets
                 </h3>
                 <p class="text-xs text-slate-500 font-normal">
-                  Select one or more available properties for this tenancy contract
+                  Select source owner contract and property assets for this tenant lease
                 </p>
               </div>
             </div>
@@ -256,73 +224,162 @@ import {
                 formControlName="source_owner_agreement_id"
                 [options]="sourceOwnerAgreementOptions()"
                 placeholder="Search or select source owner agreement..."
-                searchPlaceholder="Search agreement by reference number or dates..."
+                searchPlaceholder="Search agreement by reference number, owner name or dates..."
                 (change)="onAvailabilityInputsChange()"
                 [invalid]="isFieldInvalid('source_owner_agreement_id')"
               ></bm-combobox>
               @if (isFieldInvalid('source_owner_agreement_id')) {
-                <span class="text-xs font-medium text-rose-600 mt-1.5 flex items-center gap-1"
-                  >Source owner agreement is required.</span
-                >
-              }
-            </div>
-
-            <div class="mt-5">
-              <label class="block text-[13px] font-semibold text-[#26312C] mb-2">
-                Property Asset <span class="text-rose-600 font-bold ml-0.5">*</span>
-              </label>
-              <input
-                type="search"
-                [value]="propertySearch()"
-                (input)="onPropertySearch($event)"
-                placeholder="Search available properties by code, name or unit..."
-                class="w-full h-11 mb-3 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium shadow-2xs focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
-              />
-              <select
-                formControlName="selected_property_ids"
-                multiple
-                (change)="onPropertyChange()"
-                class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium shadow-2xs focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
-              >
-                <option value="">Select Property Asset...</option>
-                @for (prop of filteredAvailableProperties(); track prop.id) {
-                  <option [value]="prop.id">
-                    [{{ prop.property_code }}] {{ prop.name }} (Property / Unit No.:
-                    {{ prop.unit_number }})
-                  </option>
-                }
-              </select>
-              @if (isFieldInvalid('selected_property_id')) {
                 <span class="text-xs font-medium text-rose-600 mt-1.5 flex items-center gap-1">
-                  Select at least one property asset.
+                  Source owner agreement is required.
                 </span>
               }
             </div>
+
+            <!-- Selected Source Owner Agreement Summary Banner -->
+            @if (selectedOwnerAgreement()) {
+              <div
+                class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-4"
+              >
+                <div class="space-y-0.5">
+                  <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                    Source Owner Contract
+                  </div>
+                  <div class="text-sm font-extrabold text-slate-900 flex items-center gap-2">
+                    <span>{{ selectedOwnerAgreement()?.agreement_no }}</span>
+                    <span
+                      class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 capitalize"
+                    >
+                      {{ selectedOwnerAgreement()?.status }}
+                    </span>
+                  </div>
+                  <div class="text-xs text-slate-600">
+                    Owner:
+                    <strong class="text-slate-900">{{
+                      ownerName(selectedOwnerAgreement())
+                    }}</strong>
+                    · Valid: {{ selectedOwnerAgreement()?.start_date }} to
+                    {{ selectedOwnerAgreement()?.end_date }}
+                  </div>
+                </div>
+              </div>
+            }
+
+            <!-- Property Asset Selection Cards Grid -->
+            @if (!agreementForm.value.source_owner_agreement_id) {
+              <div
+                class="py-8 text-center text-xs text-slate-500 italic bg-slate-50/60 rounded-xl border border-slate-100"
+              >
+                Please select a source owner agreement above to view and select available
+                properties.
+              </div>
+            } @else if (availableProperties().length === 0) {
+              <div
+                class="py-8 text-center text-xs text-amber-800 font-medium bg-amber-50/60 rounded-xl border border-amber-200/60"
+              >
+                No available property assets found for the selected source owner agreement and lease
+                dates.
+              </div>
+            } @else {
+              <div class="space-y-3">
+                <div class="flex items-center justify-between gap-3">
+                  <label class="block text-[13px] font-semibold text-[#26312C]">
+                    Select Covered Property Asset(s)
+                    <span class="text-rose-600 font-bold ml-0.5">*</span>
+                  </label>
+                  <span class="text-xs font-semibold text-slate-500">
+                    Selected:
+                    <strong class="text-emerald-700 font-bold">{{
+                      selectedPropertyIds().length
+                    }}</strong>
+                    property(ies)
+                  </span>
+                </div>
+
+                <!-- Quick Filter Search Input -->
+                <div class="relative">
+                  <input
+                    type="search"
+                    [value]="propertySearch()"
+                    (input)="onPropertySearch($event)"
+                    placeholder="Filter properties by code, unit number or building..."
+                    class="w-full h-10 px-3.5 pl-9 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-xs font-medium shadow-2xs focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
+                  />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4 text-slate-400 absolute left-3 top-3 pointer-events-none"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </div>
+
+                <!-- Tactile Bento Property Cards Grid -->
+                <div
+                  class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-72 overflow-y-auto p-1"
+                >
+                  @for (prop of filteredAvailableProperties(); track prop.id) {
+                    <label
+                      class="flex items-start gap-3 p-3.5 rounded-xl border border-slate-200 bg-white hover:border-emerald-600 hover:shadow-2xs cursor-pointer transition-all duration-150 relative"
+                      [class.border-emerald-600]="isPropertySelected(prop.id)"
+                      [class.bg-emerald-50/20]="isPropertySelected(prop.id)"
+                      [class.ring-2]="isPropertySelected(prop.id)"
+                      [class.ring-emerald-500/10]="isPropertySelected(prop.id)"
+                    >
+                      <input
+                        type="checkbox"
+                        [checked]="isPropertySelected(prop.id)"
+                        (change)="toggleProperty(prop.id, $event)"
+                        class="rounded-md text-emerald-700 focus:ring-emerald-600 h-4.5 w-4.5 border-slate-300 mt-0.5 shrink-0 cursor-pointer"
+                      />
+                      <div class="text-xs overflow-hidden flex-1">
+                        <div class="flex items-center justify-between gap-1 mb-0.5">
+                          <span class="font-extrabold text-slate-900 truncate"
+                            >Unit {{ prop.unit_number }}</span
+                          >
+                          <span
+                            class="font-mono text-[11px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded shrink-0"
+                          >
+                            {{ prop.property_code }}
+                          </span>
+                        </div>
+                        <div class="text-slate-700 font-semibold truncate">{{ prop.name }}</div>
+                        <div class="text-slate-500 text-[11px] truncate mt-0.5">
+                          {{ prop.building_name || 'Building Asset' }} ·
+                          <span class="capitalize">{{ prop.property_type }}</span>
+                        </div>
+                      </div>
+                    </label>
+                  }
+                </div>
+
+                @if (isFieldInvalid('selected_property_ids')) {
+                  <span class="text-xs font-medium text-rose-600 mt-1.5 flex items-center gap-1">
+                    Please select at least one property asset for this tenancy contract.
+                  </span>
+                }
+              </div>
+            }
           </div>
 
           <!-- SECTION 4: Commercial Terms -->
-          <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
-            <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
+          <div
+            class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-2xs space-y-5"
+          >
+            <div class="flex items-center gap-3 pb-4 border-b border-slate-100">
               <div
-                class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0"
+                class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs shrink-0"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 12v-2m0 0c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
+                04
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">
+                <h3 class="text-lg font-extrabold text-slate-900 tracking-tight">
                   Commercial & Rent Terms
                 </h3>
                 <p class="text-xs text-slate-500 font-normal">
@@ -336,13 +393,15 @@ import {
                 <label class="block text-[13px] font-semibold text-[#26312C] mb-2">
                   Total Rent Amount (AED) <span class="text-rose-600 font-bold ml-0.5">*</span>
                 </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  formControlName="total_amount"
-                  placeholder="0.00"
-                  class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-semibold tabular-nums shadow-2xs placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
-                />
+                <div class="relative">
+                  <input
+                    type="number"
+                    step="0.01"
+                    formControlName="total_amount"
+                    placeholder="0.00"
+                    class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-semibold tabular-nums shadow-2xs placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
+                  />
+                </div>
                 @if (isFieldInvalid('total_amount')) {
                   <span class="text-xs font-medium text-rose-600 mt-1.5 flex items-center gap-1">
                     Valid rent amount is required.
@@ -412,28 +471,17 @@ import {
           </div>
 
           <!-- SECTION 5: Rent Schedule Preview -->
-          <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
-            <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
+          <div
+            class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-2xs space-y-5"
+          >
+            <div class="flex items-center gap-3 pb-4 border-b border-slate-100">
               <div
-                class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0"
+                class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs shrink-0"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                  />
-                </svg>
+                05
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">
+                <h3 class="text-lg font-extrabold text-slate-900 tracking-tight">
                   Rent Installment Schedule Preview
                 </h3>
                 <p class="text-xs text-slate-500 font-normal">
@@ -443,28 +491,35 @@ import {
             </div>
 
             @if (installmentPreview().length > 0) {
-              <div class="border border-slate-200/80 rounded-xl overflow-hidden">
+              <div class="border border-slate-200/80 rounded-xl overflow-hidden shadow-2xs">
                 <table class="w-full text-left border-collapse text-xs">
                   <thead>
                     <tr
-                      class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]"
+                      class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[11px]"
                     >
                       <th class="py-3 px-4">Payment No</th>
                       <th class="py-3 px-4">Estimated Due Date</th>
-                      <th class="py-3 px-4 text-right">Rent Installment (AED)</th>
+                      <th class="py-3 px-4 text-right">Rent Installment Amount</th>
                     </tr>
                   </thead>
-                  <tbody class="divide-y divide-slate-100">
+                  <tbody class="divide-y divide-slate-100 font-medium">
                     @for (item of installmentPreview(); track item.installment_number) {
                       <tr class="hover:bg-slate-50/50 transition-colors">
-                        <td class="py-3 px-4 font-semibold text-slate-800">
+                        <td class="py-3 px-4 font-bold text-slate-800">
                           Payment {{ item.installment_number }}
                         </td>
-                        <td class="py-3 px-4 text-slate-600 tabular-nums font-medium">
+                        <td class="py-3 px-4 text-slate-600 tabular-nums font-mono">
                           {{ item.due_date }}
                         </td>
-                        <td class="py-3 px-4 text-right font-semibold text-slate-900 tabular-nums">
-                          AED {{ item.amount | number: '1.2-2' }}
+                        <td class="py-3 px-4 text-right font-extrabold text-slate-900 tabular-nums">
+                          <div class="flex items-center justify-end">
+                            <dirham-symbol
+                              size="0.85em"
+                              weight="bold"
+                              class="mr-1 text-slate-400 select-none"
+                            ></dirham-symbol>
+                            <span>{{ item.amount | number: '1.2-2' }}</span>
+                          </div>
                         </td>
                       </tr>
                     }
@@ -551,6 +606,7 @@ export class TenantAgreementFormComponent implements OnInit {
   ownerAgreements = signal<OwnerAgreement[]>([]);
   availableProperties = signal<Property[]>([]);
   propertySearch = signal('');
+
   filteredAvailableProperties = computed(() => {
     const query = this.propertySearch().trim().toLowerCase();
     if (!query) return this.availableProperties();
@@ -559,6 +615,17 @@ export class TenantAgreementFormComponent implements OnInit {
         .filter(Boolean)
         .some((value) => String(value).toLowerCase().includes(query)),
     );
+  });
+
+  selectedPropertyIds = computed<number[]>(() => {
+    const val = this.agreementForm.get('selected_property_ids')?.value || [];
+    return (val as Array<number | string>).map(Number);
+  });
+
+  selectedOwnerAgreement = computed<OwnerAgreement | null>(() => {
+    const id = Number(this.agreementForm.value.source_owner_agreement_id);
+    if (!id) return null;
+    return this.ownerAgreements().find((oa) => oa.id === id) || null;
   });
 
   tenantOptions = computed<ComboboxOption[]>(() => {
@@ -570,10 +637,17 @@ export class TenantAgreementFormComponent implements OnInit {
     }));
   });
 
+  ownerName(oa: OwnerAgreement | null | undefined): string {
+    if (!oa || !oa.owner) return 'Owner';
+    if ('data' in oa.owner && oa.owner.data) return oa.owner.data.display_name;
+    if ('display_name' in oa.owner) return oa.owner.display_name;
+    return 'Owner';
+  }
+
   sourceOwnerAgreementOptions = computed<ComboboxOption[]>(() => {
     return this.ownerAgreements().map((oa) => ({
       id: oa.id,
-      label: `${oa.agreement_no} (${oa.start_date} – ${oa.end_date})`,
+      label: `${oa.agreement_no} (${this.ownerName(oa)} · ${oa.start_date} – ${oa.end_date})`,
       code: oa.agreement_no,
       subtitle: `Valid ${oa.start_date} to ${oa.end_date}`,
     }));
@@ -643,7 +717,9 @@ export class TenantAgreementFormComponent implements OnInit {
       this.loadAgreement();
     } else {
       const tenantId = this.route.snapshot.queryParamMap.get('tenant_customer_id');
-      const sourceOwnerAgreementId = this.route.snapshot.queryParamMap.get('source_owner_agreement_id');
+      const sourceOwnerAgreementId = this.route.snapshot.queryParamMap.get(
+        'source_owner_agreement_id',
+      );
       if (tenantId && /^\d+$/.test(tenantId)) {
         this.tenantPrefilled.set(true);
         this.agreementForm.patchValue({ tenant_customer_id: tenantId });
@@ -661,10 +737,20 @@ export class TenantAgreementFormComponent implements OnInit {
 
     this.ownerAgreementsApi.getAgreement(agreementId).subscribe({
       next: (res) => {
-        const properties = this.normalizeOwnerAgreementProperties(res.data.properties);
+        const oa = res.data;
+        const properties = this.normalizeOwnerAgreementProperties(oa.properties);
         this.availableProperties.set(properties);
-        if (properties.length === 1) {
-          this.agreementForm.get('selected_property_ids')?.setValue([properties[0].id], { emitEvent: false });
+        if (oa.start_date && !this.agreementForm.value.start_date) {
+          this.agreementForm.patchValue({
+            start_date: oa.start_date,
+            end_date: oa.end_date,
+          });
+        }
+        const prefilledPropId = Number(this.route.snapshot.queryParamMap.get('property_id'));
+        if (prefilledPropId && properties.some((p) => p.id === prefilledPropId)) {
+          this.agreementForm.get('selected_property_ids')?.setValue([prefilledPropId]);
+        } else if (properties.length === 1) {
+          this.agreementForm.get('selected_property_ids')?.setValue([properties[0].id]);
         }
       },
     });
@@ -705,7 +791,11 @@ export class TenantAgreementFormComponent implements OnInit {
 
   private applyPrefilledTenant(tenants: Customer[]): void {
     const tenantId = this.route.snapshot.queryParamMap.get('tenant_customer_id');
-    if (!this.isEditMode() && tenantId && tenants.some((tenant) => String(tenant.id) === tenantId)) {
+    if (
+      !this.isEditMode() &&
+      tenantId &&
+      tenants.some((tenant) => String(tenant.id) === tenantId)
+    ) {
       this.tenantPrefilled.set(true);
       this.agreementForm.patchValue({ tenant_customer_id: tenantId }, { emitEvent: false });
     }
@@ -720,10 +810,31 @@ export class TenantAgreementFormComponent implements OnInit {
   loadAvailableProperties(): void {
     const request = ++this.availabilityRequest;
     const value = this.agreementForm.getRawValue();
+    const oaId = Number(value.source_owner_agreement_id);
+
+    // If source owner agreement is selected but dates are missing, fetch properties directly from owner agreement
+    if (oaId && (!value.start_date || !value.end_date)) {
+      this.ownerAgreementsApi.getAgreement(oaId).subscribe({
+        next: (res) => {
+          if (request !== this.availabilityRequest) return;
+          const props = this.normalizeOwnerAgreementProperties(res.data.properties);
+          this.availableProperties.set(props);
+          if (res.data.start_date && !this.agreementForm.value.start_date) {
+            this.agreementForm.patchValue({
+              start_date: res.data.start_date,
+              end_date: res.data.end_date,
+            });
+          }
+        },
+      });
+      return;
+    }
+
     if (!value.start_date || !value.end_date || value.start_date > value.end_date) {
       this.availableProperties.set([]);
       return;
     }
+
     this.propertiesApi
       .getAvailableProperties({
         per_page: 100,
@@ -737,7 +848,7 @@ export class TenantAgreementFormComponent implements OnInit {
           if (request !== this.availabilityRequest) return;
           this.availableProperties.set(res.data);
           const selected = (
-            this.agreementForm.get('selected_property_ids')?.value as Array<number | string>
+            (this.agreementForm.get('selected_property_ids')?.value || []) as Array<number | string>
           )
             .map(Number)
             .filter((id) => res.data.some((property) => property.id === id));
@@ -759,11 +870,6 @@ export class TenantAgreementFormComponent implements OnInit {
     this.api.getAgreement(id).subscribe({
       next: (res) => {
         const agr = res.data;
-        let selectedPropId = '';
-        if (agr.properties && agr.properties.length > 0) {
-          selectedPropId = String(agr.properties[0].property_id);
-        }
-
         this.agreementForm.patchValue({
           agreement_no: agr.agreement_no,
           tenant_customer_id: String(agr.tenant_customer_id),
@@ -792,11 +898,42 @@ export class TenantAgreementFormComponent implements OnInit {
   onDateChange(): void {
     this.onAvailabilityInputsChange();
   }
+
   onAvailabilityInputsChange(): void {
+    const oaId = Number(this.agreementForm.value.source_owner_agreement_id);
+    if (oaId) {
+      const oa = this.ownerAgreements().find((item) => item.id === oaId);
+      if (oa && (!this.agreementForm.value.start_date || !this.agreementForm.value.end_date)) {
+        this.agreementForm.patchValue({
+          start_date: oa.start_date,
+          end_date: oa.end_date,
+        });
+      }
+    }
     this.agreementForm.get('selected_property_ids')?.setValue([]);
     this.loadAvailableProperties();
   }
-  onPropertyChange(): void {}
+
+  isPropertySelected(id: number): boolean {
+    const selected = (this.agreementForm.get('selected_property_ids')?.value || []) as number[];
+    return selected.map(Number).includes(Number(id));
+  }
+
+  toggleProperty(id: number, event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    const current = (
+      (this.agreementForm.get('selected_property_ids')?.value || []) as Array<number | string>
+    ).map(Number);
+    let updated: number[];
+    if (checked) {
+      updated = current.includes(id) ? current : [...current, id];
+    } else {
+      updated = current.filter((pId) => pId !== id);
+    }
+    this.agreementForm.get('selected_property_ids')?.setValue(updated);
+    this.agreementForm.get('selected_property_ids')?.markAsTouched();
+    this.agreementForm.get('selected_property_ids')?.markAsDirty();
+  }
 
   onPropertySearch(event: Event): void {
     this.propertySearch.set((event.target as HTMLInputElement).value);

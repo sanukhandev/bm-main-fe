@@ -298,8 +298,8 @@ import { BmLoadingStateComponent } from '../../shared/components/bm-loading-stat
               </div>
             </div>
 
-            <!-- MIDDLE COLUMN (Col 4): Operating Income & Operating Cost Statistics (Clean inline, NO inner cards) -->
-            <div class="lg:col-span-4 space-y-6">
+            <!-- RIGHT COLUMN (Col 6): Operating Income & Operating Cost Statistics (Clean inline) -->
+            <div class="lg:col-span-6 space-y-6">
               <!-- Operating Income (Inline statistics without nested card box) -->
               <div class="flex items-center gap-3.5">
                 <div
@@ -378,15 +378,13 @@ import { BmLoadingStateComponent } from '../../shared/components/bm-loading-stat
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- RIGHT COLUMN (Col 2): Dirham Symbol Watermark Badge at Right End -->
-            <div class="lg:col-span-2 flex items-center justify-end">
-              <div
-                class="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-slate-50/80 border border-slate-200/80 flex items-center justify-center text-slate-400/70 shadow-inner select-none transition-transform hover:scale-105 duration-300"
-              >
-                <dirham-symbol size="3.5em" weight="bold"></dirham-symbol>
-              </div>
-            </div>
+          <!-- RIGHT-END OVERFLOW DIRHAM WATERMARK (Background watermark only, soft low opacity) -->
+          <div
+            class="absolute -right-8 -bottom-10 text-slate-800 opacity-[0.04] pointer-events-none select-none z-0"
+          >
+            <dirham-symbol size="15em" weight="bold"></dirham-symbol>
           </div>
         </div>
 

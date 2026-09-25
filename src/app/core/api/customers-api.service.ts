@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse, PaginatedResponse, ListQueryParams } from './api.models';
-import { Customer, CreateCustomerDto } from '../../shared/models/customer.models';
+import { Customer, CustomerProfile, CreateCustomerDto } from '../../shared/models/customer.models';
 
 @Injectable({
   providedIn: 'root',
@@ -25,6 +25,10 @@ export class CustomersApiService {
 
   getCustomer(id: number): Observable<ApiResponse<Customer>> {
     return this.http.get<ApiResponse<Customer>>(`${this.baseUrl}/${id}`);
+  }
+
+  getCustomerProfile(id: number): Observable<ApiResponse<{ customer: Customer; profile: CustomerProfile }>> {
+    return this.http.get<ApiResponse<{ customer: Customer; profile: CustomerProfile }>>(`${this.baseUrl}/${id}/profile`);
   }
 
   createCustomer(dto: CreateCustomerDto): Observable<ApiResponse<Customer>> {

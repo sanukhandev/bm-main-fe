@@ -5,6 +5,7 @@ import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angula
 import { BillingApiService } from '../../core/api/billing-api.service';
 import { MaintenanceApiService } from '../../core/api/maintenance-api.service';
 import { Invoice, Quotation } from '../../shared/models/billing.models';
+import { uaeDateInput } from '../../shared/utils/uae-formatters';
 
 @Component({
   selector: 'bm-billing-form',
@@ -441,9 +442,9 @@ export class BillingFormComponent {
     description: [''],
     work_order_id: [''],
     vendor_id: [''],
-    quotation_date: [new Date().toLocaleDateString('en-CA'), Validators.required],
+    quotation_date: [uaeDateInput(), Validators.required],
     valid_until: [''],
-    invoice_date: [new Date().toLocaleDateString('en-CA'), Validators.required],
+    invoice_date: [uaeDateInput(), Validators.required],
     due_date: [''],
     tax_amount: [0, [Validators.required, Validators.min(0)]],
     lines: this.fb.array([this.line()]),
@@ -533,10 +534,10 @@ export class BillingFormComponent {
         quotation_date:
           'quotation_date' in record
             ? record.quotation_date
-            : new Date().toLocaleDateString('en-CA'),
+            : uaeDateInput(),
         valid_until: 'quotation_date' in record ? record.valid_until || '' : '',
         invoice_date:
-          'invoice_date' in record ? record.invoice_date : new Date().toLocaleDateString('en-CA'),
+          'invoice_date' in record ? record.invoice_date : uaeDateInput(),
         due_date: 'invoice_date' in record ? record.due_date || '' : '',
         tax_amount: Number(record.tax_amount),
       });

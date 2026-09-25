@@ -12,6 +12,7 @@ import { PropertiesApiService } from '../../core/api/properties-api.service';
 import { Customer } from '../../shared/models/customer.models';
 import { Property } from '../../shared/models/property.models';
 import { InstallmentItem, OwnerAgreement, PaymentMode } from '../../shared/models/agreement.models';
+import { uaeDateInput } from '../../shared/utils/uae-formatters';
 
 import {
   BmComboboxComponent,
@@ -683,8 +684,8 @@ export class TenantAgreementFormComponent implements OnInit {
 
     const perInstallment = total / count;
     const items: InstallmentItem[] = [];
-    let baseDate = startDateStr ? new Date(startDateStr) : new Date();
-    if (isNaN(baseDate.getTime())) baseDate = new Date();
+    let baseDate = new Date(`${startDateStr || uaeDateInput()}T12:00:00Z`);
+    if (isNaN(baseDate.getTime())) baseDate = new Date(`${uaeDateInput()}T12:00:00Z`);
 
     for (let i = 1; i <= count; i++) {
       const dueDate = new Date(baseDate);

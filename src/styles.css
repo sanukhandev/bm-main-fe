@@ -157,6 +157,41 @@ dirham-symbol svg {
   height: 1em !important;
 }
 
+/* Fluid top wave animation for hero net movement state overlays */
+@keyframes waveFlowTop {
+  0% {
+    transform: scaleY(1) translateY(0);
+  }
+  50% {
+    transform: scaleY(1.15) translateY(6px);
+  }
+  100% {
+    transform: scaleY(1) translateY(0);
+  }
+}
+
+@keyframes waveFlowTopSlow {
+  0% {
+    transform: scaleY(1.08) translateY(2px) scaleX(1);
+  }
+  50% {
+    transform: scaleY(0.92) translateY(8px) scaleX(1.02);
+  }
+  100% {
+    transform: scaleY(1.08) translateY(2px) scaleX(1);
+  }
+}
+
+.animate-wave-top {
+  animation: waveFlowTop 7s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+.animate-wave-top-slow {
+  animation: waveFlowTopSlow 11s ease-in-out infinite;
+  transform-origin: top center;
+}
+
 .bm-btn {
   display: inline-flex;
   align-items: center;

@@ -1218,10 +1218,7 @@ import { OwnerAgreement, AgreementInstallment } from '../../shared/models/agreem
               <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                 <div>
                   <label class="block font-semibold text-slate-700 mb-1">Direction</label>
-                  <select [(ngModel)]="paymentLine.direction" class="bm-input">
-                    <option value="outward">Outward</option>
-                    <option value="inward">Inward</option>
-                  </select>
+                  <div class="bm-input bg-slate-50 text-slate-600">Outward</div>
                 </div>
                 <div>
                   <label class="block font-semibold text-slate-700 mb-1">Category</label>
@@ -1667,6 +1664,7 @@ export class OwnerAgreementDetailComponent implements OnInit {
   bankReference = '';
   transferDate = new Date().toLocaleDateString('en-CA');
   paymentLineOpen = signal(false);
+  private profileActionHandled = false;
   holdModalOpen = signal(false);
   extendModalOpen = signal(false);
   renewModalOpen = signal(false);
@@ -1723,6 +1721,16 @@ export class OwnerAgreementDetailComponent implements OnInit {
         this.agreement.set(res.data);
         this.isLoading.set(false);
         this.isRefreshingPayments.set(false);
+        if (!this.profileActionHandled && this.route.snapshot.queryParamMap.get('action') === 'add-payment-line') {
+          this.profileActionHandled = true;
+          this.addExtraPayment();
+        } else if (!this.profileActionHandled) {
+          const paymentLineId = Number(this.route.snapshot.queryParamMap.get('payment_line'));
+          if (paymentLineId > 0) {
+            this.profileActionHandled = true;
+            this.openPaymentModal(paymentLineId);
+          }
+        }
       },
       error: (err) => {
         this.error.set(err.message || 'Owner agreement record not found.');
@@ -1979,6 +1987,7 @@ export class OwnerAgreementDetailComponent implements OnInit {
   }
 
   addExtraPayment(): void {
+    this.paymentLine.direction = 'outward';
     this.paymentLineOpen.set(true);
   }
 

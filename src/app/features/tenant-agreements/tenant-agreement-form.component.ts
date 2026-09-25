@@ -135,6 +135,7 @@ import {
                 <bm-combobox
                   formControlName="tenant_customer_id"
                   [options]="tenantOptions()"
+                  [locked]="tenantPrefilled()"
                   placeholder="Search or select tenant..."
                   searchPlaceholder="Search tenant by name, customer code, phone..."
                   [invalid]="isFieldInvalid('tenant_customer_id')"
@@ -270,6 +271,13 @@ import {
               <label class="block text-[13px] font-semibold text-[#26312C] mb-2">
                 Property Asset <span class="text-rose-600 font-bold ml-0.5">*</span>
               </label>
+              <input
+                type="search"
+                [value]="propertySearch()"
+                (input)="onPropertySearch($event)"
+                placeholder="Search available properties by code, name or unit..."
+                class="w-full h-11 mb-3 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium shadow-2xs focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
+              />
               <select
                 formControlName="selected_property_ids"
                 multiple
@@ -277,7 +285,7 @@ import {
                 class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium shadow-2xs focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
               >
                 <option value="">Select Property Asset...</option>
-                @for (prop of availableProperties(); track prop.id) {
+                @for (prop of filteredAvailableProperties(); track prop.id) {
                   <option [value]="prop.id">
                     [{{ prop.property_code }}] {{ prop.name }} (Property / Unit No.:
                     {{ prop.unit_number }})
@@ -537,10 +545,21 @@ export class TenantAgreementFormComponent implements OnInit {
 
   isEditMode = signal(false);
   agreementId = signal<number | null>(null);
+  tenantPrefilled = signal(false);
 
   tenants = signal<Customer[]>([]);
   ownerAgreements = signal<OwnerAgreement[]>([]);
   availableProperties = signal<Property[]>([]);
+  propertySearch = signal('');
+  filteredAvailableProperties = computed(() => {
+    const query = this.propertySearch().trim().toLowerCase();
+    if (!query) return this.availableProperties();
+    return this.availableProperties().filter((property) =>
+      [property.property_code, property.name, property.building_name, property.unit_number]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(query)),
+    );
+  });
 
   tenantOptions = computed<ComboboxOption[]>(() => {
     return this.tenants().map((tenant) => ({
@@ -622,18 +641,49 @@ export class TenantAgreementFormComponent implements OnInit {
       this.isEditMode.set(true);
       this.agreementId.set(Number(id));
       this.loadAgreement();
+    } else {
+      const tenantId = this.route.snapshot.queryParamMap.get('tenant_customer_id');
+      if (tenantId && /^\d+$/.test(tenantId)) {
+        this.tenantPrefilled.set(true);
+        this.agreementForm.patchValue({ tenant_customer_id: tenantId });
+      }
     }
   }
 
   loadTenants(): void {
+    const prefilledTenantId = Number(this.route.snapshot.queryParamMap.get('tenant_customer_id'));
+    if (prefilledTenantId > 0) {
+      this.customersApi.getCustomer(prefilledTenantId).subscribe({
+        next: (res) => {
+          this.tenants.set([res.data]);
+          this.applyPrefilledTenant([res.data]);
+        },
+      });
+      return;
+    }
+
     this.customersApi.getCustomers({ per_page: 100, role: 'tenant' }).subscribe({
-      next: (res) => this.tenants.set(res.data),
+      next: (res) => {
+        this.tenants.set(res.data);
+        this.applyPrefilledTenant(res.data);
+      },
       error: () => {
         this.customersApi.getCustomers({ per_page: 100 }).subscribe({
-          next: (res) => this.tenants.set(res.data),
+          next: (res) => {
+            this.tenants.set(res.data);
+            this.applyPrefilledTenant(res.data);
+          },
         });
       },
     });
+  }
+
+  private applyPrefilledTenant(tenants: Customer[]): void {
+    const tenantId = this.route.snapshot.queryParamMap.get('tenant_customer_id');
+    if (!this.isEditMode() && tenantId && tenants.some((tenant) => String(tenant.id) === tenantId)) {
+      this.tenantPrefilled.set(true);
+      this.agreementForm.patchValue({ tenant_customer_id: tenantId }, { emitEvent: false });
+    }
   }
 
   loadOwnerAgreements(): void {
@@ -722,6 +772,10 @@ export class TenantAgreementFormComponent implements OnInit {
     this.loadAvailableProperties();
   }
   onPropertyChange(): void {}
+
+  onPropertySearch(event: Event): void {
+    this.propertySearch.set((event.target as HTMLInputElement).value);
+  }
 
   isFieldInvalid(field: string): boolean {
     const control = this.agreementForm.get(field);

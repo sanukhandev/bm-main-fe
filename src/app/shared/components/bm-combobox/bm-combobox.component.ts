@@ -6,6 +6,8 @@ import {
   forwardRef,
   ElementRef,
   HostListener,
+  OnChanges,
+  SimpleChanges,
   signal,
   computed,
   inject,
@@ -42,9 +44,9 @@ export interface ComboboxOption {
         [class.ring-4]="isOpen()"
         [class.ring-emerald-500/10]="isOpen()"
         [class.border-rose-400]="invalid"
-        [class.bg-slate-50]="isDisabled"
-        [class.cursor-not-allowed]="isDisabled"
-        [class.cursor-pointer]="!isDisabled"
+        [class.bg-slate-50]="isDisabled || locked"
+        [class.cursor-not-allowed]="isDisabled || locked"
+        [class.cursor-pointer]="!isDisabled && !locked"
         class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium shadow-2xs flex items-center justify-between gap-2 transition-all duration-150 select-none"
       >
         <div class="flex items-center gap-2 truncate min-w-0 flex-1">
@@ -70,7 +72,7 @@ export interface ComboboxOption {
         </div>
 
         <div class="flex items-center gap-1.5 shrink-0 text-slate-400">
-          @if (clearable && selectedOption() && !isDisabled) {
+          @if (clearable && selectedOption() && !isDisabled && !locked) {
             <button
               type="button"
               (click)="clearSelection($event)"
@@ -215,7 +217,7 @@ export interface ComboboxOption {
     </div>
   `,
 })
-export class BmComboboxComponent implements ControlValueAccessor {
+export class BmComboboxComponent implements ControlValueAccessor, OnChanges {
   private elementRef = inject(ElementRef);
 
   @Input() options: ComboboxOption[] = [];
@@ -224,11 +226,13 @@ export class BmComboboxComponent implements ControlValueAccessor {
   @Input() emptyMessage = 'No matching results found';
   @Input() invalid = false;
   @Input() clearable = true;
+  @Input() locked = false;
 
   @Output() change = new EventEmitter<number | string | null>();
   @Output() selectOption = new EventEmitter<ComboboxOption | null>();
 
   selectedValue = signal<number | string | null>(null);
+  private optionsVersion = signal(0);
   isOpen = signal(false);
   searchQuery = '';
   isDisabled = false;
@@ -237,12 +241,14 @@ export class BmComboboxComponent implements ControlValueAccessor {
   private onTouched: () => void = () => {};
 
   selectedOption = computed(() => {
+    this.optionsVersion();
     const val = this.selectedValue();
     if (val === null || val === undefined || val === '') return null;
     return this.options.find((opt) => String(opt.id) === String(val)) || null;
   });
 
   filteredOptions = computed(() => {
+    this.optionsVersion();
     const query = this.searchQuery.trim().toLowerCase();
     if (!query) return this.options;
     return this.options.filter((opt) => {
@@ -270,8 +276,12 @@ export class BmComboboxComponent implements ControlValueAccessor {
     if (isDisabled) this.isOpen.set(false);
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['options']) this.optionsVersion.update((version) => version + 1);
+  }
+
   toggleOpen(): void {
-    if (this.isDisabled) return;
+    if (this.isDisabled || this.locked) return;
     this.isOpen.update((open) => !open);
     if (this.isOpen()) {
       this.searchQuery = '';

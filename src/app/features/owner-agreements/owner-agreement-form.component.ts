@@ -134,6 +134,7 @@ import {
                 <bm-combobox
                   formControlName="owner_customer_id"
                   [options]="ownerOptions()"
+                  [locked]="ownerPrefilled()"
                   placeholder="Search or select property owner..."
                   searchPlaceholder="Search owner by name, code, phone..."
                   (change)="onOwnerChange()"
@@ -542,6 +543,7 @@ export class OwnerAgreementFormComponent implements OnInit {
 
   isEditMode = signal(false);
   agreementId = signal<number | null>(null);
+  ownerPrefilled = signal(false);
 
   owners = signal<Customer[]>([]);
   allOwnerProperties = signal<Property[]>([]);
@@ -621,23 +623,61 @@ export class OwnerAgreementFormComponent implements OnInit {
       this.isEditMode.set(true);
       this.agreementId.set(Number(id));
       this.loadAgreement();
+    } else {
+      const ownerId = this.route.snapshot.queryParamMap.get('owner_customer_id');
+      if (ownerId && /^\d+$/.test(ownerId)) {
+        this.ownerPrefilled.set(true);
+        this.agreementForm.patchValue({ owner_customer_id: ownerId });
+      }
     }
   }
 
   loadOwners(): void {
+    const prefilledOwnerId = Number(this.route.snapshot.queryParamMap.get('owner_customer_id'));
+    if (prefilledOwnerId > 0) {
+      this.customersApi.getCustomer(prefilledOwnerId).subscribe({
+        next: (res) => {
+          this.owners.set([res.data]);
+          this.applyPrefilledOwner([res.data]);
+        },
+      });
+      return;
+    }
+
     this.customersApi.getCustomers({ per_page: 100, role: 'owner' }).subscribe({
-      next: (res) => this.owners.set(res.data),
+      next: (res) => {
+        this.owners.set(res.data);
+        this.applyPrefilledOwner(res.data);
+      },
       error: () => {
         this.customersApi.getCustomers({ per_page: 100 }).subscribe({
-          next: (res) => this.owners.set(res.data),
+          next: (res) => {
+            this.owners.set(res.data);
+            this.applyPrefilledOwner(res.data);
+          },
         });
       },
     });
   }
 
+  private applyPrefilledOwner(owners: Customer[]): void {
+    const ownerId = this.route.snapshot.queryParamMap.get('owner_customer_id');
+    if (!this.isEditMode() && ownerId && owners.some((owner) => String(owner.id) === ownerId)) {
+      this.ownerPrefilled.set(true);
+      this.agreementForm.patchValue({ owner_customer_id: ownerId }, { emitEvent: false });
+    }
+  }
+
   loadProperties(): void {
     this.propertiesApi.getProperties({ per_page: 100, status: 'active' }).subscribe({
-      next: (res) => this.allOwnerProperties.set(res.data),
+      next: (res) => {
+        this.allOwnerProperties.set(res.data);
+        const propertyId = this.route.snapshot.queryParamMap.get('property_id');
+        if (!this.isEditMode() && propertyId && /^\d+$/.test(propertyId)) {
+          const id = Number(propertyId);
+          if (res.data.some((property) => property.id === id)) this.selectedPropertyIds.set([id]);
+        }
+      },
     });
   }
 

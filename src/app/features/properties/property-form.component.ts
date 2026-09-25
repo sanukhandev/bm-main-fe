@@ -116,6 +116,7 @@ import {
               <bm-combobox
                 formControlName="owner_customer_id"
                 [options]="ownerOptions()"
+                [locked]="ownerPrefilled()"
                 placeholder="Search or select property owner..."
                 searchPlaceholder="Search owner by name, code, phone..."
                 [invalid]="isFieldInvalid('owner_customer_id')"
@@ -480,6 +481,7 @@ export class PropertyFormComponent implements OnInit {
 
   isEditMode = signal(false);
   propertyId = signal<number | null>(null);
+  ownerPrefilled = signal(false);
 
   owners = signal<Customer[]>([]);
 
@@ -519,21 +521,50 @@ export class PropertyFormComponent implements OnInit {
       this.isEditMode.set(true);
       this.propertyId.set(Number(id));
       this.loadProperty();
+    } else {
+      const ownerId = this.route.snapshot.queryParamMap.get('owner_customer_id');
+      if (ownerId && /^\d+$/.test(ownerId)) {
+        this.ownerPrefilled.set(true);
+        this.propertyForm.patchValue({ owner_customer_id: ownerId });
+      }
     }
   }
 
   loadOwners(): void {
+    const prefilledOwnerId = Number(this.route.snapshot.queryParamMap.get('owner_customer_id'));
+    if (prefilledOwnerId > 0) {
+      this.customersApi.getCustomer(prefilledOwnerId).subscribe({
+        next: (res) => {
+          this.owners.set([res.data]);
+          this.applyPrefilledOwner([res.data]);
+        },
+      });
+      return;
+    }
+
     this.customersApi.getCustomers({ per_page: 100, role: 'owner' }).subscribe({
       next: (res) => {
         this.owners.set(res.data);
+        this.applyPrefilledOwner(res.data);
       },
       error: () => {
         // Fallback to fetch all if role filter is unsupported
         this.customersApi.getCustomers({ per_page: 100 }).subscribe({
-          next: (res) => this.owners.set(res.data),
+          next: (res) => {
+            this.owners.set(res.data);
+            this.applyPrefilledOwner(res.data);
+          },
         });
       },
     });
+  }
+
+  private applyPrefilledOwner(owners: Customer[]): void {
+    const ownerId = this.route.snapshot.queryParamMap.get('owner_customer_id');
+    if (!this.isEditMode() && ownerId && owners.some((owner) => String(owner.id) === ownerId)) {
+      this.ownerPrefilled.set(true);
+      this.propertyForm.patchValue({ owner_customer_id: ownerId }, { emitEvent: false });
+    }
   }
 
   loadProperty(): void {

@@ -121,15 +121,15 @@ import {
         <div
           class="rounded-2xl sm:rounded-3xl border border-[#E2E8F0] bg-white relative overflow-hidden p-6 sm:p-8 shadow-[0_12px_36px_rgba(15,23,42,0.06)] hover:shadow-[0_20px_45px_rgba(15,23,42,0.09)] transition-all duration-300 min-h-[320px] flex flex-col justify-between"
         >
-          <!-- Top Fluid Wave Animation Overlay (Green for Positive, Red for Negative, Hidden for Zero) -->
+          <!-- Bottom Fluid Wave Animation Overlay (Green for Positive, Red for Negative, Hidden for Zero) -->
           <div
-            class="absolute top-0 inset-x-0 h-44 sm:h-52 pointer-events-none overflow-hidden z-0 transition-opacity duration-500"
+            class="absolute bottom-0 inset-x-0 h-44 sm:h-52 pointer-events-none overflow-hidden z-0 transition-opacity duration-500"
             [class.opacity-100]="!isNetMovementZero()"
             [class.opacity-0]="isNetMovementZero()"
           >
             <!-- Background Gradient Tint -->
             <div
-              class="absolute inset-0 transition-colors duration-500 bg-gradient-to-b"
+              class="absolute inset-0 transition-colors duration-500 bg-gradient-to-t"
               [class.from-emerald-500/15]="isNetMovementPositive()"
               [class.via-emerald-500/5]="isNetMovementPositive()"
               [class.from-rose-500/15]="isNetMovementNegative()"
@@ -139,7 +139,7 @@ import {
 
             <!-- Secondary Soft Background Wave Silhouette -->
             <svg
-              class="absolute top-0 inset-x-0 w-full h-full animate-wave-top-slow transition-colors duration-500 select-none opacity-40"
+              class="absolute bottom-0 inset-x-0 w-full h-full animate-wave-bottom-slow transition-colors duration-500 select-none opacity-40"
               [class.text-emerald-500/25]="isNetMovementPositive()"
               [class.text-rose-500/25]="isNetMovementNegative()"
               [class.text-transparent]="isNetMovementZero()"
@@ -148,13 +148,13 @@ import {
               fill="currentColor"
             >
               <path
-                d="M0,0 L1440,0 L1440,60 C1200,30 1000,80 800,45 C600,75 400,25 200,65 C100,85 50,45 0,35 Z"
+                d="M0,45 C200,85 400,35 600,65 C800,25 1000,70 1200,40 C1300,25 1380,60 1440,50 L1440,120 L0,120 Z"
               ></path>
             </svg>
 
-            <!-- Primary Animated SVG Top Wave Silhouette -->
+            <!-- Primary Animated SVG Bottom Wave Silhouette -->
             <svg
-              class="absolute top-0 inset-x-0 w-full h-full animate-wave-top transition-colors duration-500 select-none"
+              class="absolute bottom-0 inset-x-0 w-full h-full animate-wave-bottom transition-colors duration-500 select-none"
               [class.text-emerald-500/20]="isNetMovementPositive()"
               [class.text-rose-500/20]="isNetMovementNegative()"
               [class.text-transparent]="isNetMovementZero()"
@@ -163,7 +163,7 @@ import {
               fill="currentColor"
             >
               <path
-                d="M0,0 L1440,0 L1440,40 C1280,75 1120,25 960,60 C800,95 640,30 480,70 C320,105 160,35 0,55 Z"
+                d="M0,65 C160,25 320,95 480,50 C640,10 800,75 960,35 C1120,70 1280,20 1440,55 L1440,120 L0,120 Z"
               ></path>
             </svg>
           </div>

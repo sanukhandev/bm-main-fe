@@ -1,4 +1,13 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  inject,
+  signal,
+  computed,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -29,6 +38,32 @@ import {
     <div class="max-w-[1240px] w-full mx-auto pb-12">
       <!-- Page Header -->
       <bm-page-header [title]="pageTitle()" [subtitle]="pageSubtitle()">
+        @if (!isEditMode() && workflowRole()) {
+          <input
+            #identityDocument
+            type="file"
+            accept="image/jpeg,image/png,application/pdf"
+            capture="environment"
+            class="hidden"
+            (change)="onIdentityDocumentSelected($event)"
+          />
+          <button
+            type="button"
+            class="bm-btn bm-btn-primary text-xs font-semibold"
+            [disabled]="isExtractingIdentity()"
+            (click)="openIdentityCamera(identityDocument)"
+          >
+            {{ isExtractingIdentity() ? 'Reading ID…' : 'Scan with Camera' }}
+          </button>
+          <button
+            type="button"
+            class="bm-btn bm-btn-secondary text-xs font-semibold"
+            [disabled]="isExtractingIdentity()"
+            (click)="identityDocument.click()"
+          >
+            Upload ID
+          </button>
+        }
         <a
           [routerLink]="cancelRoute()"
           class="bm-btn bm-btn-secondary text-xs font-semibold px-4 py-2 rounded-xl border border-slate-200 shadow-xs hover:bg-slate-100 transition"
@@ -66,6 +101,15 @@ import {
                 <div class="font-semibold text-rose-900 mb-0.5">Submission Error</div>
                 <div>{{ serverError() }}</div>
               </div>
+            </div>
+          }
+
+          @if (identityExtractionNotice()) {
+            <div
+              class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs font-medium text-amber-900"
+            >
+              {{ identityExtractionNotice() }} Review the populated fields, enter and confirm the
+              phone number, then submit manually.
             </div>
           }
 
@@ -421,12 +465,18 @@ import {
 
               <!-- Country Code -->
               <div>
-                <label class="block text-[13px] font-semibold text-[#26312C] mb-2"> Country </label>
+                <label
+                  class="block text-[13px] font-semibold text-[#26312C] mb-2 flex items-center justify-between"
+                >
+                  <span>Country</span>
+                  <span class="text-[11px] text-slate-400 font-normal">Fixed (UAE)</span>
+                </label>
                 <input
                   type="text"
                   formControlName="country_code"
                   placeholder="AE"
-                  class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium shadow-2xs placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
+                  readonly
+                  class="w-full h-11 px-3.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 text-sm font-semibold tabular-nums cursor-not-allowed select-none placeholder:text-slate-400 placeholder:font-normal focus:outline-none"
                 />
               </div>
             </div>
@@ -522,10 +572,58 @@ import {
           </div>
         </form>
       }
+      @if (cameraOpen()) {
+        <div
+          class="fixed inset-0 z-50 bg-slate-950/80 flex items-center justify-center p-4"
+          (click)="closeIdentityCamera()"
+        >
+          <div
+            class="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden"
+            (click)="$event.stopPropagation()"
+          >
+            <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
+              <div>
+                <h2 class="font-semibold text-slate-900">Scan Emirates ID</h2>
+                <p class="text-xs text-slate-500 mt-1">
+                  Position the document clearly inside the camera view.
+                </p>
+              </div>
+              <button type="button" class="text-slate-500 text-xl" (click)="closeIdentityCamera()">
+                ×
+              </button>
+            </div>
+            <div class="bg-slate-950 aspect-video flex items-center justify-center">
+              <video
+                #cameraPreview
+                autoplay
+                playsinline
+                muted
+                class="w-full h-full object-contain"
+              ></video>
+            </div>
+            <div class="p-4 flex justify-end gap-3">
+              <button
+                type="button"
+                class="bm-btn bm-btn-secondary text-xs"
+                (click)="closeIdentityCamera()"
+              >
+                Cancel</button
+              ><button
+                type="button"
+                class="bm-btn bm-btn-primary text-xs"
+                [disabled]="isExtractingIdentity()"
+                (click)="captureIdentityCamera()"
+              >
+                {{ isExtractingIdentity() ? 'Reading ID…' : 'Capture & Read' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      }
     </div>
   `,
 })
-export class CustomerFormComponent implements OnInit {
+export class CustomerFormComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private api = inject(CustomersApiService);
   private route = inject(ActivatedRoute);
@@ -538,8 +636,14 @@ export class CustomerFormComponent implements OnInit {
 
   isLoading = signal(false);
   isSubmitting = signal(false);
+  isExtractingIdentity = signal(false);
   error = signal<string | null>(null);
   serverError = signal<string | null>(null);
+  identityExtractionNotice = signal<string | null>(null);
+  identityAssisted = signal(false);
+  cameraOpen = signal(false);
+  @ViewChild('cameraPreview') cameraPreview?: ElementRef<HTMLVideoElement>;
+  private cameraStream?: MediaStream;
 
   selectedRoles = signal<CustomerRole[]>(['tenant']);
   workflowRole = signal<CustomerRole | null>(null);
@@ -627,6 +731,105 @@ export class CustomerFormComponent implements OnInit {
     if (!current || current.trim() === '') {
       this.customerForm.get('phone')?.setValue('+971 ');
     }
+  }
+
+  onIdentityDocumentSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const document = input.files?.[0];
+    input.value = '';
+    if (!document) return;
+    this.extractIdentityDocument(document);
+  }
+
+  async openIdentityCamera(fileInput: HTMLInputElement): Promise<void> {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      fileInput.click();
+      return;
+    }
+
+    try {
+      this.cameraStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' } },
+        audio: false,
+      });
+      this.cameraOpen.set(true);
+      setTimeout(() => {
+        const video = this.cameraPreview?.nativeElement;
+        if (video && this.cameraStream) video.srcObject = this.cameraStream;
+      });
+    } catch {
+      this.identityExtractionNotice.set(
+        'Camera access is unavailable. Use the file upload option instead.',
+      );
+      fileInput.click();
+    }
+  }
+
+  closeIdentityCamera(): void {
+    this.stopCamera();
+    this.cameraOpen.set(false);
+  }
+
+  captureIdentityCamera(): void {
+    const video = this.cameraPreview?.nativeElement;
+    if (!video || video.videoWidth === 0 || video.videoHeight === 0) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d')?.drawImage(video, 0, 0, canvas.width, canvas.height);
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) return;
+        this.closeIdentityCamera();
+        this.extractIdentityDocument(
+          new File([blob], 'emirates-id-camera.jpg', { type: 'image/jpeg' }),
+        );
+      },
+      'image/jpeg',
+      0.92,
+    );
+  }
+
+  private extractIdentityDocument(document: File): void {
+    const role = this.workflowRole();
+    if (!role) return;
+    this.isExtractingIdentity.set(true);
+    this.serverError.set(null);
+    this.api.extractIdentity(document, role).subscribe({
+      next: (response) => {
+        const fields = response.data.fields;
+        this.customerForm.patchValue({
+          display_name: fields.display_name || '',
+          legal_name: fields.legal_name || '',
+          identity_no: fields.identity_no ? formatEmiratesId(fields.identity_no) : '',
+          country_code: fields.country_code || 'AE',
+          state_or_emirate: fields.state_or_emirate || 'Dubai',
+          city: fields.city || 'Dubai',
+          address_line_1: fields.address_line_1 || '',
+          phone: '',
+        });
+        this.identityAssisted.set(true);
+        this.identityExtractionNotice.set(
+          'Identity details were extracted as draft form values only.',
+        );
+        this.isExtractingIdentity.set(false);
+      },
+      error: (err) => {
+        this.serverError.set(
+          err.error?.message || err.message || 'Unable to read the identity document.',
+        );
+        this.isExtractingIdentity.set(false);
+      },
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.stopCamera();
+  }
+
+  private stopCamera(): void {
+    this.cameraStream?.getTracks().forEach((track) => track.stop());
+    this.cameraStream = undefined;
   }
 
   ngOnInit(): void {
@@ -734,6 +937,17 @@ export class CustomerFormComponent implements OnInit {
 
     if (this.selectedRoles().length === 0) {
       this.serverError.set('Please select at least one business role (Owner or Tenant).');
+      return;
+    }
+
+    if (
+      this.identityAssisted() &&
+      (this.customerForm.get('phone')?.value || '').replace(/\D/g, '').length < 11
+    ) {
+      this.serverError.set(
+        'Enter and confirm the phone number before submitting the extracted identity details.',
+      );
+      this.customerForm.get('phone')?.markAsTouched();
       return;
     }
 

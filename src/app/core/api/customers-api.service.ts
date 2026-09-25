@@ -55,4 +55,5 @@ export interface IdentityExtraction {
   fields: Partial<Pick<Customer, 'display_name' | 'legal_name' | 'identity_no' | 'country_code' | 'state_or_emirate' | 'city' | 'address_line_1'>>;
   confidence: Record<string, number>;
   warnings: string[];
+  verification_token: string | null;
 }

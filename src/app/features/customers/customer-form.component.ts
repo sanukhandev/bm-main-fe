@@ -335,14 +335,23 @@ import {
               <!-- Dynamic ID Field -->
               @if (customerType() === 'individual') {
                 <div>
-                  <label class="block text-[13px] font-semibold text-[#26312C] mb-2">
-                    Emirates ID / National ID
-                  </label>
-                  <input
-                    type="text"
-                    formControlName="identity_no"
+                   <label class="block text-[13px] font-semibold text-[#26312C] mb-2 flex items-center gap-2">
+                     Emirates ID / National ID
+                     @if (identityVerified()) {
+                       <span class="inline-flex items-center gap-1 text-emerald-700 text-[11px] font-bold" title="Verified Emirates ID">
+                         <span class="inline-flex items-center justify-center w-4 h-4 rounded-full bg-emerald-100">✓</span>
+                         Verified
+                       </span>
+                     }
+                   </label>
+                   <input
+                     type="text"
+                     formControlName="identity_no"
                     placeholder="784-1990-1234567-1"
-                    (input)="onEmiratesIdInput($event)"
+                     (input)="onEmiratesIdInput($event)"
+                     [readonly]="identityVerified()"
+                     [class.bg-slate-100]="identityVerified()"
+                     [class.cursor-not-allowed]="identityVerified()"
                     [attr.aria-invalid]="isFieldInvalid('identity_no')"
                     aria-describedby="identity_no-error"
                     class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium tabular-nums shadow-2xs placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
@@ -640,7 +649,9 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
   error = signal<string | null>(null);
   serverError = signal<string | null>(null);
   identityExtractionNotice = signal<string | null>(null);
-  identityAssisted = signal(false);
+   identityAssisted = signal(false);
+   identityVerified = signal(false);
+   identityVerificationToken = signal<string | null>(null);
   cameraOpen = signal(false);
   @ViewChild('cameraPreview') cameraPreview?: ElementRef<HTMLVideoElement>;
   private cameraStream?: MediaStream;
@@ -718,6 +729,10 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
     const input = event.target as HTMLInputElement;
     const formatted = formatEmiratesId(input.value);
     this.customerForm.get('identity_no')?.setValue(formatted, { emitEvent: false });
+    if (this.identityVerificationToken()) {
+      this.identityVerificationToken.set(null);
+      this.identityAssisted.set(false);
+    }
   }
 
   onPhoneInput(event: Event): void {
@@ -808,7 +823,8 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
           address_line_1: fields.address_line_1 || '',
           phone: '',
         });
-        this.identityAssisted.set(true);
+         this.identityAssisted.set(true);
+         this.identityVerificationToken.set(response.data.verification_token);
         this.identityExtractionNotice.set(
           'Identity details were extracted as draft form values only.',
         );
@@ -881,7 +897,7 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
           this.customerRole.set('tenant');
         }
 
-        this.customerForm.patchValue({
+         this.customerForm.patchValue({
           customer_type: cust.customer_type,
           display_name: cust.display_name,
           legal_name: cust.legal_name || '',
@@ -895,7 +911,8 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
           state_or_emirate: cust.state_or_emirate || 'Dubai',
           country_code: cust.country_code || 'AE',
           notes: cust.notes || '',
-        });
+         });
+         this.identityVerified.set(Boolean(cust.identity_verified));
         this.isLoading.set(false);
       },
       error: (err) => {
@@ -963,6 +980,7 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
       email: val.email || null,
       tax_registration_no: val.tax_registration_no || null,
       identity_no: val.identity_no || null,
+      identity_verification_token: this.identityVerificationToken(),
       company_registration_no: val.company_registration_no || null,
       address_line_1: val.address_line_1 || null,
       city: val.city || null,

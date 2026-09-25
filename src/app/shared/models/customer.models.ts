@@ -26,6 +26,45 @@ export interface Customer {
   updated_at?: string;
 }
 
+export interface CustomerProfile {
+  properties: CustomerProperty[];
+  agreements: { owner: CustomerAgreement[]; tenant: CustomerAgreement[] };
+  transactions: { data: CustomerTransaction[]; total: number; truncated: boolean };
+  financial_restricted: boolean;
+}
+
+export interface CustomerProperty {
+  id: number;
+  property_code: string;
+  name?: string | null;
+  building_name?: string | null;
+  unit_number?: string | null;
+  property_type?: string | null;
+  status?: string | null;
+}
+
+export interface CustomerAgreement {
+  id: number;
+  agreement_no: string;
+  start_date: string;
+  end_date: string;
+  status: string;
+  total_amount: string;
+  properties: CustomerProperty[];
+}
+
+export interface CustomerTransaction {
+  id: number;
+  document_no: string;
+  transaction_date: string;
+  direction: string;
+  payment_mode: string;
+  amount: string;
+  status: string;
+  remarks?: string | null;
+  agreement_numbers: string[];
+}
+
 export interface CreateCustomerDto {
   customer_code?: string;
   customer_type: CustomerType;

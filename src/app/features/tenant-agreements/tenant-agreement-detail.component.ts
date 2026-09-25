@@ -10,6 +10,7 @@ import { BmAgreementPrintSheetComponent } from '../../shared/components/bm-agree
 import { TenantAgreementsApiService } from '../../core/api/tenant-agreements-api.service';
 import { AccountTransaction } from '../../core/api/accounts-api.service';
 import { TenantAgreement, AgreementInstallment } from '../../shared/models/agreement.models';
+import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
 
 @Component({
   selector: 'bm-tenant-agreement-detail',
@@ -1628,14 +1629,14 @@ export class TenantAgreementDetailComponent implements OnInit {
   paymentPosting = false;
   paymentItemId = 0;
   paymentAmount = 0;
-  paymentDate = new Date().toLocaleDateString('en-CA');
+  paymentDate = uaeDateInput();
   paymentMode: 'cash' | 'cheque' | 'bank_transfer' = 'cash';
   paymentRemarks = '';
   chequeNo = '';
-  chequeDate = new Date().toLocaleDateString('en-CA');
+  chequeDate = uaeDateInput();
   bankName = '';
   bankReference = '';
-  transferDate = new Date().toLocaleDateString('en-CA');
+  transferDate = uaeDateInput();
   paymentLineOpen = signal(false);
   private profileActionHandled = false;
   holdModalOpen = signal(false);
@@ -1657,13 +1658,13 @@ export class TenantAgreementDetailComponent implements OnInit {
     category: '',
     particulars: '',
     amount: 0,
-    due_date: new Date().toLocaleDateString('en-CA'),
+    due_date: uaeDateInput(),
     payment_mode: 'cash' as 'cash' | 'cheque' | 'bank_transfer',
     cheque_no: '',
-    cheque_date: new Date().toLocaleDateString('en-CA'),
+    cheque_date: uaeDateInput(),
     bank_name: '',
     bank_reference: '',
-    transfer_date: new Date().toLocaleDateString('en-CA'),
+    transfer_date: uaeDateInput(),
     terms: '',
   };
   error = signal<string | null>(null);
@@ -1791,7 +1792,7 @@ export class TenantAgreementDetailComponent implements OnInit {
     if (!item || item.is_extra || item.status === 'paid') return;
     this.paymentItemId = Number(id);
     this.paymentAmount = Number(item.balance);
-    this.paymentDate = new Date().toLocaleDateString('en-CA');
+    this.paymentDate = uaeDateInput();
     this.chequeDate = this.paymentDate;
     this.transferDate = this.paymentDate;
     this.paymentMode = 'cash';
@@ -1995,16 +1996,7 @@ export class TenantAgreementDetailComponent implements OnInit {
     });
   }
 
-  formatDate(dateStr?: string | null): string {
-    if (!dateStr) return '—';
-    try {
-      const d = new Date(dateStr);
-      if (isNaN(d.getTime())) return dateStr;
-      return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-    } catch {
-      return dateStr;
-    }
-  }
+  formatDate(dateStr?: string | null): string { return formatUaeDate(dateStr); }
 
   formatAmount(val: string | number | undefined | null): string {
     const num = Number(val || 0);
@@ -2111,7 +2103,7 @@ export class TenantAgreementDetailComponent implements OnInit {
       direction: item.direction || 'inward',
       transaction_date: receiptObj?.created_at
         ? receiptObj.created_at.slice(0, 10)
-        : receiptObj?.transaction_date || item.due_date || new Date().toISOString().slice(0, 10),
+        : receiptObj?.transaction_date || item.due_date || uaeDateInput(),
       payment_mode: item.payment_mode || agr.payment_mode || 'cash',
       amount: String(amountVal || 0),
       remarks:

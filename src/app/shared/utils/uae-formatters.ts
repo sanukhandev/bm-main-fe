@@ -1,5 +1,32 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
+export const UAE_TIME_ZONE = 'Asia/Dubai';
+
+export function uaeDateInput(date = new Date()): string {
+  const parts = new Intl.DateTimeFormat('en', {
+    timeZone: UAE_TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+  return `${values['year']}-${values['month']}-${values['day']}`;
+}
+
+export function formatUaeDate(value: string | Date | null | undefined): string {
+  if (!value) return '—';
+  const date = typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)
+    ? new Date(`${value}T12:00:00Z`)
+    : new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+  return new Intl.DateTimeFormat('en-GB', {
+    timeZone: UAE_TIME_ZONE,
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  }).format(date);
+}
+
 /**
  * Format Emirates ID into 784-YYYY-XXXXXXX-X
  */

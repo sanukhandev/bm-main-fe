@@ -9,6 +9,7 @@ import {
   WorkOrder,
   WorkOrderPayment,
 } from '../../shared/models/maintenance.models';
+import { uaeDateInput } from '../../shared/utils/uae-formatters';
 import { BmStatusBadgeComponent } from '../../shared/components/bm-status-badge/bm-status-badge.component';
 import { BmLoadingStateComponent } from '../../shared/components/bm-loading-state/bm-loading-state.component';
 import { BmSpinnerComponent } from '../../shared/components/bm-spinner/bm-spinner.component';
@@ -377,7 +378,7 @@ export class WorkOrderDetailComponent {
     category: ['', Validators.required],
     particulars: ['', Validators.required],
     amount: [0, [Validators.required, Validators.min(0.01)]],
-    due_date: [new Date().toLocaleDateString('en-CA')],
+    due_date: [uaeDateInput()],
     payment_mode: ['cash', Validators.required],
     terms: [''],
     remarks: [''],

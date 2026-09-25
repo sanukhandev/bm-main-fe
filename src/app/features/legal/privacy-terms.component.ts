@@ -1,6 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BmPageHeaderComponent } from '../../shared/components/bm-page-header/bm-page-header.component';
+import { uaeDateInput } from '../../shared/utils/uae-formatters';
 
 type LegalTab = 'all' | 'privacy' | 'terms';
 
@@ -370,7 +371,7 @@ type LegalTab = 'all' | 'privacy' | 'terms';
 })
 export class PrivacyTermsComponent {
   activeTab = signal<LegalTab>('all');
-  currentDate = new Date();
+  currentDate = new Date(`${uaeDateInput()}T12:00:00Z`);
 
   printDocument(): void {
     window.print();

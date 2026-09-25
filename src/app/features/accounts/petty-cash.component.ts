@@ -15,6 +15,7 @@ import { BmReceiptChequeModalComponent } from '../../shared/components/bm-receip
 import { BmSearchInputComponent } from '../../shared/components/bm-search-input/bm-search-input.component';
 import { BmPaginationComponent } from '../../shared/components/bm-pagination/bm-pagination.component';
 import { PaginationMeta } from '../../core/api/api.models';
+import { uaeDateInput } from '../../shared/utils/uae-formatters';
 
 @Component({
   selector: 'bm-petty-cash',
@@ -273,7 +274,7 @@ export class PettyCashComponent implements OnInit {
   hasActiveFilters = computed(() => !!this.searchQuery() || this.selectedDirection() !== 'all');
 
   entryForm = this.fb.nonNullable.group({
-    transaction_date: [new Date().toLocaleDateString('en-CA'), Validators.required],
+    transaction_date: [uaeDateInput(), Validators.required],
     direction: ['outward' as 'inward' | 'outward', Validators.required],
     amount: [0, [Validators.required, Validators.min(0.01)]],
     particulars: ['', Validators.required],

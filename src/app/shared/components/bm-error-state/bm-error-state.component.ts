@@ -7,14 +7,20 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   template: `
     <div
-      class="bm-card p-8 border border-[#B98D91]/30 bg-[#B98D91]/10 text-center flex flex-col items-center justify-center my-6 rounded-xl"
+      class="rounded-2xl sm:rounded-3xl border border-rose-200/90 bg-gradient-to-br from-white via-rose-50/50 to-slate-50 p-6 sm:p-8 shadow-[0_10px_30px_rgba(244,63,94,0.06)] relative overflow-hidden text-center flex flex-col items-center justify-center my-6 transition-all duration-300 font-sans"
     >
+      <!-- Background Ambient Glow Overlay -->
       <div
-        class="w-10 h-10 rounded-lg bg-[#B98D91]/20 text-[#1B1E1C] flex items-center justify-center mb-3"
+        class="absolute inset-0 bg-gradient-to-b from-rose-500/5 via-transparent to-transparent pointer-events-none z-0"
+      ></div>
+
+      <!-- Icon Container with Subtle Breathing Animation -->
+      <div
+        class="w-12 h-12 rounded-2xl bg-rose-100/80 text-rose-600 border border-rose-200/90 flex items-center justify-center mb-3 shadow-2xs shrink-0 relative z-10 transition-transform duration-300 hover:scale-105"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5"
+          class="h-6 w-6 text-rose-600 animate-pulse"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -28,18 +34,42 @@ import { CommonModule } from '@angular/common';
         </svg>
       </div>
 
-      <h4 class="text-xs font-semibold uppercase tracking-[0.08em] text-[#1B1E1C] mb-1">
-        {{ title }}
-      </h4>
-      <p class="text-xs text-[#1B1E1C]/80 max-w-md mb-4 font-normal">{{ message }}</p>
+      <!-- Error Category Badge -->
+      <span
+        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-100/90 text-rose-800 border border-rose-200/80 text-[11px] font-extrabold uppercase tracking-wider mb-2 relative z-10"
+      >
+        <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span>
+        <span>{{ title }}</span>
+      </span>
+
+      <!-- Error Message text with High Readability -->
+      <p
+        class="text-xs sm:text-sm text-slate-800 font-semibold max-w-md leading-relaxed text-center relative z-10 my-1"
+      >
+        {{ message }}
+      </p>
 
       @if (showRetry) {
         <button
           type="button"
           (click)="retry.emit()"
-          class="bm-btn bm-btn-secondary border-[#B98D91]/40 text-[#1B1E1C]"
+          class="group mt-4 px-5 py-2.5 rounded-xl border border-rose-200/90 bg-white text-rose-700 hover:bg-rose-50 hover:text-rose-800 hover:border-rose-300 text-xs font-extrabold shadow-2xs transition-all duration-200 flex items-center gap-2 cursor-pointer relative z-10"
         >
-          Try again
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4 text-rose-600 transition-transform group-hover:rotate-180 duration-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+            />
+          </svg>
+          <span>Try again</span>
         </button>
       }
     </div>

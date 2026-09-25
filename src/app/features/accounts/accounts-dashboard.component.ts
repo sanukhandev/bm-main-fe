@@ -256,24 +256,24 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
                     </span>
                   </div>
 
-                  <div class="flex items-center gap-3 text-xs text-[#64748B]">
+                  <div class="flex items-center gap-2 text-xs text-[#64748B]">
                     <span class="font-medium"
                       >Scope: {{ activeBranch()?.name || 'All Branches' }}</span
                     >
                     <span>•</span>
                     <span
-                      class="inline-flex items-center gap-1 font-semibold px-2.5 py-0.5 rounded-md border border-[#E2E8F0] bg-slate-50 transition-colors duration-300"
+                      class="font-semibold transition-colors duration-300"
                       [class.text-[#047857]]="isNetMovementPositive()"
                       [class.text-[#DC2626]]="isNetMovementNegative()"
                       [class.text-[#64748B]]="isNetMovementZero()"
                     >
-                      <span>{{
+                      {{
                         isNetMovementNegative()
                           ? '- Net Outflow'
                           : isNetMovementPositive()
                             ? '+ Net Inflow'
                             : '0 Balance'
-                      }}</span>
+                      }}
                     </span>
                   </div>
                 </div>

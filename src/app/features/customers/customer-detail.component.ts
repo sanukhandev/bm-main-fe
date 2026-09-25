@@ -64,6 +64,31 @@ import { Customer, CustomerProfile } from '../../shared/models/customer.models';
 
           <div class="flex items-center gap-3">
             <a [routerLink]="backRoute()" class="bm-btn bm-btn-secondary text-xs"> Back to List </a>
+            @if (isOwner()) {
+              <a
+                [routerLink]="['/app/properties/new']"
+                [queryParams]="{ owner_customer_id: customer()!.id }"
+                class="bm-btn bm-btn-secondary text-xs"
+              >
+                Create Property
+              </a>
+              <a
+                [routerLink]="['/app/owner-agreements/new']"
+                [queryParams]="{ owner_customer_id: customer()!.id }"
+                class="bm-btn bm-btn-secondary text-xs"
+              >
+                Create Owner Agreement
+              </a>
+            }
+            @if (isTenant()) {
+              <a
+                [routerLink]="['/app/tenant-agreements/new']"
+                [queryParams]="{ tenant_customer_id: customer()!.id }"
+                class="bm-btn bm-btn-secondary text-xs"
+              >
+                Create Tenant Agreement
+              </a>
+            }
             <a
               [routerLink]="['/app/customers', customer()!.id, 'edit']"
               class="bm-btn bm-btn-primary text-xs"
@@ -431,6 +456,7 @@ import { Customer, CustomerProfile } from '../../shared/models/customer.models';
                         <th class="py-2.5 px-3">Period Range</th>
                         <th class="py-2.5 px-3">Status</th>
                         <th class="py-2.5 px-3 text-right">Contract Amount</th>
+                        <th class="py-2.5 px-3 text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 font-medium">
@@ -487,11 +513,82 @@ import { Customer, CustomerProfile } from '../../shared/models/customer.models';
                             ></dirham-symbol>
                             <span>{{ formatMoney(agreement.total_amount) }}</span>
                           </td>
+                          <td class="py-3 px-3 text-right">
+                            <a
+                              [routerLink]="agreementRoute(agreement.type, agreement.id)"
+                              [queryParams]="{ action: 'add-payment-line' }"
+                              class="text-xs font-semibold text-emerald-700 hover:underline whitespace-nowrap"
+                            >
+                              Add Payment Line
+                            </a>
+                          </td>
                         </tr>
                       }
                     </tbody>
                   </table>
                 </div>
+                @for (agreement of allAgreements(); track agreement.type + '-lines-' + agreement.id) {
+                  @if (agreement.payment_lines.length) {
+                    <div class="rounded-xl border border-slate-100 bg-slate-50/60 p-4 space-y-3">
+                      <div class="flex items-center justify-between">
+                        <h4 class="text-xs font-bold text-slate-800">
+                          Payment Lines · {{ agreement.agreement_no }}
+                        </h4>
+                        <a
+                          [routerLink]="agreementRoute(agreement.type, agreement.id)"
+                          [queryParams]="{ action: 'add-payment-line' }"
+                          class="text-xs font-semibold text-emerald-700 hover:underline"
+                        >
+                          Add Payment Line
+                        </a>
+                      </div>
+                      <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                          <thead>
+                            <tr class="border-b border-slate-200 text-slate-500 uppercase tracking-wider font-bold">
+                              <th class="py-2 px-2">Line</th>
+                              <th class="py-2 px-2">Particulars</th>
+                              <th class="py-2 px-2">Due</th>
+                              <th class="py-2 px-2 text-right">Amount</th>
+                              <th class="py-2 px-2">Status</th>
+                              <th class="py-2 px-2 text-right">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody class="divide-y divide-slate-200">
+                            @for (line of agreement.payment_lines; track line.line_type + line.id) {
+                              <tr>
+                                <td class="py-2 px-2 font-semibold text-slate-800">{{ line.line_no }}</td>
+                                <td class="py-2 px-2 text-slate-600">{{ line.particulars || line.category || '—' }}</td>
+                                <td class="py-2 px-2 text-slate-600">{{ line.due_date }}</td>
+                                <td class="py-2 px-2 text-right font-semibold tabular-nums">AED {{ formatMoney(line.amount) }}</td>
+                                <td class="py-2 px-2"><bm-status-badge [status]="line.status"></bm-status-badge></td>
+                                <td class="py-2 px-2 text-right">
+                                  @if (line.receipt?.document_no) {
+                                    <a
+                                      [routerLink]="receiptRoute(line.receipt!.direction)"
+                                      [queryParams]="{ search: line.receipt!.document_no }"
+                                      class="text-xs font-semibold text-emerald-700 hover:underline"
+                                    >
+                                      {{ line.receipt!.direction === 'inward' ? 'Receipt' : 'Voucher' }}
+                                    </a>
+                                  } @else {
+                                    <a
+                                      [routerLink]="agreementRoute(agreement.type, agreement.id)"
+                                      [queryParams]="paymentLineParams(line)"
+                                      class="text-xs font-semibold text-blue-700 hover:underline"
+                                    >
+                                      Post Payment
+                                    </a>
+                                  }
+                                </td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  }
+                }
               } @else {
                 <div
                   class="p-6 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200"
@@ -560,7 +657,13 @@ import { Customer, CustomerProfile } from '../../shared/models/customer.models';
                             {{ transaction.transaction_date }}
                           </td>
                           <td class="py-3 px-3 font-semibold text-slate-900">
-                            {{ transaction.document_no }}
+                            <a
+                              [routerLink]="receiptRoute(transaction.direction)"
+                              [queryParams]="{ search: transaction.document_no }"
+                              class="hover:underline text-emerald-800"
+                            >
+                              {{ transaction.document_no }}
+                            </a>
                           </td>
                           <td class="py-3 px-3 capitalize text-slate-700">
                             {{ transaction.payment_mode.replace('_', ' ') }}
@@ -780,5 +883,17 @@ export class CustomerDetailComponent implements OnInit {
   formatMoney(val: string | number | undefined | null): string {
     const num = Number(val || 0);
     return num.toLocaleString('en-AE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  agreementRoute(type: 'owner' | 'tenant', id: number): string[] {
+    return type === 'owner' ? ['/app/owner-agreements', String(id)] : ['/app/tenant-agreements', String(id)];
+  }
+
+  receiptRoute(direction: string): string {
+    return direction === 'inward' ? '/app/accounts/inward' : '/app/accounts/outward';
+  }
+
+  paymentLineParams(line: { line_type: string; id: number }): Record<string, number> {
+    return line.line_type === 'scheduled' ? { payment_line: line.id } : {};
   }
 }

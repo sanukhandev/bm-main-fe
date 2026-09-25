@@ -52,6 +52,23 @@ export interface CustomerAgreement {
   status: string;
   total_amount: string;
   properties: CustomerProperty[];
+  payment_lines: CustomerPaymentLine[];
+}
+
+export interface CustomerPaymentLine {
+  id: number;
+  line_type: 'scheduled' | 'additional';
+  line_no: number | string;
+  particulars?: string | null;
+  category?: string | null;
+  due_date: string;
+  amount: string;
+  paid_amount: string;
+  balance: string;
+  direction: 'inward' | 'outward';
+  payment_mode: string;
+  status: string;
+  receipt?: { id: number; document_no: string; direction: 'inward' | 'outward' } | null;
 }
 
 export interface CustomerTransaction {

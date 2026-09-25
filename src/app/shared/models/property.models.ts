@@ -42,3 +42,59 @@ export interface CreatePropertyDto {
   area?: string | number | null;
   notes?: string | null;
 }
+
+export interface PropertyReceipt {
+  id: number;
+  document_no: string;
+  direction: 'inward' | 'outward';
+}
+
+export interface PropertyPaymentLine {
+  id: number;
+  line_type: 'scheduled' | 'additional';
+  line_no: number | string;
+  particulars?: string | null;
+  due_date?: string | null;
+  amount: string;
+  paid_amount: string;
+  balance: string;
+  direction: 'inward' | 'outward';
+  payment_mode?: string | null;
+  status: string;
+  receipt?: PropertyReceipt | null;
+}
+
+export interface PropertyAgreementSummary {
+  id: number;
+  agreement_no: string;
+  customer: { id: number; customer_code: string; display_name: string } | null;
+  start_date: string;
+  end_date: string;
+  status: string;
+  total_amount?: string | null;
+  payment_lines: PropertyPaymentLine[];
+}
+
+export interface PropertyWorkOrderSummary {
+  id: number;
+  work_order_no: string;
+  title: string;
+  priority: string;
+  status: string;
+  vendor: { id: number; customer_code: string; display_name: string } | null;
+  service_charge?: string | null;
+  opened_at?: string | null;
+  completed_at?: string | null;
+  payments: PropertyPaymentLine[];
+}
+
+export interface PropertyProfile {
+  owner_agreements: PropertyAgreementSummary[];
+  tenant_agreements: PropertyAgreementSummary[];
+  work_orders: PropertyWorkOrderSummary[];
+  actions: {
+    can_create_owner_agreement: boolean;
+    can_create_tenant_agreement: boolean;
+  };
+  financial_restricted: boolean;
+}

@@ -121,6 +121,11 @@ import {
         <div
           class="rounded-2xl sm:rounded-3xl border border-[#E2E8F0] bg-white relative overflow-hidden p-6 sm:p-8 shadow-[0_12px_36px_rgba(15,23,42,0.06)] hover:shadow-[0_20px_45px_rgba(15,23,42,0.09)] transition-all duration-300 min-h-[320px] flex flex-col justify-between"
         >
+          <!-- Static Top-to-Bottom Light Yellow Ambient Shade Overlay -->
+          <div
+            class="absolute inset-0 bg-gradient-to-b from-amber-400/12 via-amber-300/4 to-transparent pointer-events-none z-0"
+          ></div>
+
           <!-- Bottom Fluid Wave Animation Overlay (Green for Positive, Red for Negative, Hidden for Zero) -->
           <div
             class="absolute bottom-0 inset-x-0 h-44 sm:h-52 pointer-events-none overflow-hidden z-0 transition-opacity duration-500"

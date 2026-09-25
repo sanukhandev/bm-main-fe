@@ -72,6 +72,11 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
         <div
           class="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-white via-slate-50/90 to-slate-100/70 border border-slate-200/80 p-6 sm:p-7 shadow-[0_10px_30px_rgba(15,23,42,0.06)] hover:shadow-[0_20px_40px_rgba(15,23,42,0.12)] transition-all duration-300"
         >
+          <!-- Static Top-to-Bottom Light Yellow Ambient Shade Overlay -->
+          <div
+            class="absolute inset-0 bg-gradient-to-b from-amber-400/12 via-amber-300/4 to-transparent pointer-events-none z-0"
+          ></div>
+
           <!-- Bottom Fluid Wave Animation Overlay (Green for Positive, Red for Negative, Hidden for Zero) -->
           <div
             class="absolute bottom-0 inset-x-0 h-44 sm:h-52 pointer-events-none overflow-hidden z-0 transition-opacity duration-500"

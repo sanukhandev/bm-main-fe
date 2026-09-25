@@ -297,24 +297,24 @@ import {
                     </span>
                   </div>
 
-                  <div class="flex items-center gap-3 text-xs text-[#64748B]">
+                  <div class="flex items-center gap-2 text-xs text-[#64748B]">
                     <span class="font-medium"
                       >Scope: {{ activeBranch()?.name || 'All Branches' }}</span
                     >
                     <span>•</span>
                     <span
-                      class="inline-flex items-center gap-1 font-semibold px-2.5 py-0.5 rounded-md border border-[#E2E8F0] bg-slate-50 transition-colors duration-300"
+                      class="font-semibold transition-colors duration-300"
                       [class.text-[#047857]]="isNetMovementPositive()"
                       [class.text-[#DC2626]]="isNetMovementNegative()"
                       [class.text-[#64748B]]="isNetMovementZero()"
                     >
-                      <span>{{
+                      {{
                         isNetMovementNegative()
                           ? '- Net Outflow'
                           : isNetMovementPositive()
                             ? '+ Net Inflow'
                             : '0 Balance'
-                      }}</span>
+                      }}
                     </span>
                   </div>
                 </div>
@@ -395,116 +395,86 @@ import {
             </div>
           </div>
 
-          <!-- High-Level Operational Summary Strip (Fills white space after numbers) -->
+          <!-- High-Level Operational Summary Strip (Counts Row) -->
           <div
-            class="mt-6 pt-5 border-t border-slate-200/60 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6 z-10 relative"
+            class="mt-6 pt-5 border-t border-slate-200/60 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-y-4 lg:gap-y-0 z-10 relative lg:divide-x divide-slate-200/60"
           >
             <a
               routerLink="/app/tenant-agreements"
-              class="flex flex-col hover:opacity-80 transition group"
+              class="flex flex-col hover:opacity-80 transition group px-3 sm:px-4 lg:px-6 lg:first:pl-0"
             >
+              <div class="text-xl sm:text-2xl font-normal text-[#0F172A] tabular-nums">
+                <span>{{ metrics()?.total_tenant_agreements || 0 }}</span>
+              </div>
               <span
-                class="text-xs sm:text-sm font-bold text-[#475569] uppercase tracking-wider group-hover:text-[#047857]"
+                class="text-xs sm:text-sm font-normal text-[#64748B] group-hover:text-[#047857] transition-colors mt-0.5"
                 >Tenant Leases</span
               >
-              <div
-                class="text-xl sm:text-2xl font-extrabold text-[#0F172A] tabular-nums mt-1 flex items-center gap-2"
-              >
-                <span>{{ metrics()?.total_tenant_agreements || 0 }}</span>
-                <span
-                  class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-50 text-[#047857] border border-emerald-200/60"
-                  >Active</span
-                >
-              </div>
             </a>
 
             <a
               routerLink="/app/owner-agreements"
-              class="flex flex-col hover:opacity-80 transition group"
+              class="flex flex-col hover:opacity-80 transition group px-3 sm:px-4 lg:px-6"
             >
+              <div class="text-xl sm:text-2xl font-normal text-[#0F172A] tabular-nums">
+                <span>{{ metrics()?.total_owner_agreements || 0 }}</span>
+              </div>
               <span
-                class="text-xs sm:text-sm font-bold text-[#475569] uppercase tracking-wider group-hover:text-[#2563EB]"
+                class="text-xs sm:text-sm font-normal text-[#64748B] group-hover:text-[#2563EB] transition-colors mt-0.5"
                 >Owner Contracts</span
               >
-              <div
-                class="text-xl sm:text-2xl font-extrabold text-[#0F172A] tabular-nums mt-1 flex items-center gap-2"
-              >
-                <span>{{ metrics()?.total_owner_agreements || 0 }}</span>
-                <span
-                  class="text-xs font-semibold px-2 py-0.5 rounded bg-blue-50 text-[#2563EB] border border-blue-200/60"
-                  >Active</span
-                >
-              </div>
             </a>
 
-            <a routerLink="/app/properties" class="flex flex-col hover:opacity-80 transition group">
+            <a
+              routerLink="/app/properties"
+              class="flex flex-col hover:opacity-80 transition group px-3 sm:px-4 lg:px-6"
+            >
+              <div class="text-xl sm:text-2xl font-normal text-[#047857] tabular-nums">
+                <span>{{ metrics()?.occupancy?.occupied_properties || 0 }}</span>
+              </div>
               <span
-                class="text-xs sm:text-sm font-bold text-[#475569] uppercase tracking-wider group-hover:text-[#047857]"
+                class="text-xs sm:text-sm font-normal text-[#64748B] group-hover:text-[#047857] transition-colors mt-0.5"
                 >Occupied Units</span
               >
-              <div
-                class="text-xl sm:text-2xl font-extrabold text-[#047857] tabular-nums mt-1 flex items-center gap-2"
-              >
-                <span>{{ metrics()?.occupancy?.occupied_properties || 0 }}</span>
-                <span
-                  class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-[#475569] border border-slate-200"
-                  >Units</span
-                >
-              </div>
             </a>
 
-            <a routerLink="/app/properties" class="flex flex-col hover:opacity-80 transition group">
+            <a
+              routerLink="/app/properties"
+              class="flex flex-col hover:opacity-80 transition group px-3 sm:px-4 lg:px-6"
+            >
+              <div class="text-xl sm:text-2xl font-normal text-[#2563EB] tabular-nums">
+                <span>{{ metrics()?.occupancy?.available_properties || 0 }}</span>
+              </div>
               <span
-                class="text-xs sm:text-sm font-bold text-[#475569] uppercase tracking-wider group-hover:text-[#2563EB]"
+                class="text-xs sm:text-sm font-normal text-[#64748B] group-hover:text-[#2563EB] transition-colors mt-0.5"
                 >Available Units</span
               >
-              <div
-                class="text-xl sm:text-2xl font-extrabold text-[#2563EB] tabular-nums mt-1 flex items-center gap-2"
-              >
-                <span>{{ metrics()?.occupancy?.available_properties || 0 }}</span>
-                <span
-                  class="text-xs font-semibold px-2 py-0.5 rounded bg-blue-50 text-[#2563EB] border border-blue-200/60"
-                  >Available</span
-                >
-              </div>
             </a>
 
             <a
               routerLink="/app/maintenance/work-orders"
-              class="flex flex-col hover:opacity-80 transition group"
+              class="flex flex-col hover:opacity-80 transition group px-3 sm:px-4 lg:px-6"
             >
+              <div class="text-xl sm:text-2xl font-normal text-[#D97706] tabular-nums">
+                <span>{{ metrics()?.maintenance?.open_work_orders || 0 }}</span>
+              </div>
               <span
-                class="text-xs sm:text-sm font-bold text-[#475569] uppercase tracking-wider group-hover:text-[#D97706]"
+                class="text-xs sm:text-sm font-normal text-[#64748B] group-hover:text-[#D97706] transition-colors mt-0.5"
                 >Work Orders</span
               >
-              <div
-                class="text-xl sm:text-2xl font-extrabold text-[#D97706] tabular-nums mt-1 flex items-center gap-2"
-              >
-                <span>{{ metrics()?.maintenance?.open_work_orders || 0 }}</span>
-                <span
-                  class="text-xs font-semibold px-2 py-0.5 rounded bg-amber-50 text-[#D97706] border border-amber-200/60"
-                  >Open</span
-                >
-              </div>
             </a>
 
             <a
               routerLink="/app/customers/tenants"
-              class="flex flex-col hover:opacity-80 transition group"
+              class="flex flex-col hover:opacity-80 transition group px-3 sm:px-4 lg:px-6 lg:last:pr-0"
             >
+              <div class="text-xl sm:text-2xl font-normal text-[#0F172A] tabular-nums">
+                <span>{{ metrics()?.total_tenants || 0 }}</span>
+              </div>
               <span
-                class="text-xs sm:text-sm font-bold text-[#475569] uppercase tracking-wider group-hover:text-[#0F172A]"
+                class="text-xs sm:text-sm font-normal text-[#64748B] group-hover:text-[#0F172A] transition-colors mt-0.5"
                 >Total Tenants</span
               >
-              <div
-                class="text-xl sm:text-2xl font-extrabold text-[#0F172A] tabular-nums mt-1 flex items-center gap-2"
-              >
-                <span>{{ metrics()?.total_tenants || 0 }}</span>
-                <span
-                  class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-[#475569] border border-slate-200"
-                  >Tenants</span
-                >
-              </div>
             </a>
           </div>
 

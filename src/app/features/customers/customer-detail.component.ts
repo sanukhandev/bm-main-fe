@@ -53,6 +53,12 @@ import { Customer, CustomerProfile } from '../../shared/models/customer.models';
                 {{ customer()!.display_name }}
               </h1>
               <bm-status-badge [status]="customer()!.status || 'active'"></bm-status-badge>
+              @if (customer()!.identity_verified) {
+                <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 border border-emerald-200">
+                  <span aria-hidden="true">&#10003;</span>
+                  Verified
+                </span>
+              }
             </div>
           </div>
 
@@ -627,6 +633,9 @@ import { Customer, CustomerProfile } from '../../shared/models/customer.models';
                   <span class="text-slate-400 font-medium block">Identity / Registration No</span>
                   <span class="font-bold text-slate-900 mt-1 block font-mono">
                     {{ customer()!.identity_no || customer()!.company_registration_no || '—' }}
+                    @if (customer()!.identity_verified && customer()!.identity_no) {
+                      <span class="ml-1 text-emerald-600" title="Verified Emirates ID" aria-label="Verified Emirates ID">&#10003;</span>
+                    }
                   </span>
                 </div>
 

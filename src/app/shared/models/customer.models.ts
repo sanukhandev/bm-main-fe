@@ -13,6 +13,7 @@ export interface Customer {
   email?: string | null;
   tax_registration_no?: string | null;
   identity_no?: string | null;
+  identity_verified?: boolean;
   company_registration_no?: string | null;
   address_line_1?: string | null;
   address_line_2?: string | null;
@@ -74,6 +75,7 @@ export interface CreateCustomerDto {
   email?: string | null;
   tax_registration_no?: string | null;
   identity_no?: string | null;
+  identity_verification_token?: string | null;
   company_registration_no?: string | null;
   address_line_1?: string | null;
   address_line_2?: string | null;

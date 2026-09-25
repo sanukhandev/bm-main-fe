@@ -361,12 +361,18 @@ import {
 
               <!-- Country -->
               <div>
-                <label class="block text-[13px] font-semibold text-[#26312C] mb-2"> Country </label>
+                <label
+                  class="block text-[13px] font-semibold text-[#26312C] mb-2 flex items-center justify-between"
+                >
+                  <span>Country</span>
+                  <span class="text-[11px] text-slate-400 font-normal">Fixed (UAE)</span>
+                </label>
                 <input
                   type="text"
                   formControlName="country_code"
                   placeholder="AE"
-                  class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium shadow-2xs placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
+                  readonly
+                  class="w-full h-11 px-3.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 text-sm font-semibold tabular-nums cursor-not-allowed select-none placeholder:text-slate-400 placeholder:font-normal focus:outline-none"
                 />
               </div>
             </div>

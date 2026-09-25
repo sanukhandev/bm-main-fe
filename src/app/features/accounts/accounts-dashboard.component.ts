@@ -72,6 +72,53 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
         <div
           class="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-white via-slate-50/90 to-slate-100/70 border border-slate-200/80 p-6 sm:p-7 shadow-[0_10px_30px_rgba(15,23,42,0.06)] hover:shadow-[0_20px_40px_rgba(15,23,42,0.12)] transition-all duration-300"
         >
+          <!-- Top Fluid Wave Animation Overlay (Green for Positive, Red for Negative, Hidden for Zero) -->
+          <div
+            class="absolute top-0 inset-x-0 h-44 sm:h-52 pointer-events-none overflow-hidden z-0 transition-opacity duration-500"
+            [class.opacity-100]="!isNetMovementZero()"
+            [class.opacity-0]="isNetMovementZero()"
+          >
+            <!-- Background Gradient Tint -->
+            <div
+              class="absolute inset-0 transition-colors duration-500 bg-gradient-to-b"
+              [class.from-emerald-500/15]="isNetMovementPositive()"
+              [class.via-emerald-500/5]="isNetMovementPositive()"
+              [class.from-rose-500/15]="isNetMovementNegative()"
+              [class.via-rose-500/5]="isNetMovementNegative()"
+              [class.to-transparent]="true"
+            ></div>
+
+            <!-- Secondary Soft Background Wave Silhouette -->
+            <svg
+              class="absolute top-0 inset-x-0 w-full h-full animate-wave-top-slow transition-colors duration-500 select-none opacity-40"
+              [class.text-emerald-500/25]="isNetMovementPositive()"
+              [class.text-rose-500/25]="isNetMovementNegative()"
+              [class.text-transparent]="isNetMovementZero()"
+              viewBox="0 0 1440 120"
+              preserveAspectRatio="none"
+              fill="currentColor"
+            >
+              <path
+                d="M0,0 L1440,0 L1440,60 C1200,30 1000,80 800,45 C600,75 400,25 200,65 C100,85 50,45 0,35 Z"
+              ></path>
+            </svg>
+
+            <!-- Primary Animated SVG Top Wave Silhouette -->
+            <svg
+              class="absolute top-0 inset-x-0 w-full h-full animate-wave-top transition-colors duration-500 select-none"
+              [class.text-emerald-500/20]="isNetMovementPositive()"
+              [class.text-rose-500/20]="isNetMovementNegative()"
+              [class.text-transparent]="isNetMovementZero()"
+              viewBox="0 0 1440 120"
+              preserveAspectRatio="none"
+              fill="currentColor"
+            >
+              <path
+                d="M0,0 L1440,0 L1440,40 C1280,75 1120,25 960,60 C800,95 640,30 480,70 C320,105 160,35 0,55 Z"
+              ></path>
+            </svg>
+          </div>
+
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center relative z-10">
             <!-- LEFT COLUMN (Col 3): Petty Cash Balance & Pending Cheques Inward -->
             <div
@@ -156,13 +203,16 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
             <div class="lg:col-span-6 flex items-center justify-center py-2">
               <div class="flex items-center gap-4 sm:gap-5">
                 <div
-                  class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shrink-0 shadow-2xs border"
-                  [class.bg-[#ECFDF5]]="!isNetMovementNegative()"
-                  [class.border-[#A7F3D0]]="!isNetMovementNegative()"
-                  [class.text-[#047857]]="!isNetMovementNegative()"
+                  class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shrink-0 shadow-2xs border transition-colors duration-300"
+                  [class.bg-[#ECFDF5]]="isNetMovementPositive()"
+                  [class.border-[#A7F3D0]]="isNetMovementPositive()"
+                  [class.text-[#047857]]="isNetMovementPositive()"
                   [class.bg-[#FEF2F2]]="isNetMovementNegative()"
                   [class.border-[#FECACA]]="isNetMovementNegative()"
                   [class.text-[#DC2626]]="isNetMovementNegative()"
+                  [class.bg-slate-100]="isNetMovementZero()"
+                  [class.border-slate-200]="isNetMovementZero()"
+                  [class.text-[#64748B]]="isNetMovementZero()"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -186,9 +236,10 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
                   </span>
 
                   <div
-                    class="flex items-center gap-2.5 my-0.5 text-4xl sm:text-5xl lg:text-6xl font-serif font-normal tracking-tight tabular-nums"
-                    [class.text-[#047857]]="!isNetMovementNegative()"
+                    class="flex items-center gap-2.5 my-0.5 text-4xl sm:text-5xl lg:text-6xl font-serif font-normal tracking-tight tabular-nums transition-colors duration-300"
+                    [class.text-[#047857]]="isNetMovementPositive()"
                     [class.text-[#DC2626]]="isNetMovementNegative()"
+                    [class.text-[#64748B]]="isNetMovementZero()"
                   >
                     <dirham-symbol
                       size="0.85em"
@@ -206,11 +257,18 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
                     >
                     <span>•</span>
                     <span
-                      class="inline-flex items-center gap-1 font-semibold px-2.5 py-0.5 rounded-md border border-[#E2E8F0] bg-slate-50"
-                      [class.text-[#047857]]="!isNetMovementNegative()"
+                      class="inline-flex items-center gap-1 font-semibold px-2.5 py-0.5 rounded-md border border-[#E2E8F0] bg-slate-50 transition-colors duration-300"
+                      [class.text-[#047857]]="isNetMovementPositive()"
                       [class.text-[#DC2626]]="isNetMovementNegative()"
+                      [class.text-[#64748B]]="isNetMovementZero()"
                     >
-                      <span>{{ isNetMovementNegative() ? '- Net Outflow' : '+ Net Inflow' }}</span>
+                      <span>{{
+                        isNetMovementNegative()
+                          ? '- Net Outflow'
+                          : isNetMovementPositive()
+                            ? '+ Net Inflow'
+                            : '0 Balance'
+                      }}</span>
                     </span>
                   </div>
                 </div>
@@ -788,6 +846,16 @@ export class AccountsDashboardComponent implements OnInit, OnDestroy {
   isNetMovementNegative(): boolean {
     const val = Number(this.snapshot()?.today_net_movement || 0);
     return val < 0;
+  }
+
+  isNetMovementPositive(): boolean {
+    const val = Number(this.snapshot()?.today_net_movement || 0);
+    return val > 0;
+  }
+
+  isNetMovementZero(): boolean {
+    const val = Number(this.snapshot()?.today_net_movement || 0);
+    return val === 0;
   }
 
   isMonthNetNegative(): boolean {

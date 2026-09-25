@@ -120,8 +120,54 @@ import {
         <!-- 1. EDITORIAL FINANCIAL HERO CARD (~320px Height, Tactile 3D Depth) -->
         <div
           class="rounded-2xl sm:rounded-3xl border border-[#E2E8F0] bg-white relative overflow-hidden p-6 sm:p-8 shadow-[0_12px_36px_rgba(15,23,42,0.06)] hover:shadow-[0_20px_45px_rgba(15,23,42,0.09)] transition-all duration-300 min-h-[320px] flex flex-col justify-between"
-          style="background: radial-gradient(circle at 12% 45%, rgba(16,185,129,0.05), transparent 40%), radial-gradient(circle at 88% 40%, rgba(239,68,68,0.04), transparent 40%), #FFFFFF;"
         >
+          <!-- Top Fluid Wave Animation Overlay (Green for Positive, Red for Negative, Hidden for Zero) -->
+          <div
+            class="absolute top-0 inset-x-0 h-44 sm:h-52 pointer-events-none overflow-hidden z-0 transition-opacity duration-500"
+            [class.opacity-100]="!isNetMovementZero()"
+            [class.opacity-0]="isNetMovementZero()"
+          >
+            <!-- Background Gradient Tint -->
+            <div
+              class="absolute inset-0 transition-colors duration-500 bg-gradient-to-b"
+              [class.from-emerald-500/15]="isNetMovementPositive()"
+              [class.via-emerald-500/5]="isNetMovementPositive()"
+              [class.from-rose-500/15]="isNetMovementNegative()"
+              [class.via-rose-500/5]="isNetMovementNegative()"
+              [class.to-transparent]="true"
+            ></div>
+
+            <!-- Secondary Soft Background Wave Silhouette -->
+            <svg
+              class="absolute top-0 inset-x-0 w-full h-full animate-wave-top-slow transition-colors duration-500 select-none opacity-40"
+              [class.text-emerald-500/25]="isNetMovementPositive()"
+              [class.text-rose-500/25]="isNetMovementNegative()"
+              [class.text-transparent]="isNetMovementZero()"
+              viewBox="0 0 1440 120"
+              preserveAspectRatio="none"
+              fill="currentColor"
+            >
+              <path
+                d="M0,0 L1440,0 L1440,60 C1200,30 1000,80 800,45 C600,75 400,25 200,65 C100,85 50,45 0,35 Z"
+              ></path>
+            </svg>
+
+            <!-- Primary Animated SVG Top Wave Silhouette -->
+            <svg
+              class="absolute top-0 inset-x-0 w-full h-full animate-wave-top transition-colors duration-500 select-none"
+              [class.text-emerald-500/20]="isNetMovementPositive()"
+              [class.text-rose-500/20]="isNetMovementNegative()"
+              [class.text-transparent]="isNetMovementZero()"
+              viewBox="0 0 1440 120"
+              preserveAspectRatio="none"
+              fill="currentColor"
+            >
+              <path
+                d="M0,0 L1440,0 L1440,40 C1280,75 1120,25 960,60 C800,95 640,30 480,70 C320,105 160,35 0,55 Z"
+              ></path>
+            </svg>
+          </div>
+
           <!-- Top Row Grid Structure: Left Balances | Center Hero Metric | Right Inward/Outward -->
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center z-10 relative">
             <!-- LEFT COLUMN (Col 3): Cash Balance & Bank/Cheque Summary -->
@@ -202,9 +248,10 @@ import {
               <div class="flex items-center gap-4 sm:gap-5">
                 <!-- Center Colored Icon without Background Box -->
                 <div
-                  class="w-10 h-10 flex items-center justify-center shrink-0"
-                  [class.text-[#047857]]="!isNetMovementNegative()"
+                  class="w-10 h-10 flex items-center justify-center shrink-0 transition-colors duration-300"
+                  [class.text-[#047857]]="isNetMovementPositive()"
                   [class.text-[#DC2626]]="isNetMovementNegative()"
+                  [class.text-[#64748B]]="isNetMovementZero()"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -228,11 +275,12 @@ import {
                     Today's Net Cash Movement
                   </span>
 
-                  <!-- Large Newsreader Serif Hero Number (Green if >= 0, Red if < 0) -->
+                  <!-- Large Newsreader Serif Hero Number (Green if > 0, Red if < 0, Grey if 0) -->
                   <div
-                    class="flex items-center gap-2.5 my-0.5 text-4xl sm:text-5xl lg:text-6xl font-serif font-normal tracking-tight tabular-nums"
-                    [class.text-[#047857]]="!isNetMovementNegative()"
+                    class="flex items-center gap-2.5 my-0.5 text-4xl sm:text-5xl lg:text-6xl font-serif font-normal tracking-tight tabular-nums transition-colors duration-300"
+                    [class.text-[#047857]]="isNetMovementPositive()"
                     [class.text-[#DC2626]]="isNetMovementNegative()"
+                    [class.text-[#64748B]]="isNetMovementZero()"
                   >
                     <dirham-symbol
                       size="0.85em"
@@ -250,11 +298,18 @@ import {
                     >
                     <span>•</span>
                     <span
-                      class="inline-flex items-center gap-1 font-semibold px-2.5 py-0.5 rounded-md border border-[#E2E8F0] bg-slate-50"
-                      [class.text-[#047857]]="!isNetMovementNegative()"
+                      class="inline-flex items-center gap-1 font-semibold px-2.5 py-0.5 rounded-md border border-[#E2E8F0] bg-slate-50 transition-colors duration-300"
+                      [class.text-[#047857]]="isNetMovementPositive()"
                       [class.text-[#DC2626]]="isNetMovementNegative()"
+                      [class.text-[#64748B]]="isNetMovementZero()"
                     >
-                      <span>{{ isNetMovementNegative() ? '- Net Outflow' : '+ Net Inflow' }}</span>
+                      <span>{{
+                        isNetMovementNegative()
+                          ? '- Net Outflow'
+                          : isNetMovementPositive()
+                            ? '+ Net Inflow'
+                            : '0 Balance'
+                      }}</span>
                     </span>
                   </div>
                 </div>
@@ -1494,6 +1549,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
   isNetMovementNegative(): boolean {
     const val = Number(this.accountsSnapshot()?.today_net_movement || 0);
     return val < 0;
+  }
+
+  isNetMovementPositive(): boolean {
+    const val = Number(this.accountsSnapshot()?.today_net_movement || 0);
+    return val > 0;
+  }
+
+  isNetMovementZero(): boolean {
+    const val = Number(this.accountsSnapshot()?.today_net_movement || 0);
+    return val === 0;
   }
 
   formatMoney(val: string | number | undefined | null): string {

@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { BillingApiService } from '../../core/api/billing-api.service';
@@ -12,6 +12,7 @@ import { PaginationMeta } from '../../core/api/api.models';
 @Component({
   selector: 'bm-billing',
   standalone: true,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
     CommonModule,
     RouterLink,
@@ -21,35 +22,210 @@ import { PaginationMeta } from '../../core/api/api.models';
     BmPaginationComponent,
   ],
   template: `
-    <div class="max-w-7xl mx-auto space-y-6">
-      <div class="flex flex-wrap items-center justify-between gap-4">
+    <div class="max-w-[1740px] mx-auto space-y-6 font-sans text-slate-900">
+      <!-- HEADER AND ACTIONS -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div class="text-xs font-semibold uppercase tracking-wider text-emerald-700">Billing</div>
-          <h1 class="text-3xl font-bold text-slate-900 mt-1">
+          <div class="flex items-center gap-2">
+            <span
+              class="text-xs font-extrabold uppercase tracking-widest text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2.5 py-0.5 rounded-md"
+            >
+              Accounts & Financial Billing
+            </span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-1">
             {{ type() === 'quotations' ? 'Quotations' : 'Invoices' }}
           </h1>
-          <p class="text-sm text-slate-500 mt-1">
-            Branch-scoped billing records and financial activity
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+            Branch-scoped {{ type() === 'quotations' ? 'price estimates' : 'tax invoices' }} and
+            payment line settlements
           </p>
         </div>
-        <a class="bm-btn bm-btn-primary" [routerLink]="['/app/billing', type(), 'new']">
-          + Create {{ type() === 'quotations' ? 'Quotation' : 'Invoice' }}
-        </a>
+        <div class="flex items-center gap-3">
+          <a
+            class="bm-btn bm-btn-primary text-xs flex items-center gap-2 px-4 py-2.5 shadow-md hover:shadow-lg transition"
+            [routerLink]="['/app/billing', type(), 'new']"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            <span>Create {{ type() === 'quotations' ? 'Quotation' : 'Invoice' }}</span>
+          </a>
+        </div>
       </div>
 
-      <!-- Toolbar Filters -->
-      <div class="bm-card p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+      <!-- BENTO SUMMARY METRICS CARDS -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Card 1: Total Records -->
+        <div
+          class="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-2xs hover:shadow-md transition"
+        >
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block">
+              Total {{ type() === 'quotations' ? 'Quotations' : 'Invoices' }}
+            </span>
+            <div
+              class="w-8 h-8 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+            </div>
+          </div>
+          <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 tabular-nums mt-2">
+            {{ rows().length }}
+          </div>
+          <p class="text-xs text-slate-500 mt-1">Total documents in active branch</p>
+        </div>
+
+        <!-- Card 2: Total Financial Value -->
+        <div
+          class="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-2xs hover:shadow-md transition"
+        >
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-emerald-800 uppercase tracking-wider block">
+              Gross Volume
+            </span>
+            <div
+              class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center"
+            >
+              <dirham-symbol size="0.95em" weight="bold"></dirham-symbol>
+            </div>
+          </div>
+          <div
+            class="text-2xl sm:text-3xl font-extrabold text-emerald-700 tabular-nums mt-2 flex items-center"
+          >
+            <dirham-symbol
+              size="0.8em"
+              weight="bold"
+              class="mr-1.5 text-emerald-600 select-none"
+            ></dirham-symbol>
+            <span>{{ money(totalAmount()) }}</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">Cumulative document total</p>
+        </div>
+
+        <!-- Card 3: Status Breakdown 1 -->
+        <div
+          class="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-2xs hover:shadow-md transition"
+        >
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-blue-800 uppercase tracking-wider block">
+              {{ type() === 'quotations' ? 'Issued / Sent' : 'Paid' }}
+            </span>
+            <div
+              class="w-8 h-8 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+          </div>
+          <div class="text-2xl sm:text-3xl font-extrabold text-blue-700 tabular-nums mt-2">
+            {{ type() === 'quotations' ? statusCounts().issued : statusCounts().paid }}
+          </div>
+          <p class="text-xs text-slate-500 mt-1">
+            {{
+              type() === 'quotations'
+                ? 'Quotations active for acceptance'
+                : 'Invoices fully settled'
+            }}
+          </p>
+        </div>
+
+        <!-- Card 4: Status Breakdown 2 -->
+        <div
+          class="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-2xs hover:shadow-md transition"
+        >
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-amber-800 uppercase tracking-wider block">
+              {{ type() === 'quotations' ? 'Converted' : 'Draft / Pending' }}
+            </span>
+            <div
+              class="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+          </div>
+          <div class="text-2xl sm:text-3xl font-extrabold text-amber-700 tabular-nums mt-2">
+            {{
+              type() === 'quotations'
+                ? statusCounts().converted
+                : statusCounts().draft + statusCounts().partially_paid
+            }}
+          </div>
+          <p class="text-xs text-slate-500 mt-1">
+            {{
+              type() === 'quotations'
+                ? 'Converted into official invoices'
+                : 'Unpaid or draft documents'
+            }}
+          </p>
+        </div>
+      </div>
+
+      <!-- BENTO FILTER TOOLBAR -->
+      <div
+        class="rounded-2xl border border-slate-200/90 bg-white p-4 sm:p-5 shadow-2xs flex flex-col md:flex-row items-center justify-between gap-4"
+      >
         <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
           <bm-search-input
+            class="w-full sm:w-80"
             [value]="searchQuery()"
-            placeholder="Search document no, title, work order, total..."
+            placeholder="Search document no, title, work order..."
             (searchChange)="onSearchChange($event)"
           ></bm-search-input>
 
           <select
             [value]="selectedStatus()"
             (change)="onStatusChange($event)"
-            class="bm-input !w-auto text-xs font-medium"
+            class="w-full sm:w-auto h-10 px-3 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-xs font-semibold shadow-2xs focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition"
           >
             <option value="all">All Statuses</option>
             <option value="draft">Draft</option>
@@ -62,53 +238,85 @@ import { PaginationMeta } from '../../core/api/api.models';
           </select>
         </div>
 
-        @if (hasActiveFilters()) {
-          <button
-            type="button"
-            (click)="clearFilters()"
-            class="text-xs text-emerald-700 hover:text-emerald-800 font-medium cursor-pointer"
-          >
-            Clear Filters
-          </button>
-        }
+        <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+          <span class="text-xs text-slate-500 font-medium">
+            Showing <strong class="text-slate-900">{{ filteredRows().length }}</strong> records
+          </span>
+          @if (hasActiveFilters()) {
+            <button
+              type="button"
+              (click)="clearFilters()"
+              class="text-xs text-emerald-700 hover:text-emerald-800 font-bold px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200/60 transition"
+            >
+              Clear Filters
+            </button>
+          }
+        </div>
       </div>
 
       @if (error()) {
-        <div class="bm-card p-4 text-sm text-rose-700 font-medium">{{ error() }}</div>
+        <div
+          class="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700 font-medium"
+        >
+          {{ error() }}
+        </div>
       }
 
       @if (loading()) {
         <bm-loading-state type="table"></bm-loading-state>
       } @else {
-        <div class="bm-card overflow-hidden">
+        <!-- DATA TABLE BENTO CONTAINER -->
+        <div class="rounded-2xl border border-slate-200/90 bg-white shadow-2xs overflow-hidden">
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse text-xs">
               <thead>
                 <tr
-                  class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]"
+                  class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[11px]"
                 >
-                  <th class="py-3.5 px-4">Number</th>
+                  <th class="py-3.5 px-4">Document No</th>
                   <th class="py-3.5 px-4">Title</th>
                   <th class="py-3.5 px-4">Work Order</th>
                   <th class="py-3.5 px-4">Date</th>
-                  <th class="py-3.5 px-4">Total</th>
+                  <th class="py-3.5 px-4">Total Amount</th>
                   <th class="py-3.5 px-4">Status</th>
                   <th class="py-3.5 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-slate-100">
+              <tbody class="divide-y divide-slate-100 font-medium">
                 @for (row of paginatedRows(); track row.id) {
-                  <tr class="hover:bg-slate-50/60 transition-colors">
-                    <td class="py-3.5 px-4 font-semibold text-emerald-700 tabular-nums">
-                      {{ number(row) }}
+                  <tr class="hover:bg-slate-50/80 transition-colors">
+                    <td class="py-3.5 px-4 font-bold text-emerald-700 tabular-nums">
+                      <a [routerLink]="['/app/billing', type(), row.id]" class="hover:underline">
+                        {{ number(row) }}
+                      </a>
                     </td>
-                    <td class="py-3.5 px-4 font-medium text-slate-900">{{ row.title }}</td>
+                    <td
+                      class="py-3.5 px-4 font-bold text-slate-900 max-w-xs truncate"
+                      [title]="row.title"
+                    >
+                      {{ row.title }}
+                    </td>
                     <td class="py-3.5 px-4 text-slate-600">
-                      {{ row.work_order?.work_order_no || '—' }}
+                      @if (row.work_order?.work_order_no) {
+                        <span
+                          class="px-2 py-0.5 rounded bg-slate-100 border border-slate-200/60 font-mono text-[11px]"
+                        >
+                          {{ row.work_order?.work_order_no }}
+                        </span>
+                      } @else {
+                        <span class="text-slate-400">—</span>
+                      }
                     </td>
                     <td class="py-3.5 px-4 text-slate-600 tabular-nums">{{ date(row) }}</td>
-                    <td class="py-3.5 px-4 font-semibold text-slate-900 tabular-nums">
-                      AED {{ money(row.total_amount) }}
+                    <td class="py-3.5 px-4 font-extrabold text-slate-900 tabular-nums">
+                      <div class="flex items-center">
+                        <dirham-symbol
+                          size="0.85em"
+                          weight="bold"
+                          class="mr-1 text-slate-400 select-none"
+                        ></dirham-symbol>
+                        <span>{{ money(row.total_amount) }}</span>
+                      </div>
                     </td>
                     <td class="py-3.5 px-4">
                       <bm-status-badge [status]="row.status"></bm-status-badge>
@@ -118,7 +326,7 @@ import { PaginationMeta } from '../../core/api/api.models';
                         <a
                           class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200/60 inline-flex items-center justify-center transition shadow-2xs"
                           [routerLink]="['/app/billing', type(), row.id]"
-                          title="View Document"
+                          title="View Details"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -188,7 +396,7 @@ import { PaginationMeta } from '../../core/api/api.models';
                         <button
                           class="w-8 h-8 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200/60 inline-flex items-center justify-center transition shadow-2xs cursor-pointer"
                           (click)="remove(row.id)"
-                          title="Void Record"
+                          title="Void Document"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -211,7 +419,7 @@ import { PaginationMeta } from '../../core/api/api.models';
                 } @empty {
                   <tr>
                     <td colspan="7" class="p-12 text-center text-slate-500 font-medium">
-                      No {{ type() }} records found matching your filters.
+                      No {{ type() }} records found matching your active filters.
                     </td>
                   </tr>
                 }
@@ -242,6 +450,27 @@ export class BillingComponent {
   pageSize = signal(10);
   loading = signal(true);
   error = signal<string | null>(null);
+
+  totalAmount = computed(() => {
+    return this.rows().reduce((acc, row) => acc + Number(row.total_amount || 0), 0);
+  });
+
+  statusCounts = computed(() => {
+    const counts = {
+      draft: 0,
+      issued: 0,
+      paid: 0,
+      partially_paid: 0,
+      overdue: 0,
+      converted: 0,
+      voided: 0,
+    };
+    for (const row of this.rows()) {
+      const st = (row.status || '').toLowerCase() as keyof typeof counts;
+      if (st in counts) counts[st]++;
+    }
+    return counts;
+  });
 
   filteredRows = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();

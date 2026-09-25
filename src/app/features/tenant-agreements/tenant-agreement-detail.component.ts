@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -14,6 +14,7 @@ import { TenantAgreement, AgreementInstallment } from '../../shared/models/agree
 @Component({
   selector: 'bm-tenant-agreement-detail',
   standalone: true,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
     CommonModule,
     FormsModule,
@@ -1693,7 +1694,10 @@ export class TenantAgreementDetailComponent implements OnInit {
         this.agreement.set(res.data);
         this.isLoading.set(false);
         this.isRefreshingPayments.set(false);
-        if (!this.profileActionHandled && this.route.snapshot.queryParamMap.get('action') === 'add-payment-line') {
+        if (
+          !this.profileActionHandled &&
+          this.route.snapshot.queryParamMap.get('action') === 'add-payment-line'
+        ) {
           this.profileActionHandled = true;
           this.addExtraPayment();
         } else if (!this.profileActionHandled) {

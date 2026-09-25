@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { BmStatusBadgeComponent } from '../../shared/components/bm-status-badge/bm-status-badge.component';
@@ -115,10 +115,10 @@ import { Property, PropertyProfile } from '../../shared/models/property.models';
               </a>
             }
 
-            @if (profile()?.actions?.can_create_tenant_agreement) {
+            @if (canCreateTenantAgreement()) {
               <a
                 [routerLink]="['/app/tenant-agreements/new']"
-                [queryParams]="{ property_id: property()!.id }"
+                [queryParams]="{ source_owner_agreement_id: profile()?.actions?.default_owner_agreement_id }"
                 class="bm-btn bm-btn-primary text-xs flex items-center gap-1.5"
               >
                 <svg
@@ -564,27 +564,52 @@ import { Property, PropertyProfile } from '../../shared/models/property.models';
                 }
 
                 @if (profile()?.actions?.can_create_tenant_agreement) {
-                  <a
-                    [routerLink]="['/app/tenant-agreements/new']"
-                    [queryParams]="{ property_id: property()!.id }"
-                    class="bm-btn bm-btn-secondary w-full text-xs font-bold py-2.5 flex items-center justify-center gap-2"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
+                  @if (hasApprovedOrCommencedOwnerAgreement()) {
+                    <a
+                      [routerLink]="['/app/tenant-agreements/new']"
+                      [queryParams]="{ property_id: property()!.id }"
+                      class="bm-btn bm-btn-secondary w-full text-xs font-bold py-2.5 flex items-center justify-center gap-2"
                     >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M12 4v16m8-8H4"
-                      />
-                    </svg>
-                    <span>Create Tenant Lease</span>
-                  </a>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 4v16m8-8H4"
+                        />
+                      </svg>
+                      <span>Create Tenant Lease</span>
+                    </a>
+                  } @else {
+                    <div
+                      class="p-3.5 rounded-xl bg-amber-50 border border-amber-200/80 text-xs text-amber-900 font-medium flex items-start gap-2.5"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4 text-amber-600 shrink-0 mt-0.5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                        />
+                      </svg>
+                      <span
+                        >Creating a Tenant Lease requires an Owner Agreement in
+                        <strong>Approved</strong> or <strong>Commenced</strong> status.</span
+                      >
+                    </div>
+                  }
                 }
 
                 @if (
@@ -827,7 +852,7 @@ import { Property, PropertyProfile } from '../../shared/models/property.models';
                 @for (line of lines; track line.id) {
                   <tr class="hover:bg-slate-50/80 transition-colors">
                     <td class="py-2 px-3 font-bold text-slate-800">#{{ line.line_no }}</td>
-                    <td class="py-2 px-3 text-slate-600 tabular-nums">
+                    <td class="py-2 px-3 text-slate-600 tabular-nums font-mono">
                       {{ line.due_date || '—' }}
                     </td>
                     <td class="py-2 px-3 font-bold text-slate-900 tabular-nums">
@@ -894,6 +919,18 @@ export class PropertyDetailComponent implements OnInit {
   profile = signal<PropertyProfile | null>(null);
   isLoading = signal(true);
   error = signal<string | null>(null);
+
+  hasApprovedOrCommencedOwnerAgreement = computed(() => {
+    const agreements = this.profile()?.owner_agreements || [];
+    return agreements.some((ag) => ag.status === 'approved' || ag.status === 'commenced');
+  });
+
+  canCreateTenantAgreement = computed(() => {
+    return (
+      !!this.profile()?.actions?.can_create_tenant_agreement &&
+      this.hasApprovedOrCommencedOwnerAgreement()
+    );
+  });
 
   ngOnInit(): void {
     this.loadProperty();

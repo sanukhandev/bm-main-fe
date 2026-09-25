@@ -95,6 +95,7 @@ export interface PropertyProfile {
   actions: {
     can_create_owner_agreement: boolean;
     can_create_tenant_agreement: boolean;
+    default_owner_agreement_id?: number | null;
   };
   financial_restricted: boolean;
 }

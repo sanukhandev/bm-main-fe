@@ -643,11 +643,36 @@ export class TenantAgreementFormComponent implements OnInit {
       this.loadAgreement();
     } else {
       const tenantId = this.route.snapshot.queryParamMap.get('tenant_customer_id');
+      const sourceOwnerAgreementId = this.route.snapshot.queryParamMap.get('source_owner_agreement_id');
       if (tenantId && /^\d+$/.test(tenantId)) {
         this.tenantPrefilled.set(true);
         this.agreementForm.patchValue({ tenant_customer_id: tenantId });
       }
+      if (sourceOwnerAgreementId && /^\d+$/.test(sourceOwnerAgreementId)) {
+        this.agreementForm.patchValue({ source_owner_agreement_id: sourceOwnerAgreementId });
+      }
+      this.loadPrefilledOwnerAgreementProperties();
     }
+  }
+
+  private loadPrefilledOwnerAgreementProperties(): void {
+    const agreementId = Number(this.route.snapshot.queryParamMap.get('source_owner_agreement_id'));
+    if (!agreementId || this.isEditMode()) return;
+
+    this.ownerAgreementsApi.getAgreement(agreementId).subscribe({
+      next: (res) => {
+        const properties = this.normalizeOwnerAgreementProperties(res.data.properties);
+        this.availableProperties.set(properties);
+        if (properties.length === 1) {
+          this.agreementForm.get('selected_property_ids')?.setValue([properties[0].id], { emitEvent: false });
+        }
+      },
+    });
+  }
+
+  private normalizeOwnerAgreementProperties(properties: OwnerAgreement['properties']): Property[] {
+    if (Array.isArray(properties)) return properties;
+    return properties?.data || [];
   }
 
   loadTenants(): void {
@@ -716,7 +741,7 @@ export class TenantAgreementFormComponent implements OnInit {
           )
             .map(Number)
             .filter((id) => res.data.some((property) => property.id === id));
-          this.agreementForm.get('selected_property_ids')?.setValue(selected);
+          this.agreementForm.get('selected_property_ids')?.setValue(selected, { emitEvent: false });
         },
         error: () => {
           if (request === this.availabilityRequest) this.availableProperties.set([]);

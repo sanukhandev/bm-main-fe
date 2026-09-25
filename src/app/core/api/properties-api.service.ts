@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse, PaginatedResponse, ListQueryParams } from './api.models';
-import { Property, CreatePropertyDto } from '../../shared/models/property.models';
+import { Property, CreatePropertyDto, PropertyProfile } from '../../shared/models/property.models';
 
 @Injectable({
   providedIn: 'root',
@@ -36,6 +36,10 @@ export class PropertiesApiService {
 
   getProperty(id: number): Observable<ApiResponse<Property>> {
     return this.http.get<ApiResponse<Property>>(`${this.baseUrl}/${id}`);
+  }
+
+  getPropertyProfile(id: number): Observable<ApiResponse<{ property: Property; profile: PropertyProfile }>> {
+    return this.http.get<ApiResponse<{ property: Property; profile: PropertyProfile }>>(`${this.baseUrl}/${id}/profile`);
   }
 
   createProperty(dto: CreatePropertyDto): Observable<ApiResponse<Property>> {

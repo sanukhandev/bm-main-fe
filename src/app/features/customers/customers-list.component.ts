@@ -32,18 +32,18 @@ import { PaginationMeta } from '../../core/api/api.models';
   ],
   template: `
     <bm-page-header
-      [title]="role() ? (role() === 'owner' ? 'Owners' : 'Tenants') : 'Customers'"
+      [title]="role() ? roleLabel() : 'Customers'"
       subtitle="Branch-scoped customer directory"
     >
       <a
         [routerLink]="
           role()
-            ? ['/app/customers', role() === 'owner' ? 'owners' : 'tenants', 'new']
+            ? ['/app/customers', role() === 'owner' ? 'owners' : role() === 'tenant' ? 'tenants' : 'vendors', 'new']
             : ['/app/customers/new']
         "
         class="bm-btn bm-btn-primary text-xs"
       >
-        + Create {{ role() === 'owner' ? 'Owner' : role() === 'tenant' ? 'Tenant' : 'Customer' }}
+        + Create {{ roleLabel() || 'Customer' }}
       </a>
     </bm-page-header>
 
@@ -99,7 +99,7 @@ import { PaginationMeta } from '../../core/api/api.models';
         title="No customers found"
         description="No customer records match your filter criteria."
         [actionLabel]="
-          '+ Create ' + (role() === 'owner' ? 'Owner' : role() === 'tenant' ? 'Tenant' : 'Customer')
+          '+ Create ' + (roleLabel() || 'Customer')
         "
         (action)="navigateToCreate()"
       ></bm-empty-state>
@@ -185,7 +185,7 @@ import { PaginationMeta } from '../../core/api/api.models';
                           role()
                             ? [
                                 '/app/customers',
-                                role() === 'owner' ? 'owners' : 'tenants',
+                                role() === 'owner' ? 'owners' : role() === 'tenant' ? 'tenants' : 'vendors',
                                 cust.id,
                                 'edit',
                               ]
@@ -276,7 +276,7 @@ export class CustomersListComponent implements OnInit, OnDestroy {
   searchQuery = signal('');
   selectedType = signal('');
   selectedStatus = signal('');
-  role = signal<'owner' | 'tenant' | null>(null);
+  role = signal<'owner' | 'tenant' | 'vendor' | null>(null);
   currentPage = signal(1);
 
   archiveDialogOpen = signal(false);
@@ -292,7 +292,9 @@ export class CustomersListComponent implements OnInit, OnDestroy {
         ? 'owner'
         : routePath.includes('/customers/tenants')
           ? 'tenant'
-          : null,
+          : routePath.includes('/customers/vendors')
+            ? 'vendor'
+            : null,
     );
     this.route.queryParams.subscribe((queryParams) => {
       this.searchQuery.set(queryParams['search'] || '');
@@ -333,6 +335,10 @@ export class CustomersListComponent implements OnInit, OnDestroy {
           this.isLoading.set(false);
         },
       });
+  }
+
+  roleLabel(): string {
+    return this.role() === 'owner' ? 'Owners' : this.role() === 'tenant' ? 'Tenants' : this.role() === 'vendor' ? 'Vendors' : '';
   }
 
   updateQueryParams(): void {

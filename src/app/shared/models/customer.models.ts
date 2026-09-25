@@ -1,6 +1,6 @@
 export type CustomerType = 'individual' | 'organization';
 export type CustomerStatus = 'active' | 'inactive' | 'archived';
-export type CustomerRole = 'owner' | 'tenant';
+export type CustomerRole = 'owner' | 'tenant' | 'vendor';
 
 export interface Customer {
   id: number;

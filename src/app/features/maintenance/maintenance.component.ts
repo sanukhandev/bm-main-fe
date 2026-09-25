@@ -43,6 +43,8 @@ import { formatUaePhone, uaePhoneValidator } from '../../shared/utils/uae-format
           <a class="bm-btn bm-btn-primary" routerLink="/app/maintenance/work-orders/new"
             >Create Work Order</a
           >
+        } @else if (section() === 'vendors') {
+          <a class="bm-btn bm-btn-primary" routerLink="/app/customers/vendors/new">Create Vendor</a>
         } @else {
           <button class="bm-btn bm-btn-primary cursor-pointer" (click)="showForm.set(true)">
             Create {{ section() === 'vendors' ? 'Vendor' : 'Inventory Item' }}

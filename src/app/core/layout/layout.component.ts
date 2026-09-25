@@ -896,12 +896,31 @@ export interface PageSearchItem {
                     (click)="closeMegaMenu()"
                     class="group flex items-start gap-3 p-2 rounded-xl hover:bg-[#F8FAFC] transition"
                   >
-                    <div class="w-7 h-7 rounded-lg bg-[#FFF7ED] text-[#C2410C] flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m-7 4h8m-9 4h10M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z" /></svg>
+                    <div
+                      class="w-7 h-7 rounded-lg bg-[#FFF7ED] text-[#C2410C] flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 7h6m-7 4h8m-9 4h10M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"
+                        />
+                      </svg>
                     </div>
                     <div>
-                      <div class="text-xs font-semibold text-[#0F172A] group-hover:text-[#C2410C]">Vendors</div>
-                      <div class="text-[10px] text-[#64748B] leading-tight">Maintenance vendor directory</div>
+                      <div class="text-xs font-semibold text-[#0F172A] group-hover:text-[#C2410C]">
+                        Vendors
+                      </div>
+                      <div class="text-[10px] text-[#64748B] leading-tight">
+                        Maintenance vendor directory
+                      </div>
                     </div>
                   </a>
                 </div>
@@ -1200,7 +1219,7 @@ export interface PageSearchItem {
 
           <!-- ACCOUNTS MEGA MENU -->
           @if (activeMegaMenu() === 'accounts') {
-            <div class="grid grid-cols-2 gap-6">
+            <div class="grid grid-cols-3 gap-6">
               <div class="space-y-1">
                 <div class="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider mb-3">
                   Accounting Operations
@@ -1364,6 +1383,75 @@ export interface PageSearchItem {
                       Financial Reports
                     </div>
                     <div class="text-[10px] text-[#64748B]">Income & expenditure statements</div>
+                  </div>
+                </a>
+              </div>
+
+              <div class="space-y-1">
+                <div class="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider mb-3">
+                  Billing & Invoicing
+                </div>
+                <a
+                  routerLink="/app/billing/quotations"
+                  (click)="closeMegaMenu()"
+                  class="group flex items-start gap-3 p-2 rounded-xl hover:bg-[#F8FAFC] transition"
+                >
+                  <div
+                    class="w-7 h-7 rounded-lg bg-[#F5F3FF] text-[#7C3AED] flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="text-xs font-semibold text-[#0F172A] group-hover:text-[#7C3AED]">
+                      Quotations
+                    </div>
+                    <div class="text-[10px] text-[#64748B]">Estimations & client fee quotes</div>
+                  </div>
+                </a>
+
+                <a
+                  routerLink="/app/billing/invoices"
+                  (click)="closeMegaMenu()"
+                  class="group flex items-start gap-3 p-2 rounded-xl hover:bg-[#F8FAFC] transition"
+                >
+                  <div
+                    class="w-7 h-7 rounded-lg bg-[#ECFDF5] text-[#047857] flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="text-xs font-semibold text-[#0F172A] group-hover:text-[#047857]">
+                      Invoices
+                    </div>
+                    <div class="text-[10px] text-[#64748B]">
+                      Receivable billing invoices & statements
+                    </div>
                   </div>
                 </a>
               </div>
@@ -1776,6 +1864,18 @@ export interface PageSearchItem {
                 (click)="closeMobileDrawer()"
                 class="block px-3 py-1.5 rounded-lg text-xs text-[#334155] hover:bg-slate-100"
                 >Petty Cash Daybook</a
+              >
+              <a
+                routerLink="/app/billing/quotations"
+                (click)="closeMobileDrawer()"
+                class="block px-3 py-1.5 rounded-lg text-xs text-[#334155] hover:bg-slate-100"
+                >Quotations</a
+              >
+              <a
+                routerLink="/app/billing/invoices"
+                (click)="closeMobileDrawer()"
+                class="block px-3 py-1.5 rounded-lg text-xs text-[#334155] hover:bg-slate-100"
+                >Invoices</a
               >
 
               @if (isSuperAdmin()) {

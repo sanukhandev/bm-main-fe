@@ -1,5 +1,6 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { BmPageHeaderComponent } from '../../../shared/components/bm-page-header/bm-page-header.component';
 import { BmStatusBadgeComponent } from '../../../shared/components/bm-status-badge/bm-status-badge.component';
 import { BmLoadingStateComponent } from '../../../shared/components/bm-loading-state/bm-loading-state.component';
@@ -16,6 +17,7 @@ import { PaginationMeta } from '../../../core/api/api.models';
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     BmPageHeaderComponent,
     BmStatusBadgeComponent,
     BmLoadingStateComponent,
@@ -25,10 +27,11 @@ import { PaginationMeta } from '../../../core/api/api.models';
     BmPaginationComponent,
   ],
   template: `
-    <bm-page-header
+      <bm-page-header
       title="Branches Administration"
       subtitle="Super Admin multi-branch organization control"
-    >
+      >
+        <button type="button" (click)="openCreate()" class="bm-btn bm-btn-primary">Create Branch</button>
     </bm-page-header>
 
     <!-- Toolbar Filters -->
@@ -85,6 +88,7 @@ import { PaginationMeta } from '../../../core/api/api.models';
                 <th class="py-3.5 px-4">Timezone</th>
                 <th class="py-3.5 px-4">Currency</th>
                 <th class="py-3.5 px-4">Status</th>
+                <th class="py-3.5 px-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
@@ -105,6 +109,7 @@ import { PaginationMeta } from '../../../core/api/api.models';
                   <td class="py-3.5 px-4">
                     <bm-status-badge [status]="b.status"></bm-status-badge>
                   </td>
+                  <td class="py-3.5 px-4 text-right"><button type="button" class="text-emerald-700 font-semibold" (click)="openEdit(b)">Edit</button></td>
                 </tr>
               }
             </tbody>
@@ -119,10 +124,28 @@ import { PaginationMeta } from '../../../core/api/api.models';
         }
       </div>
     }
+
+    @if (formOpen()) {
+      <div class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4" (click)="closeForm()">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-xl max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
+          <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between"><div><h2 class="text-lg font-semibold text-slate-900">{{ editingBranch() ? 'Edit Branch' : 'Create Branch' }}</h2><p class="text-xs text-slate-500 mt-1">Branch code is generated automatically from the emirate.</p></div><button type="button" class="text-slate-400 text-xl" (click)="closeForm()">×</button></div>
+          <form class="p-6 space-y-4" (ngSubmit)="saveBranch()">
+            @if (formError()) { <p class="text-sm text-rose-700 bg-rose-50 rounded-lg px-3 py-2">{{ formError() }}</p> }
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3"><label class="block text-sm font-medium text-slate-700">Name<input class="bm-input mt-1" name="name" [(ngModel)]="form.name" required /></label><label class="block text-sm font-medium text-slate-700">Emirate<select class="bm-input mt-1" name="state_or_emirate" [(ngModel)]="form.state_or_emirate" required><option value="">Select emirate</option>@for (emirate of emirates; track emirate) {<option [value]="emirate">{{ emirate }}</option>}</select></label></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3"><label class="block text-sm font-medium text-slate-700">Phone<input class="bm-input mt-1" name="phone" [(ngModel)]="form.phone" /></label><label class="block text-sm font-medium text-slate-700">Email<input class="bm-input mt-1" type="email" name="email" [(ngModel)]="form.email" /></label></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3"><label class="block text-sm font-medium text-slate-700">Timezone<input class="bm-input mt-1" name="timezone" [(ngModel)]="form.timezone" required /></label><label class="block text-sm font-medium text-slate-700">Currency<input class="bm-input mt-1" name="currency_code" maxlength="3" [(ngModel)]="form.currency_code" required /></label></div>
+            <label class="block text-sm font-medium text-slate-700">Address<input class="bm-input mt-1" name="address_line_1" [(ngModel)]="form.address_line_1" /></label>
+            @if (editingBranch()) { <label class="block text-sm font-medium text-slate-700">Status<select class="bm-input mt-1" name="status" [(ngModel)]="form.status"><option value="active">Active</option><option value="inactive">Inactive</option></select></label> }
+            <div class="flex justify-end gap-3 pt-3 border-t border-slate-100"><button type="button" class="bm-btn bm-btn-secondary" (click)="closeForm()">Cancel</button><button type="submit" class="bm-btn bm-btn-primary" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Save Branch' }}</button></div>
+          </form>
+        </div>
+      </div>
+    }
   `,
 })
 export class BranchesListComponent implements OnInit {
   private api = inject(AdministrationApiService);
+  emirates = ['Abu Dhabi', 'Ajman', 'Dubai', 'Fujairah', 'Ras Al Khaimah', 'Sharjah', 'Umm Al Quwain'];
 
   branches = signal<Branch[]>([]);
   searchQuery = signal('');
@@ -131,6 +154,11 @@ export class BranchesListComponent implements OnInit {
   pageSize = signal(10);
   isLoading = signal(true);
   error = signal<string | null>(null);
+  formOpen = signal(false);
+  editingBranch = signal<Branch | null>(null);
+  saving = signal(false);
+  formError = signal<string | null>(null);
+  form: Partial<Branch> = this.emptyForm();
 
   filteredBranches = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
@@ -186,6 +214,16 @@ export class BranchesListComponent implements OnInit {
       },
     });
   }
+
+  openCreate(): void { this.editingBranch.set(null); this.form = this.emptyForm(); this.formError.set(null); this.formOpen.set(true); }
+  openEdit(branch: Branch): void { this.editingBranch.set(branch); this.form = { ...branch }; this.formError.set(null); this.formOpen.set(true); }
+  closeForm(): void { if (!this.saving()) this.formOpen.set(false); }
+  saveBranch(): void {
+    this.saving.set(true); this.formError.set(null);
+    const request = this.editingBranch() ? this.api.updateBranch(this.editingBranch()!.id, this.form) : this.api.createBranch(this.form);
+    request.subscribe({ next: () => { this.saving.set(false); this.formOpen.set(false); this.loadBranches(true); }, error: (err) => { this.saving.set(false); this.formError.set(err.error?.message || err.message || 'Unable to save branch.'); } });
+  }
+  private emptyForm(): Partial<Branch> { return { name: '', state_or_emirate: '', timezone: 'Asia/Dubai', currency_code: 'AED', status: 'active', phone: '', email: '', address_line_1: '' }; }
 
   onSearchChange(q: string): void {
     this.searchQuery.set(q);

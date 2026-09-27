@@ -1722,7 +1722,10 @@ export class OwnerAgreementDetailComponent implements OnInit {
         this.agreement.set(res.data);
         this.isLoading.set(false);
         this.isRefreshingPayments.set(false);
-        if (!this.profileActionHandled && this.route.snapshot.queryParamMap.get('action') === 'add-payment-line') {
+        if (
+          !this.profileActionHandled &&
+          this.route.snapshot.queryParamMap.get('action') === 'add-payment-line'
+        ) {
           this.profileActionHandled = true;
           this.addExtraPayment();
         } else if (!this.profileActionHandled) {
@@ -2011,7 +2014,9 @@ export class OwnerAgreementDetailComponent implements OnInit {
     });
   }
 
-  formatDate(dateStr?: string | null): string { return formatUaeDate(dateStr); }
+  formatDate(dateStr?: string | null): string {
+    return formatUaeDate(dateStr);
+  }
 
   formatAmount(val: string | number | undefined | null): string {
     const num = Number(val || 0);

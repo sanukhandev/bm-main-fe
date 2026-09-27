@@ -1996,7 +1996,9 @@ export class TenantAgreementDetailComponent implements OnInit {
     });
   }
 
-  formatDate(dateStr?: string | null): string { return formatUaeDate(dateStr); }
+  formatDate(dateStr?: string | null): string {
+    return formatUaeDate(dateStr);
+  }
 
   formatAmount(val: string | number | undefined | null): string {
     const num = Number(val || 0);

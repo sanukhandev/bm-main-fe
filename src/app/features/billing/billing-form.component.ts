@@ -531,13 +531,9 @@ export class BillingFormComponent {
         description: record.description || '',
         work_order_id: record.work_order_id ? String(record.work_order_id) : '',
         vendor_id: record.vendor?.id ? String(record.vendor.id) : '',
-        quotation_date:
-          'quotation_date' in record
-            ? record.quotation_date
-            : uaeDateInput(),
+        quotation_date: 'quotation_date' in record ? record.quotation_date : uaeDateInput(),
         valid_until: 'quotation_date' in record ? record.valid_until || '' : '',
-        invoice_date:
-          'invoice_date' in record ? record.invoice_date : uaeDateInput(),
+        invoice_date: 'invoice_date' in record ? record.invoice_date : uaeDateInput(),
         due_date: 'invoice_date' in record ? record.due_date || '' : '',
         tax_amount: Number(record.tax_amount),
       });

@@ -54,7 +54,9 @@ import { Customer, CustomerProfile } from '../../shared/models/customer.models';
               </h1>
               <bm-status-badge [status]="customer()!.status || 'active'"></bm-status-badge>
               @if (customer()!.identity_verified) {
-                <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 border border-emerald-200">
+                <span
+                  class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 border border-emerald-200"
+                >
                   <span aria-hidden="true">&#10003;</span>
                   Verified
                 </span>
@@ -527,7 +529,10 @@ import { Customer, CustomerProfile } from '../../shared/models/customer.models';
                     </tbody>
                   </table>
                 </div>
-                @for (agreement of allAgreements(); track agreement.type + '-lines-' + agreement.id) {
+                @for (
+                  agreement of allAgreements();
+                  track agreement.type + '-lines-' + agreement.id
+                ) {
                   @if (agreement.payment_lines.length) {
                     <div class="rounded-xl border border-slate-100 bg-slate-50/60 p-4 space-y-3">
                       <div class="flex items-center justify-between">
@@ -545,7 +550,9 @@ import { Customer, CustomerProfile } from '../../shared/models/customer.models';
                       <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs">
                           <thead>
-                            <tr class="border-b border-slate-200 text-slate-500 uppercase tracking-wider font-bold">
+                            <tr
+                              class="border-b border-slate-200 text-slate-500 uppercase tracking-wider font-bold"
+                            >
                               <th class="py-2 px-2">Line</th>
                               <th class="py-2 px-2">Particulars</th>
                               <th class="py-2 px-2">Due</th>
@@ -557,11 +564,19 @@ import { Customer, CustomerProfile } from '../../shared/models/customer.models';
                           <tbody class="divide-y divide-slate-200">
                             @for (line of agreement.payment_lines; track line.line_type + line.id) {
                               <tr>
-                                <td class="py-2 px-2 font-semibold text-slate-800">{{ line.line_no }}</td>
-                                <td class="py-2 px-2 text-slate-600">{{ line.particulars || line.category || '—' }}</td>
+                                <td class="py-2 px-2 font-semibold text-slate-800">
+                                  {{ line.line_no }}
+                                </td>
+                                <td class="py-2 px-2 text-slate-600">
+                                  {{ line.particulars || line.category || '—' }}
+                                </td>
                                 <td class="py-2 px-2 text-slate-600">{{ line.due_date }}</td>
-                                <td class="py-2 px-2 text-right font-semibold tabular-nums">AED {{ formatMoney(line.amount) }}</td>
-                                <td class="py-2 px-2"><bm-status-badge [status]="line.status"></bm-status-badge></td>
+                                <td class="py-2 px-2 text-right font-semibold tabular-nums">
+                                  AED {{ formatMoney(line.amount) }}
+                                </td>
+                                <td class="py-2 px-2">
+                                  <bm-status-badge [status]="line.status"></bm-status-badge>
+                                </td>
                                 <td class="py-2 px-2 text-right">
                                   @if (line.receipt?.document_no) {
                                     <a
@@ -569,7 +584,9 @@ import { Customer, CustomerProfile } from '../../shared/models/customer.models';
                                       [queryParams]="{ search: line.receipt!.document_no }"
                                       class="text-xs font-semibold text-emerald-700 hover:underline"
                                     >
-                                      {{ line.receipt!.direction === 'inward' ? 'Receipt' : 'Voucher' }}
+                                      {{
+                                        line.receipt!.direction === 'inward' ? 'Receipt' : 'Voucher'
+                                      }}
                                     </a>
                                   } @else {
                                     <a
@@ -737,7 +754,12 @@ import { Customer, CustomerProfile } from '../../shared/models/customer.models';
                   <span class="font-bold text-slate-900 mt-1 block font-mono">
                     {{ customer()!.identity_no || customer()!.company_registration_no || '—' }}
                     @if (customer()!.identity_verified && customer()!.identity_no) {
-                      <span class="ml-1 text-emerald-600" title="Verified Emirates ID" aria-label="Verified Emirates ID">&#10003;</span>
+                      <span
+                        class="ml-1 text-emerald-600"
+                        title="Verified Emirates ID"
+                        aria-label="Verified Emirates ID"
+                        >&#10003;</span
+                      >
                     }
                   </span>
                 </div>
@@ -886,7 +908,9 @@ export class CustomerDetailComponent implements OnInit {
   }
 
   agreementRoute(type: 'owner' | 'tenant', id: number): string[] {
-    return type === 'owner' ? ['/app/owner-agreements', String(id)] : ['/app/tenant-agreements', String(id)];
+    return type === 'owner'
+      ? ['/app/owner-agreements', String(id)]
+      : ['/app/tenant-agreements', String(id)];
   }
 
   receiptRoute(direction: string): string {

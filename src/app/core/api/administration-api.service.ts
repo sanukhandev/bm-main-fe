@@ -47,7 +47,10 @@ export class AdministrationApiService {
     return this.http.patch<ApiResponse<UserAdmin>>(`/api/v1/admin/users/${id}`, data);
   }
 
-  updateUserStatus(id: number, status: 'active' | 'inactive' | 'suspended'): Observable<ApiResponse<UserAdmin>> {
+  updateUserStatus(
+    id: number,
+    status: 'active' | 'inactive' | 'suspended',
+  ): Observable<ApiResponse<UserAdmin>> {
     return this.http.patch<ApiResponse<UserAdmin>>(`/api/v1/admin/users/${id}/status`, { status });
   }
 

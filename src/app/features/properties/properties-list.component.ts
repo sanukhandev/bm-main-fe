@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -35,8 +35,117 @@ import { PaginationMeta } from '../../core/api/api.models';
       <a routerLink="/app/properties/new" class="bm-btn bm-btn-primary text-xs"> + Add Property </a>
     </bm-page-header>
 
-    <!-- Toolbar Filters -->
-    <div class="bm-card p-4 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
+    <!-- Top Bento KPI Summary Strip -->
+    <div class="rounded-2xl border border-slate-200/90 bg-white p-5 mb-6 shadow-xs">
+      <div
+        class="grid grid-cols-2 md:grid-cols-4 gap-6 divide-y md:divide-y-0 md:divide-x divide-slate-100"
+      >
+        <div class="space-y-1">
+          <div
+            class="flex items-center gap-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 text-emerald-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+              />
+            </svg>
+            <span>Total Properties</span>
+          </div>
+          <div class="text-2xl font-extrabold text-slate-900 tabular-nums">
+            {{ paginationMeta()?.total || properties().length }}
+          </div>
+        </div>
+
+        <div class="space-y-1 pt-4 md:pt-0 md:pl-6">
+          <div
+            class="flex items-center gap-1.5 text-xs font-semibold text-emerald-700 uppercase tracking-wider"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 text-emerald-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span>Active Units</span>
+          </div>
+          <div class="text-2xl font-extrabold text-emerald-700 tabular-nums">
+            {{ activeCount() }}
+          </div>
+        </div>
+
+        <div class="space-y-1 pt-4 md:pt-0 md:pl-6">
+          <div
+            class="flex items-center gap-1.5 text-xs font-semibold text-blue-700 uppercase tracking-wider"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 text-blue-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+              />
+            </svg>
+            <span>Occupied Units</span>
+          </div>
+          <div class="text-2xl font-extrabold text-blue-700 tabular-nums">
+            {{ occupiedCount() }}
+          </div>
+        </div>
+
+        <div class="space-y-1 pt-4 md:pt-0 md:pl-6">
+          <div
+            class="flex items-center gap-1.5 text-xs font-semibold text-amber-700 uppercase tracking-wider"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 text-amber-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 8V4m0 0h4M4 4l5 5m11-2V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+              />
+            </svg>
+            <span>Total Area (sq ft)</span>
+          </div>
+          <div class="text-2xl font-extrabold text-amber-700 tabular-nums">
+            {{ totalArea() | number: '1.0-0' }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bento Toolbar Filters -->
+    <div
+      class="rounded-2xl border border-slate-200/90 bg-white p-4 mb-6 flex flex-col md:flex-row items-center justify-between gap-4 shadow-xs"
+    >
       <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
         <bm-search-input
           [value]="searchQuery()"
@@ -76,14 +185,14 @@ import { PaginationMeta } from '../../core/api/api.models';
         <button
           type="button"
           (click)="clearFilters()"
-          class="text-xs text-emerald-700 hover:text-emerald-800 font-medium"
+          class="text-xs text-emerald-700 hover:text-emerald-800 font-medium cursor-pointer"
         >
           Clear Filters
         </button>
       }
     </div>
 
-    <!-- Data Table -->
+    <!-- Data Table Container -->
     @if (isLoading()) {
       <bm-loading-state type="table"></bm-loading-state>
     } @else if (error()) {
@@ -96,7 +205,7 @@ import { PaginationMeta } from '../../core/api/api.models';
         (action)="navigateToCreate()"
       ></bm-empty-state>
     } @else {
-      <div class="bm-card overflow-hidden bg-[#FBFAF7] border border-[#E5E0D8] rounded-xl">
+      <div class="rounded-2xl border border-slate-200/90 bg-white overflow-hidden shadow-xs">
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse text-xs">
             <thead>
@@ -268,6 +377,21 @@ export class PropertiesListComponent implements OnInit, OnDestroy {
   archiveDialogOpen = signal(false);
   selectedProperty = signal<Property | null>(null);
   isArchiving = signal(false);
+
+  readonly activeCount = computed(
+    () => this.properties().filter((p) => (p.status || 'active').toLowerCase() === 'active').length,
+  );
+  readonly occupiedCount = computed(
+    () =>
+      this.properties().filter(
+        (p) =>
+          (p.status || '').toLowerCase() === 'occupied' ||
+          (p.status || '').toLowerCase() === 'rented',
+      ).length,
+  );
+  readonly totalArea = computed(() =>
+    this.properties().reduce((acc, p) => acc + (Number(p.area) || 0), 0),
+  );
 
   private branchSub?: Subscription;
 

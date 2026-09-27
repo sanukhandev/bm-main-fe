@@ -1005,38 +1005,6 @@ export interface PageSearchItem {
                     </div>
                   </a>
                   <a
-                    routerLink="/app/maintenance/vendors"
-                    (click)="closeMegaMenu()"
-                    class="group flex items-start gap-3 p-2 rounded-xl hover:bg-[#F8FAFC] transition"
-                  >
-                    <div
-                      class="w-7 h-7 rounded-lg bg-[#FEF2F2] text-[#DC2626] flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-4 w-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                        />
-                      </svg>
-                    </div>
-                    <div>
-                      <div class="text-xs font-semibold text-[#0F172A] group-hover:text-[#DC2626]">
-                        Vendors
-                      </div>
-                      <div class="text-[10px] text-[#64748B] leading-tight">
-                        Approved contractors
-                      </div>
-                    </div>
-                  </a>
-                  <a
                     routerLink="/app/maintenance/inventory"
                     (click)="closeMegaMenu()"
                     class="group flex items-start gap-3 p-2 rounded-xl hover:bg-[#F8FAFC] transition"
@@ -1219,7 +1187,7 @@ export interface PageSearchItem {
 
           <!-- ACCOUNTS MEGA MENU -->
           @if (activeMegaMenu() === 'accounts') {
-            <div class="grid grid-cols-3 gap-6">
+            <div class="grid grid-cols-2 gap-6">
               <div class="space-y-1">
                 <div class="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider mb-3">
                   Accounting Operations
@@ -1383,75 +1351,6 @@ export interface PageSearchItem {
                       Financial Reports
                     </div>
                     <div class="text-[10px] text-[#64748B]">Income & expenditure statements</div>
-                  </div>
-                </a>
-              </div>
-
-              <div class="space-y-1">
-                <div class="text-[11px] font-semibold text-[#64748B] uppercase tracking-wider mb-3">
-                  Billing & Invoicing
-                </div>
-                <a
-                  routerLink="/app/billing/quotations"
-                  (click)="closeMegaMenu()"
-                  class="group flex items-start gap-3 p-2 rounded-xl hover:bg-[#F8FAFC] transition"
-                >
-                  <div
-                    class="w-7 h-7 rounded-lg bg-[#F5F3FF] text-[#7C3AED] flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <div class="text-xs font-semibold text-[#0F172A] group-hover:text-[#7C3AED]">
-                      Quotations
-                    </div>
-                    <div class="text-[10px] text-[#64748B]">Estimations & client fee quotes</div>
-                  </div>
-                </a>
-
-                <a
-                  routerLink="/app/billing/invoices"
-                  (click)="closeMegaMenu()"
-                  class="group flex items-start gap-3 p-2 rounded-xl hover:bg-[#F8FAFC] transition"
-                >
-                  <div
-                    class="w-7 h-7 rounded-lg bg-[#ECFDF5] text-[#047857] flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <div class="text-xs font-semibold text-[#0F172A] group-hover:text-[#047857]">
-                      Invoices
-                    </div>
-                    <div class="text-[10px] text-[#64748B]">
-                      Receivable billing invoices & statements
-                    </div>
                   </div>
                 </a>
               </div>
@@ -1785,7 +1684,7 @@ export interface PageSearchItem {
               <div
                 class="pt-2 text-[10px] font-semibold text-[#64748B] uppercase tracking-wider px-3"
               >
-                Operations
+                Customers & Portfolio
               </div>
               <a
                 routerLink="/app/customers/owners"
@@ -1800,22 +1699,16 @@ export interface PageSearchItem {
                 >Tenants</a
               >
               <a
+                routerLink="/app/customers/vendors"
+                (click)="closeMobileDrawer()"
+                class="block px-3 py-1.5 rounded-lg text-xs text-[#334155] hover:bg-slate-100"
+                >Vendors</a
+              >
+              <a
                 routerLink="/app/properties"
                 (click)="closeMobileDrawer()"
                 class="block px-3 py-1.5 rounded-lg text-xs text-[#334155] hover:bg-slate-100"
                 >Properties</a
-              >
-              <a
-                routerLink="/app/maintenance/work-orders"
-                (click)="closeMobileDrawer()"
-                class="block px-3 py-1.5 rounded-lg text-xs text-[#334155] hover:bg-slate-100"
-                >Work Orders</a
-              >
-              <a
-                routerLink="/app/billing/invoices"
-                (click)="closeMobileDrawer()"
-                class="block px-3 py-1.5 rounded-lg text-xs text-[#334155] hover:bg-slate-100"
-                >Invoices</a
               >
 
               <div
@@ -1839,7 +1732,7 @@ export interface PageSearchItem {
               <div
                 class="pt-2 text-[10px] font-semibold text-[#64748B] uppercase tracking-wider px-3"
               >
-                Accounts
+                Accounts & Financials
               </div>
               <a
                 routerLink="/app/accounts/dashboard"
@@ -1866,6 +1759,30 @@ export interface PageSearchItem {
                 >Petty Cash Daybook</a
               >
               <a
+                routerLink="/app/accounts/reports"
+                (click)="closeMobileDrawer()"
+                class="block px-3 py-1.5 rounded-lg text-xs text-[#334155] hover:bg-slate-100"
+                >Financial Reports</a
+              >
+
+              <div
+                class="pt-2 text-[10px] font-semibold text-[#64748B] uppercase tracking-wider px-3"
+              >
+                Maintenance & Billing
+              </div>
+              <a
+                routerLink="/app/maintenance/work-orders"
+                (click)="closeMobileDrawer()"
+                class="block px-3 py-1.5 rounded-lg text-xs text-[#334155] hover:bg-slate-100"
+                >Work Orders</a
+              >
+              <a
+                routerLink="/app/maintenance/inventory"
+                (click)="closeMobileDrawer()"
+                class="block px-3 py-1.5 rounded-lg text-xs text-[#334155] hover:bg-slate-100"
+                >Inventory</a
+              >
+              <a
                 routerLink="/app/billing/quotations"
                 (click)="closeMobileDrawer()"
                 class="block px-3 py-1.5 rounded-lg text-xs text-[#334155] hover:bg-slate-100"
@@ -1876,6 +1793,18 @@ export interface PageSearchItem {
                 (click)="closeMobileDrawer()"
                 class="block px-3 py-1.5 rounded-lg text-xs text-[#334155] hover:bg-slate-100"
                 >Invoices</a
+              >
+
+              <div
+                class="pt-2 text-[10px] font-semibold text-[#64748B] uppercase tracking-wider px-3"
+              >
+                Reports & AI
+              </div>
+              <a
+                routerLink="/app/reports/intelligent"
+                (click)="closeMobileDrawer()"
+                class="block px-3 py-1.5 rounded-lg text-xs text-[#334155] hover:bg-slate-100"
+                >Intelligent AI Report</a
               >
 
               @if (isSuperAdmin()) {
@@ -1902,6 +1831,14 @@ export interface PageSearchItem {
                   class="block px-3 py-1.5 rounded-lg text-xs text-[#334155] hover:bg-slate-100"
                   >Roles</a
                 >
+                @if (hasPermission('audit.view')) {
+                  <a
+                    routerLink="/app/administration/audit"
+                    (click)="closeMobileDrawer()"
+                    class="block px-3 py-1.5 rounded-lg text-xs text-[#334155] hover:bg-slate-100"
+                    >Audit Log</a
+                  >
+                }
               }
 
               <div
@@ -1922,16 +1859,10 @@ export interface PageSearchItem {
                 >FAQ & Guide</a
               >
               <a
-                routerLink="/app/terms-of-use"
+                routerLink="/app/privacy-terms"
                 (click)="closeMobileDrawer()"
                 class="block px-3 py-1.5 rounded-lg text-xs text-[#334155] hover:bg-slate-100"
-                >Terms of Use</a
-              >
-              <a
-                routerLink="/app/privacy-policy"
-                (click)="closeMobileDrawer()"
-                class="block px-3 py-1.5 rounded-lg text-xs text-[#334155] hover:bg-slate-100"
-                >Privacy Policy</a
+                >Terms & Privacy</a
               >
             </nav>
           </div>
@@ -2301,13 +2232,21 @@ export class LayoutComponent {
   selectedIndex = signal(0);
 
   readonly allSearchItems: PageSearchItem[] = [
-    // Dashboard & Overview
+    // Executive Dashboard & AI Assistant
     {
       title: 'Executive Overview',
       subtitle: 'Real-time ERP dashboard & metrics',
       category: 'Pages',
       url: '/app/dashboard',
       keywords: ['dashboard', 'home', 'overview', 'metrics', 'analytics'],
+    },
+    {
+      title: 'Zaakiy AI Assistant',
+      subtitle: 'AI copilot for natural language ERP queries & automation',
+      category: 'Pages',
+      url: '/app/zaakiy',
+      keywords: ['zaakiy', 'ai', 'assistant', 'copilot', 'chat', 'bot', 'intelligence', 'gpt'],
+      badge: 'AI Copilot',
     },
 
     // Customers: Owners
@@ -2320,10 +2259,10 @@ export class LayoutComponent {
     },
     {
       title: 'Add New Owner',
-      subtitle: 'Register a new property owner',
+      subtitle: 'Register a new property owner profile',
       category: 'Actions',
       url: '/app/customers/owners/new',
-      keywords: ['add owner', 'new owner', 'create owner', 'register owner'],
+      keywords: ['add owner', 'new owner', 'create owner', 'register owner', '+owner'],
       badge: 'New Action',
     },
 
@@ -2336,167 +2275,296 @@ export class LayoutComponent {
       keywords: ['tenant', 'tenants', 'renter', 'leaseholder', 'occupant'],
     },
     {
-      title: 'Vendor Directory',
-      subtitle: 'Maintenance vendors & contractors',
-      category: 'Customers',
-      url: '/app/customers/vendors',
-      keywords: ['vendor', 'vendors', 'supplier', 'contractor', 'maintenance'],
-    },
-    {
       title: 'Add New Tenant',
-      subtitle: 'Register a new tenant',
+      subtitle: 'Register a new tenant profile',
       category: 'Actions',
       url: '/app/customers/tenants/new',
-      keywords: ['add tenant', 'new tenant', 'create tenant', 'register tenant'],
+      keywords: ['add tenant', 'new tenant', 'create tenant', 'register tenant', '+tenant'],
+      badge: 'New Action',
+    },
+
+    // Customers: Vendors
+    {
+      title: 'Vendor Directory',
+      subtitle: 'Maintenance vendors, contractors & suppliers',
+      category: 'Customers',
+      url: '/app/customers/vendors',
+      keywords: [
+        'vendor',
+        'vendors',
+        'supplier',
+        'contractor',
+        'maintenance vendor',
+        'plumber',
+        'electrician',
+      ],
+    },
+    {
+      title: 'Add New Vendor',
+      subtitle: 'Register a new maintenance vendor or contractor',
+      category: 'Actions',
+      url: '/app/customers/vendors/new',
+      keywords: ['add vendor', 'new vendor', 'create vendor', 'register vendor', '+vendor'],
       badge: 'New Action',
     },
 
     // Properties & Units
     {
-      title: 'Property Directory',
-      subtitle: 'Master property & unit portfolio',
+      title: 'Property Portfolio',
+      subtitle: 'Master property & unit portfolio directory',
       category: 'Properties',
       url: '/app/properties',
-      keywords: ['property', 'properties', 'unit', 'building', 'portfolio', 'estate'],
+      keywords: [
+        'property',
+        'properties',
+        'unit',
+        'building',
+        'portfolio',
+        'estate',
+        'real estate',
+      ],
     },
     {
       title: 'Add New Property',
-      subtitle: 'Register a new property or unit',
+      subtitle: 'Register a new property or building unit',
       category: 'Actions',
       url: '/app/properties/new',
-      keywords: ['add property', 'new property', 'create property', 'new unit'],
+      keywords: [
+        'add property',
+        'new property',
+        'create property',
+        'new unit',
+        'building',
+        '+property',
+      ],
       badge: 'New Action',
     },
 
     // Owner Agreements
     {
       title: 'Owner Agreements',
-      subtitle: 'Management contracts with owners',
+      subtitle: 'Management contracts & terms with owners',
       category: 'Agreements',
       url: '/app/owner-agreements',
-      keywords: ['owner agreement', 'management contract', 'owner terms'],
+      keywords: ['owner agreement', 'management contract', 'owner terms', 'agreements'],
     },
     {
       title: 'New Owner Agreement',
-      subtitle: 'Create a new owner management contract',
+      subtitle: 'Draft a new owner property management contract',
       category: 'Actions',
       url: '/app/owner-agreements/new',
-      keywords: ['new owner agreement', 'create owner agreement'],
+      keywords: ['new owner agreement', 'create owner agreement', '+owner agreement'],
       badge: 'New Action',
     },
 
     // Tenant Agreements
     {
       title: 'Tenant Agreements',
-      subtitle: 'Lease contracts & rent schedules',
+      subtitle: 'Lease contracts & rent payment schedules',
       category: 'Agreements',
       url: '/app/tenant-agreements',
-      keywords: ['tenant agreement', 'lease', 'rent contract', 'expiry', 'installments'],
+      keywords: ['tenant agreement', 'lease', 'rent contract', 'expiry', 'installments', 'tenancy'],
     },
     {
       title: 'New Tenant Lease',
-      subtitle: 'Create a new tenant lease contract',
+      subtitle: 'Create a new tenant lease contract & payment terms',
       category: 'Actions',
       url: '/app/tenant-agreements/new',
-      keywords: ['new lease', 'create tenant agreement', 'new rent contract'],
+      keywords: [
+        'new lease',
+        'create tenant agreement',
+        'new rent contract',
+        '+lease',
+        '+tenant agreement',
+      ],
       badge: 'New Action',
     },
 
     // Accounts & Financials
     {
       title: 'Accounts Dashboard',
-      subtitle: 'Real-time financial ledger & position',
+      subtitle: 'Real-time financial ledger & monetary position',
       category: 'Financials',
       url: '/app/accounts/dashboard',
-      keywords: ['accounts', 'finance', 'ledger', 'cash flow', 'balance'],
+      keywords: ['accounts', 'finance', 'ledger', 'cash flow', 'balance', 'accounting'],
     },
     {
       title: 'Inward Receipts',
       subtitle: 'Collection vouchers & incoming money',
       category: 'Financials',
       url: '/app/accounts/inward',
-      keywords: ['inward', 'receipt', 'rent payment', 'income', 'cash in'],
+      keywords: ['inward', 'receipt', 'rent payment', 'income', 'cash in', 'collection'],
     },
     {
-      title: 'Issue Inward Receipt',
-      subtitle: 'Record an incoming rent receipt voucher',
+      title: 'Post Inward Receipt',
+      subtitle: 'Record an incoming rent or fee payment voucher',
       category: 'Actions',
       url: '/app/accounts/inward',
-      keywords: ['new receipt', 'issue inward', 'collect rent'],
+      keywords: ['new receipt', 'issue inward', 'collect rent', 'post receipt', '+receipt'],
       badge: 'New Action',
     },
     {
       title: 'Outward Vouchers',
-      subtitle: 'Payment vouchers & disbursements',
+      subtitle: 'Payment vouchers & expense disbursements',
       category: 'Financials',
       url: '/app/accounts/outward',
-      keywords: ['outward', 'voucher', 'expense', 'payout', 'disbursement'],
+      keywords: ['outward', 'voucher', 'expense', 'payout', 'disbursement', 'payment voucher'],
     },
     {
-      title: 'Issue Outward Voucher',
-      subtitle: 'Record an outgoing payment voucher',
+      title: 'Post Outward Voucher',
+      subtitle: 'Record an outgoing payment voucher or disbursement',
       category: 'Actions',
       url: '/app/accounts/outward',
-      keywords: ['new voucher', 'issue outward', 'make payment'],
+      keywords: ['new voucher', 'issue outward', 'make payment', 'post voucher', '+voucher'],
       badge: 'New Action',
     },
     {
       title: 'Petty Cash Daybook',
-      subtitle: 'Daily petty cash transactions log',
+      subtitle: 'Daily petty cash transactions & expenses log',
       category: 'Financials',
       url: '/app/accounts/petty-cash',
-      keywords: ['petty cash', 'daybook', 'daily cash', 'expenses'],
+      keywords: ['petty cash', 'daybook', 'daily cash', 'expenses', 'cashbook'],
+    },
+    {
+      title: 'Financial Reports',
+      subtitle: 'Income, expenditure & daily movement statements',
+      category: 'Financials',
+      url: '/app/accounts/reports',
+      keywords: [
+        'financial reports',
+        'statement',
+        'income statement',
+        'expenditure',
+        'p&l',
+        'cashbook',
+      ],
     },
 
     // Maintenance & Inventory
     {
       title: 'Work Orders',
-      subtitle: 'Maintenance requests & repairs',
+      subtitle: 'Maintenance requests, repairs & tickets',
       category: 'Pages',
       url: '/app/maintenance/work-orders',
-      keywords: ['work order', 'maintenance', 'repair', 'ticket', 'dispatch'],
+      keywords: ['work order', 'maintenance', 'repair', 'ticket', 'dispatch', 'service request'],
     },
     {
-      title: 'Vendors Directory',
+      title: 'Create Work Order',
+      subtitle: 'Issue a new repair or maintenance work order',
+      category: 'Actions',
+      url: '/app/maintenance/work-orders/new',
+      keywords: ['new work order', 'create work order', 'issue ticket', '+work order', '+repair'],
+      badge: 'New Action',
+    },
+    {
+      title: 'Maintenance Vendors',
       subtitle: 'Approved contractors & service providers',
       category: 'Pages',
       url: '/app/maintenance/vendors',
       keywords: ['vendor', 'contractor', 'supplier', 'plumber', 'electrician'],
     },
     {
-      title: 'Inventory Management',
-      subtitle: 'Stock items & spare parts',
+      title: 'Spare Parts & Inventory',
+      subtitle: 'Stock items, spare parts & asset inventory',
       category: 'Pages',
       url: '/app/maintenance/inventory',
-      keywords: ['inventory', 'stock', 'parts', 'spares'],
+      keywords: ['inventory', 'stock', 'parts', 'spares', 'supplies'],
     },
 
-    // Billing & Reports
+    // Billing & Invoicing
     {
       title: 'Quotations',
-      subtitle: 'Price quotes & cost estimates',
+      subtitle: 'Price quotes, estimates & fee estimations',
       category: 'Pages',
       url: '/app/billing/quotations',
-      keywords: ['quotation', 'quote', 'estimate'],
+      keywords: ['quotation', 'quote', 'estimate', 'fee quote', 'proforma'],
+    },
+    {
+      title: 'Create Quotation',
+      subtitle: 'Draft a new price quote or estimate',
+      category: 'Actions',
+      url: '/app/billing/quotations/new',
+      keywords: ['new quotation', 'create quote', 'new estimate', '+quote', '+quotation'],
+      badge: 'New Action',
     },
     {
       title: 'Invoices',
-      subtitle: 'Receivable billing invoices',
+      subtitle: 'Receivable billing invoices & statements',
       category: 'Pages',
       url: '/app/billing/invoices',
-      keywords: ['invoice', 'billing', 'statement'],
+      keywords: ['invoice', 'billing', 'statement', 'receivable', 'bill'],
     },
     {
+      title: 'Create Invoice',
+      subtitle: 'Draft a new receivable billing invoice',
+      category: 'Actions',
+      url: '/app/billing/invoices/new',
+      keywords: ['new invoice', 'create invoice', 'bill tenant', '+invoice', '+bill'],
+      badge: 'New Action',
+    },
+
+    // Reports & Analytics
+    {
       title: 'Intelligent Report',
-      subtitle: 'Management intelligence, leakage & AI insights',
+      subtitle: 'Management intelligence, revenue leakage & AI insights',
       category: 'Reports',
       url: '/app/reports/intelligent',
-      keywords: ['intelligent', 'report', 'leakage', 'ai', 'analytics', 'revenue'],
+      keywords: ['intelligent', 'report', 'leakage', 'ai', 'analytics', 'revenue', 'insights'],
       badge: 'Analytics',
     },
     {
-      title: 'Help & FAQ',
-      subtitle: 'Answers for daily ERP tasks and workflows',
+      title: 'Owner Agreements Report',
+      subtitle: 'Owner agreement tracking, payouts & status reports',
+      category: 'Reports',
+      url: '/app/reports/owner-agreements',
+      keywords: ['owner agreement report', 'management report', 'owner payout report'],
+    },
+    {
+      title: 'Tenant Agreements Report',
+      subtitle: 'Tenant lease status, renewals & vacancy reports',
+      category: 'Reports',
+      url: '/app/reports/tenant-agreements',
+      keywords: ['tenant agreement report', 'lease report', 'expiry report', 'occupancy report'],
+    },
+
+    // System & Administration
+    {
+      title: 'Branch Management',
+      subtitle: 'Branches & office locations setup',
+      category: 'System',
+      url: '/app/administration/branches',
+      keywords: ['branch', 'branches', 'location', 'office', 'fujairah', 'ajman'],
+      adminOnly: true,
+    },
+    {
+      title: 'User Management',
+      subtitle: 'Staff accounts & system users',
+      category: 'System',
+      url: '/app/administration/users',
+      keywords: ['user', 'users', 'staff', 'employee', 'account', 'admin'],
+      adminOnly: true,
+    },
+    {
+      title: 'Roles & Permissions',
+      subtitle: 'Security roles & access control matrix',
+      category: 'System',
+      url: '/app/administration/roles',
+      keywords: ['role', 'roles', 'permission', 'security', 'access', 'rbac'],
+      adminOnly: true,
+    },
+    {
+      title: 'Security Audit Trail',
+      subtitle: 'Sensitive activity, login logs & audit history',
+      category: 'System',
+      url: '/app/administration/audit',
+      keywords: ['audit', 'audit trail', 'log', 'security', 'activity', 'history'],
+      adminOnly: true,
+    },
+
+    // Help & Legal
+    {
+      title: 'Help & FAQ Guide',
+      subtitle: 'Answers for daily ERP tasks, workflows & user guide',
       category: 'Pages',
       url: '/app/faq',
       keywords: ['faq', 'help', 'guide', 'manual', 'how to', 'support', 'question'],
@@ -2515,66 +2583,24 @@ export class LayoutComponent {
         'dwtech',
         'desertwhales',
         'zaakiy',
-        'fujairah',
-        'ajman',
         'credits',
       ],
       badge: 'Info',
     },
     {
-      title: 'Terms of Use',
-      subtitle: 'Legal terms & service agreement for ERP platform',
+      title: 'Terms of Use & Privacy Policy',
+      subtitle: 'Enterprise license, terms & UAE data protection policy',
       category: 'Pages',
-      url: '/app/terms-of-use',
-      keywords: ['terms', 'terms of use', 'legal', 'conditions', 'agreement'],
-    },
-    {
-      title: 'Privacy Policy',
-      subtitle: 'Data protection, UAE laws & confidentiality policy',
-      category: 'Pages',
-      url: '/app/privacy-policy',
+      url: '/app/privacy-terms',
       keywords: [
+        'terms',
+        'terms of use',
         'privacy',
         'privacy policy',
-        'gdpr',
-        'data',
-        'security',
-        'confidentiality',
         'legal',
+        'conditions',
+        'agreement',
       ],
-    },
-    {
-      title: 'Financial Reports',
-      subtitle: 'Operational & audit reports',
-      category: 'Pages',
-      url: '/app/reports/owner-agreements',
-      keywords: ['reports', 'statement', 'financial report', 'audit'],
-    },
-
-    // Administration (Super Admin)
-    {
-      title: 'Branch Management',
-      subtitle: 'Branches & office locations',
-      category: 'System',
-      url: '/app/administration/branches',
-      keywords: ['branch', 'branches', 'location', 'office'],
-      adminOnly: true,
-    },
-    {
-      title: 'User Management',
-      subtitle: 'Staff accounts & system users',
-      category: 'System',
-      url: '/app/administration/users',
-      keywords: ['user', 'users', 'staff', 'employee', 'account'],
-      adminOnly: true,
-    },
-    {
-      title: 'Roles & Permissions',
-      subtitle: 'Security roles & access control',
-      category: 'System',
-      url: '/app/administration/roles',
-      keywords: ['role', 'roles', 'permission', 'security', 'access'],
-      adminOnly: true,
     },
   ];
 
@@ -2751,6 +2777,14 @@ export class LayoutComponent {
         badge: 'Records',
       },
       {
+        title: `Search Vendors for "${query}"`,
+        subtitle: 'Find matching vendor records',
+        category: 'Customers',
+        url: `/app/customers/vendors?search=${search}`,
+        keywords: ['vendor', 'contractor', 'record'],
+        badge: 'Records',
+      },
+      {
         title: `Search Properties for "${query}"`,
         subtitle: 'Find matching property records',
         category: 'Properties',
@@ -2760,7 +2794,7 @@ export class LayoutComponent {
       },
       {
         title: `Search Owner Agreements for "${query}"`,
-        subtitle: 'Find matching owner agreements',
+        subtitle: 'Find matching owner contracts',
         category: 'Agreements',
         url: `/app/owner-agreements?search=${search}`,
         keywords: ['owner agreement', 'contract', 'record'],
@@ -2768,10 +2802,42 @@ export class LayoutComponent {
       },
       {
         title: `Search Tenant Agreements for "${query}"`,
-        subtitle: 'Find matching tenant agreements',
+        subtitle: 'Find matching tenant leases',
         category: 'Agreements',
         url: `/app/tenant-agreements?search=${search}`,
         keywords: ['tenant agreement', 'lease', 'record'],
+        badge: 'Records',
+      },
+      {
+        title: `Search Work Orders for "${query}"`,
+        subtitle: 'Find matching repair & service tickets',
+        category: 'Pages',
+        url: `/app/maintenance/work-orders?search=${search}`,
+        keywords: ['work order', 'maintenance', 'repair'],
+        badge: 'Records',
+      },
+      {
+        title: `Search Invoices for "${query}"`,
+        subtitle: 'Find matching receivable billing invoices',
+        category: 'Pages',
+        url: `/app/billing/invoices?search=${search}`,
+        keywords: ['invoice', 'billing'],
+        badge: 'Records',
+      },
+      {
+        title: `Search Quotations for "${query}"`,
+        subtitle: 'Find matching price estimates',
+        category: 'Pages',
+        url: `/app/billing/quotations?search=${search}`,
+        keywords: ['quotation', 'estimate'],
+        badge: 'Records',
+      },
+      {
+        title: `Search Security Audit Trail for "${query}"`,
+        subtitle: 'Find matching security log entries',
+        category: 'System',
+        url: `/app/administration/audit?search=${search}`,
+        keywords: ['audit', 'security', 'log'],
         badge: 'Records',
       },
     ];

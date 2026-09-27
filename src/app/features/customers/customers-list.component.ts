@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -38,7 +38,11 @@ import { PaginationMeta } from '../../core/api/api.models';
       <a
         [routerLink]="
           role()
-            ? ['/app/customers', role() === 'owner' ? 'owners' : role() === 'tenant' ? 'tenants' : 'vendors', 'new']
+            ? [
+                '/app/customers',
+                role() === 'owner' ? 'owners' : role() === 'tenant' ? 'tenants' : 'vendors',
+                'new',
+              ]
             : ['/app/customers/new']
         "
         class="bm-btn bm-btn-primary text-xs"
@@ -47,8 +51,117 @@ import { PaginationMeta } from '../../core/api/api.models';
       </a>
     </bm-page-header>
 
-    <!-- Toolbar Filters -->
-    <div class="bm-card p-4 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
+    <!-- Top Bento KPI Summary Strip -->
+    <div class="rounded-2xl border border-slate-200/90 bg-white p-5 mb-6 shadow-xs">
+      <div
+        class="grid grid-cols-2 md:grid-cols-4 gap-6 divide-y md:divide-y-0 md:divide-x divide-slate-100"
+      >
+        <div class="space-y-1">
+          <div
+            class="flex items-center gap-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 text-emerald-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              />
+            </svg>
+            <span>Total Records</span>
+          </div>
+          <div class="text-2xl font-extrabold text-slate-900 tabular-nums">
+            {{ paginationMeta()?.total || customers().length }}
+          </div>
+        </div>
+
+        <div class="space-y-1 pt-4 md:pt-0 md:pl-6">
+          <div
+            class="flex items-center gap-1.5 text-xs font-semibold text-emerald-700 uppercase tracking-wider"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 text-emerald-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span>Active Accounts</span>
+          </div>
+          <div class="text-2xl font-extrabold text-emerald-700 tabular-nums">
+            {{ activeCount() }}
+          </div>
+        </div>
+
+        <div class="space-y-1 pt-4 md:pt-0 md:pl-6">
+          <div
+            class="flex items-center gap-1.5 text-xs font-semibold text-blue-700 uppercase tracking-wider"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 text-blue-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+              />
+            </svg>
+            <span>Corporate</span>
+          </div>
+          <div class="text-2xl font-extrabold text-blue-700 tabular-nums">
+            {{ corporateCount() }}
+          </div>
+        </div>
+
+        <div class="space-y-1 pt-4 md:pt-0 md:pl-6">
+          <div
+            class="flex items-center gap-1.5 text-xs font-semibold text-purple-700 uppercase tracking-wider"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 text-purple-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
+            </svg>
+            <span>Individual</span>
+          </div>
+          <div class="text-2xl font-extrabold text-purple-700 tabular-nums">
+            {{ individualCount() }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bento Toolbar Filters -->
+    <div
+      class="rounded-2xl border border-slate-200/90 bg-white p-4 mb-6 flex flex-col md:flex-row items-center justify-between gap-4 shadow-xs"
+    >
       <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
         <bm-search-input
           [value]="searchQuery()"
@@ -82,14 +195,14 @@ import { PaginationMeta } from '../../core/api/api.models';
         <button
           type="button"
           (click)="clearFilters()"
-          class="text-xs text-emerald-700 hover:text-emerald-800 font-medium"
+          class="text-xs text-emerald-700 hover:text-emerald-800 font-medium cursor-pointer"
         >
           Clear Filters
         </button>
       }
     </div>
 
-    <!-- Data Table -->
+    <!-- Data Table Container -->
     @if (isLoading()) {
       <bm-loading-state type="table"></bm-loading-state>
     } @else if (error()) {
@@ -98,13 +211,11 @@ import { PaginationMeta } from '../../core/api/api.models';
       <bm-empty-state
         title="No customers found"
         description="No customer records match your filter criteria."
-        [actionLabel]="
-          '+ Create ' + (roleLabel() || 'Customer')
-        "
+        [actionLabel]="'+ Create ' + (roleLabel() || 'Customer')"
         (action)="navigateToCreate()"
       ></bm-empty-state>
     } @else {
-      <div class="bm-card overflow-hidden">
+      <div class="rounded-2xl border border-slate-200/90 bg-white overflow-hidden shadow-xs">
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse text-xs">
             <thead>
@@ -185,7 +296,11 @@ import { PaginationMeta } from '../../core/api/api.models';
                           role()
                             ? [
                                 '/app/customers',
-                                role() === 'owner' ? 'owners' : role() === 'tenant' ? 'tenants' : 'vendors',
+                                role() === 'owner'
+                                  ? 'owners'
+                                  : role() === 'tenant'
+                                    ? 'tenants'
+                                    : 'vendors',
                                 cust.id,
                                 'edit',
                               ]
@@ -283,6 +398,19 @@ export class CustomersListComponent implements OnInit, OnDestroy {
   selectedCustomer = signal<Customer | null>(null);
   isArchiving = signal(false);
 
+  readonly activeCount = computed(
+    () => this.customers().filter((c) => (c.status || 'active').toLowerCase() === 'active').length,
+  );
+  readonly corporateCount = computed(
+    () =>
+      this.customers().filter((c) => (c.customer_type || '').toLowerCase() === 'organization')
+        .length,
+  );
+  readonly individualCount = computed(
+    () =>
+      this.customers().filter((c) => (c.customer_type || '').toLowerCase() === 'individual').length,
+  );
+
   private branchSub?: Subscription;
 
   ngOnInit(): void {
@@ -338,7 +466,13 @@ export class CustomersListComponent implements OnInit, OnDestroy {
   }
 
   roleLabel(): string {
-    return this.role() === 'owner' ? 'Owners' : this.role() === 'tenant' ? 'Tenants' : this.role() === 'vendor' ? 'Vendors' : '';
+    return this.role() === 'owner'
+      ? 'Owners'
+      : this.role() === 'tenant'
+        ? 'Tenants'
+        : this.role() === 'vendor'
+          ? 'Vendors'
+          : '';
   }
 
   updateQueryParams(): void {

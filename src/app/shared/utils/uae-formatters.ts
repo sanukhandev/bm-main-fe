@@ -15,9 +15,10 @@ export function uaeDateInput(date = new Date()): string {
 
 export function formatUaeDate(value: string | Date | null | undefined): string {
   if (!value) return '—';
-  const date = typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)
-    ? new Date(`${value}T12:00:00Z`)
-    : new Date(value);
+  const date =
+    typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)
+      ? new Date(`${value}T12:00:00Z`)
+      : new Date(value);
   if (Number.isNaN(date.getTime())) return String(value);
   return new Intl.DateTimeFormat('en-GB', {
     timeZone: UAE_TIME_ZONE,

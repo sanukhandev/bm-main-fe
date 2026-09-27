@@ -38,8 +38,12 @@ export class PropertiesApiService {
     return this.http.get<ApiResponse<Property>>(`${this.baseUrl}/${id}`);
   }
 
-  getPropertyProfile(id: number): Observable<ApiResponse<{ property: Property; profile: PropertyProfile }>> {
-    return this.http.get<ApiResponse<{ property: Property; profile: PropertyProfile }>>(`${this.baseUrl}/${id}/profile`);
+  getPropertyProfile(
+    id: number,
+  ): Observable<ApiResponse<{ property: Property; profile: PropertyProfile }>> {
+    return this.http.get<ApiResponse<{ property: Property; profile: PropertyProfile }>>(
+      `${this.baseUrl}/${id}/profile`,
+    );
   }
 
   createProperty(dto: CreatePropertyDto): Observable<ApiResponse<Property>> {

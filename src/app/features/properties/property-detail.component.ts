@@ -118,7 +118,9 @@ import { Property, PropertyProfile } from '../../shared/models/property.models';
             @if (canCreateTenantAgreement()) {
               <a
                 [routerLink]="['/app/tenant-agreements/new']"
-                [queryParams]="{ source_owner_agreement_id: profile()?.actions?.default_owner_agreement_id }"
+                [queryParams]="{
+                  source_owner_agreement_id: profile()?.actions?.default_owner_agreement_id,
+                }"
                 class="bm-btn bm-btn-primary text-xs flex items-center gap-1.5"
               >
                 <svg

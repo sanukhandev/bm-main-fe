@@ -1,6 +1,7 @@
 export interface BillingLine {
   id?: number;
   particulars: string;
+  transaction_reference?: string;
   quantity: number | string;
   unit_price: number | string;
   line_total?: number | string;

@@ -1249,6 +1249,9 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                     class="bm-input"
                     placeholder="Line description"
                   />
+                  <div class="mt-1 text-[10px] text-slate-500">
+                    Transaction reference: {{ extraPaymentReference() }}
+                  </div>
                 </div>
                 <div>
                   <label class="block font-semibold text-slate-700 mb-1">Amount</label>
@@ -2033,6 +2036,10 @@ export class OwnerAgreementDetailComponent implements OnInit {
       },
       error: (err) => this.error.set(err.message || 'Unable to add payment line.'),
     });
+  }
+
+  extraPaymentReference(): string {
+    return `${this.ownerCustomer()?.customer_code || 'CUSTOMER'}/${this.agreement()?.agreement_no || 'AGREEMENT'}/${this.paymentLine.direction.toUpperCase()}/${this.paymentLine.category.toUpperCase() || 'CATEGORY'}/${this.paymentLine.particulars.trim() || '[particulars]'}`;
   }
 
   formatDate(dateStr?: string | null): string {

@@ -22,6 +22,8 @@ export interface AuditLog {
   before: Record<string, unknown> | null;
   after: Record<string, unknown> | null;
   metadata: Record<string, unknown> | null;
+  activity?: string;
+  page?: string | null;
   created_at: string;
 }
 export interface AuditFilters {
@@ -33,6 +35,7 @@ export interface AuditFilters {
   search?: string;
   page?: number;
   per_page?: number;
+  all_branches?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })

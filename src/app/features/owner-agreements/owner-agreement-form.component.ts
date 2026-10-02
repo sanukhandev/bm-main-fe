@@ -448,6 +448,7 @@ import {
                     >
                       <th class="py-3 px-4">Installment</th>
                       <th class="py-3 px-4">Estimated Due Date</th>
+                      <th class="py-3 px-4">Reference / Particulars <span class="text-rose-600">*</span></th>
                       <th class="py-3 px-4 text-right">Amount (AED)</th>
                     </tr>
                   </thead>
@@ -459,6 +460,29 @@ import {
                         </td>
                         <td class="py-3 px-4 text-slate-600 tabular-nums font-medium">
                           {{ item.due_date }}
+                        </td>
+                        <td class="py-3 px-4 min-w-[360px]">
+                          <div class="text-[10px] text-slate-400 font-mono truncate mb-1">
+                            {{ scheduleReference(item) }}
+                          </div>
+                          <div class="flex gap-2">
+                            <select
+                              [value]="item.category"
+                              (change)="updateScheduleCategory(item.installment_number, $event)"
+                              class="h-9 rounded-lg border border-slate-200 bg-white px-2 text-xs"
+                            >
+                              <option value="rent">Rent</option>
+                              <option value="security">Security</option>
+                              <option value="commission">Commission</option>
+                            </select>
+                            <input
+                              [value]="item.particulars"
+                              (input)="updateScheduleParticulars(item.installment_number, $event)"
+                              placeholder="Enter particulars"
+                              required
+                              class="h-9 min-w-0 flex-1 rounded-lg border border-slate-200 px-2 text-xs"
+                            />
+                          </div>
                         </td>
                         <td class="py-3 px-4 text-right font-semibold text-slate-900 tabular-nums">
                           AED {{ item.amount | number: '1.2-2' }}
@@ -549,6 +573,8 @@ export class OwnerAgreementFormComponent implements OnInit {
   owners = signal<Customer[]>([]);
   allOwnerProperties = signal<Property[]>([]);
   selectedPropertyIds = signal<number[]>([]);
+  scheduleDetails = signal<Record<number, { category: InstallmentItem['category']; particulars: string }>>({});
+  private formVersion = signal(0);
 
   ownerOptions = computed<ComboboxOption[]>(() => {
     return this.owners().map((owner) => ({
@@ -583,6 +609,7 @@ export class OwnerAgreementFormComponent implements OnInit {
   });
 
   installmentPreview = computed<InstallmentItem[]>(() => {
+    this.formVersion();
     const total = Number(this.agreementForm.value.total_amount) || 0;
     const count = Number(this.agreementForm.value.payment_count) || 1;
     const startDateStr = this.agreementForm.value.start_date;
@@ -608,6 +635,8 @@ export class OwnerAgreementFormComponent implements OnInit {
         installment_number: i,
         due_date: dueDate.toISOString().split('T')[0],
         amount: perInstallment,
+        category: this.scheduleDetails()[i]?.category || 'rent',
+        particulars: this.scheduleDetails()[i]?.particulars || '',
         status: 'pending',
       });
     }
@@ -615,7 +644,23 @@ export class OwnerAgreementFormComponent implements OnInit {
     return items;
   });
 
+  scheduleReference(item: InstallmentItem): string {
+    const customerCode = this.owners().find((owner) => String(owner.id) === String(this.agreementForm.value.owner_customer_id))?.customer_code || 'CUSTOMER';
+    return `${customerCode}/${this.agreementForm.value.agreement_no || 'AGREEMENT_PENDING'}/OUTWARD/${item.category.toUpperCase()}/${item.particulars || '[particulars required]'}`;
+  }
+
+  updateScheduleCategory(number: number, event: Event): void {
+    const category = (event.target as HTMLSelectElement).value as InstallmentItem['category'];
+    this.scheduleDetails.update((details) => ({ ...details, [number]: { ...details[number], category, particulars: details[number]?.particulars || '' } }));
+  }
+
+  updateScheduleParticulars(number: number, event: Event): void {
+    const particulars = (event.target as HTMLInputElement).value;
+    this.scheduleDetails.update((details) => ({ ...details, [number]: { ...details[number], category: details[number]?.category || 'rent', particulars } }));
+  }
+
   ngOnInit(): void {
+    this.agreementForm.valueChanges.subscribe(() => this.formVersion.update((version) => version + 1));
     this.loadOwners();
     this.loadProperties();
 
@@ -713,6 +758,7 @@ export class OwnerAgreementFormComponent implements OnInit {
           payment_mode: agr.payment_mode || 'bank_transfer',
           notes: agr.notes || '',
         });
+        this.scheduleDetails.set(Object.fromEntries((agr.installments || []).map((line) => [Number(line.installment_no), { category: line.category, particulars: line.particulars }])));
         this.isLoading.set(false);
       },
       error: (err) => {
@@ -756,6 +802,10 @@ export class OwnerAgreementFormComponent implements OnInit {
       this.serverError.set('Please select at least one property asset.');
       return;
     }
+    if (this.installmentPreview().some((item) => !item.particulars.trim())) {
+      this.serverError.set('Particulars are required for every installment in the schedule preview.');
+      return;
+    }
 
     this.isSubmitting.set(true);
     this.serverError.set(null);
@@ -770,6 +820,7 @@ export class OwnerAgreementFormComponent implements OnInit {
       payment_count: Number(val.payment_count),
       payment_frequency: val.payment_frequency || 'monthly',
       payment_mode: val.payment_mode as PaymentMode,
+      installments: this.installmentPreview().map((item) => ({ installment_no: item.installment_number, category: item.category, particulars: item.particulars.trim() })),
       notes: val.notes || null,
     };
 
@@ -777,7 +828,7 @@ export class OwnerAgreementFormComponent implements OnInit {
       this.api.updateAgreement(this.agreementId()!, dto).subscribe({
         next: () => {
           this.isSubmitting.set(false);
-          this.router.navigate(['/app/owner-agreements']);
+          this.router.navigate(['/app/owner-agreements', this.agreementId()!]);
         },
         error: (err) => {
           this.isSubmitting.set(false);

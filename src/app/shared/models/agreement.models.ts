@@ -120,6 +120,8 @@ export interface InstallmentItem {
   installment_number: number;
   due_date: string;
   amount: number;
+  category: 'rent' | 'security' | 'commission';
+  particulars: string;
   status?: string;
 }
 
@@ -133,9 +135,18 @@ export interface AgreementInstallment {
   paid_amount: string | number;
   balance: string | number;
   payment_mode: PaymentMode;
+  category: 'rent' | 'security' | 'commission';
+  particulars: string;
+  transaction_reference?: string;
   direction: 'inward' | 'outward';
   status: string;
   notes?: string | null;
   is_extra?: boolean;
   receipt?: PaymentReceipt | null;
+}
+
+export interface AgreementScheduleInput {
+  installment_no: number;
+  category: 'rent' | 'security' | 'commission';
+  particulars: string;
 }

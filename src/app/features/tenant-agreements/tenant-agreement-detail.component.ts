@@ -211,7 +211,8 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                       <span>Raise Dispute</span>
                     </button>
 
-                    <button
+                    @if (canPostPayments()) {
+                      <button
                       type="button"
                       (click)="addExtraPayment(); showMoreMenu.set(false)"
                       class="w-full text-left px-4 py-2 hover:bg-slate-50 text-slate-700 flex items-center gap-2 font-medium"
@@ -231,7 +232,8 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                         />
                       </svg>
                       <span>Add Payment Line</span>
-                    </button>
+                      </button>
+                    }
 
                     @if (agreement()!.available_actions?.includes('extend')) {
                       <button
@@ -698,13 +700,15 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                 <tr>
                   <th class="py-3.5 px-4 w-16">Payment</th>
                   <th class="py-3.5 px-4 w-32">Due</th>
-                  <th class="py-3.5 px-4">Particulars</th>
+                  <th class="py-3.5 px-4">Transaction Reference</th>
                   <th class="py-3.5 px-4 w-28">Method</th>
                   <th class="py-3.5 px-4 w-32 text-right">Scheduled</th>
                   <th class="py-3.5 px-4 w-32 text-right">Paid</th>
                   <th class="py-3.5 px-4 w-32 text-right">Balance</th>
                   <th class="py-3.5 px-4 w-28 text-center">Status</th>
-                  <th class="py-3.5 px-4 w-28 text-right">Actions</th>
+                  @if (canPostPayments()) {
+                    <th class="py-3.5 px-4 w-28 text-right">Actions</th>
+                  }
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100">
@@ -725,7 +729,7 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                       {{ formatDate(item.due_date) }}
                     </td>
                     <td class="py-3.5 px-4 text-slate-700">
-                      {{ item.notes || 'Rent installment' }}
+                      {{ item.transaction_reference || item.particulars || item.notes || 'Rent installment' }}
                     </td>
                     <td class="py-3.5 px-4">
                       <span
@@ -759,7 +763,8 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                         {{ item.status.replace('_', ' ') }}
                       </span>
                     </td>
-                    <td class="py-3.5 px-4 text-right whitespace-nowrap">
+                    @if (canPostPayments()) {
+                      <td class="py-3.5 px-4 text-right whitespace-nowrap">
                       <div class="flex items-center justify-end gap-1.5">
                         @if (isPaidOrVoid(item)) {
                           <button
@@ -798,7 +803,7 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                               </span>
                             }
                           </button>
-                        } @else {
+                        } @else if (canPostPayments()) {
                           <button
                             type="button"
                             [disabled]="installmentProcessingId() === item.id"
@@ -854,11 +859,12 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                           }
                         }
                       </div>
-                    </td>
+                      </td>
+                    }
                   </tr>
                 } @empty {
                   <tr>
-                    <td colspan="9" class="p-6 text-center text-slate-500">
+                    <td [attr.colspan]="canPostPayments() ? 9 : 8" class="p-6 text-center text-slate-500">
                       No payment schedule installments found.
                     </td>
                   </tr>
@@ -884,7 +890,7 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                 </div>
                 <div class="text-slate-600">
                   <div class="font-medium text-slate-900 mb-2">
-                    {{ item.notes || 'Rent installment' }}
+                    {{ item.transaction_reference || item.particulars || item.notes || 'Rent installment' }}
                   </div>
                   <div class="grid grid-cols-2 gap-2">
                     <div>
@@ -919,7 +925,8 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                     </div>
                   </div>
                 </div>
-                <div class="pt-2 border-t border-slate-100 flex items-center justify-end gap-2">
+                @if (canPostPayments()) {
+                  <div class="pt-2 border-t border-slate-100 flex items-center justify-end gap-2">
                   @if (isPaidOrVoid(item)) {
                     <button
                       type="button"
@@ -953,7 +960,7 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                         </span>
                       }
                     </button>
-                  } @else {
+                  } @else if (canPostPayments()) {
                     <button
                       type="button"
                       [disabled]="installmentProcessingId() === item.id"
@@ -978,6 +985,7 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                     }
                   }
                 </div>
+                }
               </div>
             }
           </div>
@@ -1193,15 +1201,20 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
               <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
                 <div>
                   <label class="block font-semibold text-slate-700 mb-1">Direction</label>
-                  <div class="bm-input bg-slate-50 text-slate-600">Inward</div>
+                  <select [(ngModel)]="paymentLine.direction" class="bm-input">
+                    <option value="inward">Inward</option>
+                    <option value="outward">Outward</option>
+                  </select>
                 </div>
                 <div>
                   <label class="block font-semibold text-slate-700 mb-1">Category</label>
-                  <input
-                    [(ngModel)]="paymentLine.category"
-                    class="bm-input"
-                    placeholder="Commission / security"
-                  />
+                  <select [(ngModel)]="paymentLine.category" class="bm-input">
+                    <option value="" disabled>Select category</option>
+                    <option value="commission">Commission</option>
+                    <option value="security_deposit">Security Deposit</option>
+                    <option value="maintenance_charges">Maintenance Charges</option>
+                    <option value="others">Others</option>
+                  </select>
                 </div>
                 <div>
                   <label class="block font-semibold text-slate-700 mb-1">Particulars</label>
@@ -1669,6 +1682,10 @@ export class TenantAgreementDetailComponent implements OnInit {
   };
   error = signal<string | null>(null);
 
+  canPostPayments(): boolean {
+    return ['approved', 'commenced'].includes(this.agreement()?.status || '');
+  }
+
   confirmTerminateDialog = signal(false);
 
   ngOnInit(): void {
@@ -1796,7 +1813,11 @@ export class TenantAgreementDetailComponent implements OnInit {
     this.chequeDate = this.paymentDate;
     this.transferDate = this.paymentDate;
     this.paymentMode = 'cash';
-    this.paymentRemarks = '';
+    this.paymentRemarks =
+      item.transaction_reference ||
+      item.particulars ||
+      item.notes ||
+      `Installment #${item.installment_no} for Tenant Agreement ${this.agreement()?.agreement_no}`;
     this.chequeNo = '';
     this.bankName = '';
     this.bankReference = '';
@@ -2109,6 +2130,8 @@ export class TenantAgreementDetailComponent implements OnInit {
       payment_mode: item.payment_mode || agr.payment_mode || 'cash',
       amount: String(amountVal || 0),
       remarks:
+        item.transaction_reference ||
+        item.particulars ||
         item.notes ||
         `Installment #${item.installment_no} for Tenant Agreement ${agr.agreement_no}`,
       cheque_no: (receiptObj as any)?.cheque_no || (item as any).cheque_no || null,

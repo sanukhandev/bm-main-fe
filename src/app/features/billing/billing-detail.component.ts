@@ -248,7 +248,9 @@ import { BmStatusBadgeComponent } from '../../shared/components/bm-status-badge/
               <tbody class="divide-y divide-slate-100 font-medium">
                 @for (line of record()!.lines || []; track line.id) {
                   <tr class="hover:bg-slate-50/80 transition-colors">
-                    <td class="py-3.5 px-4 font-bold text-slate-900">{{ line.particulars }}</td>
+                    <td class="py-3.5 px-4 font-bold text-slate-900">
+                      {{ line.transaction_reference || line.particulars }}
+                    </td>
                     <td class="py-3.5 px-4 text-center tabular-nums text-slate-700 font-semibold">
                       {{ line.quantity }}
                     </td>
@@ -349,6 +351,9 @@ import { BmStatusBadgeComponent } from '../../shared/components/bm-status-badge/
                   placeholder="e.g. Initial Deposit Payment"
                   required
                 />
+                <div class="mt-1 text-[10px] text-slate-500 md:col-span-2">
+                  Transaction reference: {{ generatedPaymentReference() }}
+                </div>
               </div>
 
               <div>
@@ -733,6 +738,12 @@ export class BillingDetailComponent {
     if ('quotation_no' in row)
       this.api.addQuotationPayment(row.id, payload).subscribe({ next: success, error: failure });
     else this.api.addInvoicePayment(row.id, payload).subscribe({ next: success, error: failure });
+  }
+
+  generatedPaymentReference(): string {
+    const row = this.record();
+    const document = row ? this.number(row) : 'DOCUMENT';
+    return `CUSTOMER/${document}/${this.payment.direction.toUpperCase()}/PAYMENT/${this.payment.particulars.trim() || '[particulars]'}`;
   }
 
   onPaymentModeChange(): void {

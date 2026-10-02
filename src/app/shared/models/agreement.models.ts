@@ -60,6 +60,7 @@ export interface OwnerAgreement {
   additional_payments?: Array<{
     category: string;
     particulars: string;
+    transaction_reference?: string;
     direction: string;
     amount: string | number;
     due_date: string;

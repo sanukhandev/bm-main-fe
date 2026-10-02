@@ -1,5 +1,6 @@
 export interface Vendor {
   id: number;
+  customer_code?: string;
   name: string;
   phone?: string | null;
   email?: string | null;
@@ -43,6 +44,7 @@ export interface WorkOrderPayment {
   direction: 'inward' | 'outward';
   category: string;
   particulars: string;
+  transaction_reference?: string;
   amount: string | number;
   due_date?: string | null;
   payment_mode: 'cash' | 'cheque' | 'bank_transfer';

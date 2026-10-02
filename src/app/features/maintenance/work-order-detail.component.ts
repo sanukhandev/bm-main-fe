@@ -196,7 +196,7 @@ import { BmSpinnerComponent } from '../../shared/components/bm-spinner/bm-spinne
                   <td class="p-4">
                     <bm-status-badge [status]="payment.direction"></bm-status-badge>
                   </td>
-                  <td class="p-4">{{ payment.particulars }}</td>
+                  <td class="p-4">{{ payment.transaction_reference || payment.particulars }}</td>
                   <td class="p-4">{{ payment.category }}</td>
                   <td class="p-4">
                     <bm-status-badge [status]="payment.payment_mode"></bm-status-badge>
@@ -264,6 +264,9 @@ import { BmSpinnerComponent } from '../../shared/components/bm-spinner/bm-spinne
                 </select>
                 <input class="bm-input" formControlName="category" placeholder="Category" />
                 <input class="bm-input" formControlName="particulars" placeholder="Particulars" />
+                <div class="md:col-span-2 text-[10px] text-slate-500">
+                  Transaction reference: {{ generatedPaymentReference() }}
+                </div>
                 <input
                   class="bm-input"
                   type="number"
@@ -469,6 +472,12 @@ export class WorkOrderDetailComponent {
           this.saving.set(false);
         },
       });
+  }
+
+  generatedPaymentReference(): string {
+    const order = this.order();
+    const value = this.paymentForm.getRawValue();
+    return `${order?.vendor?.customer_code || 'CUSTOMER'}/${order?.work_order_no || 'WORKORDER'}/${value.direction.toUpperCase()}/${value.category.toUpperCase() || 'CATEGORY'}/${value.particulars.trim() || '[particulars]'}`;
   }
 
   onPaymentModeChange(): void {

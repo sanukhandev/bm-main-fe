@@ -3,7 +3,13 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse, PaginatedResponse, ListQueryParams } from './api.models';
 import { Branch } from '../branch-context/branch.models';
-import { UserAdmin, UserAdminPayload, RoleAdmin } from '../../shared/models/admin.models';
+import {
+  UserAdmin,
+  UserAdminPayload,
+  RoleAdmin,
+  RoleAdminPayload,
+  PermissionAdmin,
+} from '../../shared/models/admin.models';
 
 @Injectable({
   providedIn: 'root',
@@ -57,5 +63,25 @@ export class AdministrationApiService {
   // Roles
   getRoles(): Observable<ApiResponse<RoleAdmin[]>> {
     return this.http.get<ApiResponse<RoleAdmin[]>>('/api/v1/admin/roles');
+  }
+
+  createRole(data: RoleAdminPayload): Observable<ApiResponse<RoleAdmin>> {
+    return this.http.post<ApiResponse<RoleAdmin>>('/api/v1/admin/roles', data);
+  }
+
+  updateRole(id: number, data: RoleAdminPayload): Observable<ApiResponse<RoleAdmin>> {
+    return this.http.patch<ApiResponse<RoleAdmin>>(`/api/v1/admin/roles/${id}`, data);
+  }
+
+  getPermissions(): Observable<ApiResponse<PermissionAdmin[]>> {
+    return this.http.get<ApiResponse<PermissionAdmin[]>>('/api/v1/admin/permissions');
+  }
+
+  createPermission(data: Pick<PermissionAdmin, 'key' | 'name'>): Observable<ApiResponse<PermissionAdmin>> {
+    return this.http.post<ApiResponse<PermissionAdmin>>('/api/v1/admin/permissions', data);
+  }
+
+  updatePermission(id: number, data: Pick<PermissionAdmin, 'name'>): Observable<ApiResponse<PermissionAdmin>> {
+    return this.http.patch<ApiResponse<PermissionAdmin>>(`/api/v1/admin/permissions/${id}`, data);
   }
 }

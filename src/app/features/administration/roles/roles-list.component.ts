@@ -1,219 +1,74 @@
-import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { AdministrationApiService } from '../../../core/api/administration-api.service';
 import { BmPageHeaderComponent } from '../../../shared/components/bm-page-header/bm-page-header.component';
-import { RoleAdmin } from '../../../shared/models/admin.models';
+import { PermissionAdmin, RoleAdmin } from '../../../shared/models/admin.models';
 
 @Component({
   selector: 'bm-roles-list',
   standalone: true,
-  imports: [CommonModule, BmPageHeaderComponent],
+  imports: [CommonModule, FormsModule, BmPageHeaderComponent],
   template: `
     <div class="max-w-[1740px] mx-auto space-y-6 font-sans text-[#0F172A]">
-      <bm-page-header
-        title="Roles & Access Control"
-        subtitle="System roles, Security Policy Architecture, and Permission Matrix"
-      ></bm-page-header>
-
-      <!-- TOP BENTO SUMMARY STRIP -->
-      <div class="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-xs">
-        <div
-          class="grid grid-cols-1 sm:grid-cols-3 gap-6 divide-y sm:divide-y-0 sm:divide-x divide-slate-100"
-        >
-          <div class="space-y-1">
-            <div
-              class="flex items-center gap-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4 text-emerald-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                />
-              </svg>
-              <span>System Roles</span>
-            </div>
-            <div class="text-2xl font-extrabold text-slate-900 tabular-nums">
-              {{ roles().length }} Defined Roles
-            </div>
-          </div>
-
-          <div class="space-y-1 pt-4 sm:pt-0 sm:pl-6">
-            <div
-              class="flex items-center gap-1.5 text-xs font-semibold text-emerald-700 uppercase tracking-wider"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4 text-emerald-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                />
-              </svg>
-              <span>Security Isolation</span>
-            </div>
-            <div class="text-2xl font-extrabold text-emerald-700 tabular-nums">
-              Branch Isolation
-            </div>
-          </div>
-
-          <div class="space-y-1 pt-4 sm:pt-0 sm:pl-6">
-            <div
-              class="flex items-center gap-1.5 text-xs font-semibold text-blue-700 uppercase tracking-wider"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4 text-blue-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
-                />
-              </svg>
-              <span>Total Capabilities</span>
-            </div>
-            <div class="text-2xl font-extrabold text-blue-700 tabular-nums">
-              {{ totalPermissions() }} Permissions
-            </div>
-          </div>
-        </div>
+      <bm-page-header title="Roles & Access Control" subtitle="Create roles and manage permissions"></bm-page-header>
+      @if (error()) { <div class="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-800">{{ error() }}</div> }
+      <div class="flex justify-end gap-2">
+        <button class="bm-btn bm-btn-secondary text-xs" type="button" (click)="openPermission()">New Permission</button>
+        <button class="bm-btn bm-btn-primary text-xs" type="button" (click)="openRole()">New Role</button>
       </div>
-
-      <!-- BENTO ROLES GRID -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         @for (role of roles(); track role.id) {
-          <div
-            class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-6 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
-          >
-            <div>
-              <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
-                <div class="flex items-center gap-3">
-                  <div
-                    class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                    [class.bg-emerald-50]="role.name === 'super_admin'"
-                    [class.text-emerald-700]="role.name === 'super_admin'"
-                    [class.bg-blue-50]="role.name !== 'super_admin'"
-                    [class.text-blue-700]="role.name !== 'super_admin'"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-5 w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 class="text-base font-bold text-slate-900">{{ role.label }}</h3>
-                    <span class="font-mono text-[11px] text-slate-400 font-semibold">{{
-                      role.name
-                    }}</span>
-                  </div>
-                </div>
-                <span
-                  class="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
-                  [class.bg-emerald-50]="role.name === 'super_admin'"
-                  [class.text-emerald-800]="role.name === 'super_admin'"
-                  [class.border]="role.name === 'super_admin'"
-                  [class.border-emerald-200/80]="role.name === 'super_admin'"
-                  [class.bg-blue-50]="role.name !== 'super_admin'"
-                  [class.text-blue-800]="role.name !== 'super_admin'"
-                  [class.border-blue-200/80]="role.name !== 'super_admin'"
-                >
-                  {{ role.permissions.length }} Permissions
-                </span>
-              </div>
-
-              <p class="text-xs text-slate-600 leading-relaxed mb-5 font-normal">
-                {{ role.description }}
-              </p>
-
-              <div class="pt-4 border-t border-slate-100">
-                <div class="text-slate-400 font-bold mb-2.5 uppercase text-[10px] tracking-widest">
-                  Granted Security Capabilities
-                </div>
-                <div class="flex flex-wrap gap-1.5">
-                  @for (p of role.permissions; track p) {
-                    <span
-                      class="px-2.5 py-1 rounded-xl bg-slate-50 border border-slate-200/80 text-slate-700 font-mono text-[11px] font-semibold"
-                    >
-                      {{ p }}
-                    </span>
-                  }
-                </div>
-              </div>
-            </div>
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs">
+            <div class="flex items-start justify-between gap-3"><div><h3 class="text-base font-bold text-slate-900">{{ role.label }}</h3><span class="font-mono text-[11px] text-slate-400">{{ role.name }}</span></div><button class="bm-btn bm-btn-secondary text-xs" type="button" (click)="openRole(role)">Edit</button></div>
+            <p class="text-xs text-slate-600 leading-relaxed my-4">{{ role.description || 'No description' }}</p>
+            <div class="flex flex-wrap gap-1.5">@for (permission of role.permissions; track permission) { <span class="px-2.5 py-1 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-mono text-[11px]">{{ permission }}</span> } @empty { <span class="text-xs text-slate-400">No permissions assigned</span> }</div>
           </div>
         }
       </div>
+      <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs"><h2 class="text-base font-bold text-slate-900 mb-4">Permission Catalog</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-3">@for (permission of permissions(); track permission.id) { <div class="flex items-center justify-between rounded-xl border border-slate-100 p-3"><div><div class="font-mono text-xs text-slate-700">{{ permission.key }}</div><div class="text-xs text-slate-500">{{ permission.name }}</div></div><button class="bm-btn bm-btn-secondary text-xs" type="button" (click)="openPermission(permission)">Edit</button></div> }</div></section>
+      @if (roleFormOpen()) { <div class="fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-4" (click)="closeForms()"><form class="bg-white rounded-3xl w-full max-w-xl max-h-[90vh] overflow-y-auto p-6 space-y-4" (click)="$event.stopPropagation()" (ngSubmit)="saveRole()"><h2 class="text-xl font-bold">{{ editingRole() ? 'Edit Role' : 'Create Role' }}</h2><input class="bm-input" name="key" [(ngModel)]="roleForm.key" placeholder="role.key" [disabled]="!!editingRole()" required /><input class="bm-input" name="name" [(ngModel)]="roleForm.name" placeholder="Role name" required /><textarea class="bm-input" name="description" [(ngModel)]="roleForm.description" placeholder="Description"></textarea><div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto">@for (permission of permissions(); track permission.id) { <label class="flex gap-2 items-center text-xs"><input type="checkbox" [checked]="roleForm.permission_keys.includes(permission.key)" (change)="togglePermission(permission.key)" />{{ permission.name }}</label> }</div><div class="flex justify-end gap-2"><button type="button" class="bm-btn bm-btn-secondary text-xs" (click)="closeForms()">Cancel</button><button type="submit" class="bm-btn bm-btn-primary text-xs" [disabled]="saving()">Save</button></div></form></div> }
+      @if (permissionFormOpen()) { <div class="fixed inset-0 z-50 bg-slate-900/60 flex items-center justify-center p-4" (click)="closeForms()"><form class="bg-white rounded-3xl w-full max-w-md p-6 space-y-4" (click)="$event.stopPropagation()" (ngSubmit)="savePermission()"><h2 class="text-xl font-bold">{{ editingPermission() ? 'Edit Permission' : 'Create Permission' }}</h2><input class="bm-input" name="key" [(ngModel)]="permissionForm.key" placeholder="module.action" [disabled]="!!editingPermission()" required /><input class="bm-input" name="name" [(ngModel)]="permissionForm.name" placeholder="Display name" required /><div class="flex justify-end gap-2"><button type="button" class="bm-btn bm-btn-secondary text-xs" (click)="closeForms()">Cancel</button><button type="submit" class="bm-btn bm-btn-primary text-xs" [disabled]="saving()">Save</button></div></form></div> }
     </div>
   `,
 })
-export class RolesListComponent {
-  roles = signal<RoleAdmin[]>([
-    {
-      id: 1,
-      name: 'super_admin',
-      label: 'Super Admin',
-      description:
-        'Global administrator with complete access to all branch contexts, user management, system organization settings, and consolidated reporting.',
-      permissions: [
-        'all:branches',
-        'switch:branch-context',
-        'manage:users',
-        'manage:customers',
-        'manage:properties',
-        'manage:owner-agreements',
-        'manage:tenant-agreements',
-        'approve:agreements',
-      ],
-    },
-    {
-      id: 2,
-      name: 'branch_admin',
-      label: 'Branch Admin',
-      description:
-        'Operational branch manager with isolated access strictly restricted to their assigned active branch context.',
-      permissions: [
-        'view:assigned-branch',
-        'manage:customers',
-        'manage:properties',
-        'manage:owner-agreements',
-        'manage:tenant-agreements',
-        'approve:agreements',
-      ],
-    },
-  ]);
+export class RolesListComponent implements OnInit {
+  private api = inject(AdministrationApiService);
+  roles = signal<RoleAdmin[]>([]);
+  permissions = signal<PermissionAdmin[]>([]);
+  error = signal<string | null>(null);
+  saving = signal(false);
+  roleFormOpen = signal(false);
+  permissionFormOpen = signal(false);
+  editingRole = signal<RoleAdmin | null>(null);
+  editingPermission = signal<PermissionAdmin | null>(null);
+  roleForm = { key: '', name: '', description: '', permission_keys: [] as string[] };
+  permissionForm = { key: '', name: '' };
 
-  readonly totalPermissions = computed(() => {
-    const all = new Set<string>();
-    for (const r of this.roles()) {
-      r.permissions.forEach((p) => all.add(p));
-    }
-    return all.size;
-  });
+  ngOnInit(): void { this.load(); }
+
+  load(): void {
+    this.error.set(null);
+    this.api.getRoles().subscribe({ next: (response) => this.roles.set(response.data), error: (error) => this.showError(error) });
+    this.api.getPermissions().subscribe({ next: (response) => this.permissions.set(response.data), error: (error) => this.showError(error) });
+  }
+
+  openRole(role?: RoleAdmin): void { this.editingRole.set(role || null); this.roleForm = role ? { key: role.name, name: role.label, description: role.description || '', permission_keys: [...role.permissions] } : { key: '', name: '', description: '', permission_keys: [] }; this.roleFormOpen.set(true); }
+  openPermission(permission?: PermissionAdmin): void { this.editingPermission.set(permission || null); this.permissionForm = permission ? { key: permission.key, name: permission.name } : { key: '', name: '' }; this.permissionFormOpen.set(true); }
+  closeForms(): void { this.roleFormOpen.set(false); this.permissionFormOpen.set(false); }
+  togglePermission(key: string): void { this.roleForm.permission_keys = this.roleForm.permission_keys.includes(key) ? this.roleForm.permission_keys.filter((value) => value !== key) : [...this.roleForm.permission_keys, key]; }
+
+  saveRole(): void {
+    this.saving.set(true);
+    const request = this.editingRole() ? this.api.updateRole(this.editingRole()!.id, this.roleForm) : this.api.createRole(this.roleForm);
+    request.subscribe({ next: () => { this.closeForms(); this.saving.set(false); this.load(); }, error: (error) => { this.saving.set(false); this.showError(error); } });
+  }
+
+  savePermission(): void {
+    this.saving.set(true);
+    const request = this.editingPermission() ? this.api.updatePermission(this.editingPermission()!.id, { name: this.permissionForm.name }) : this.api.createPermission(this.permissionForm);
+    request.subscribe({ next: () => { this.closeForms(); this.saving.set(false); this.load(); }, error: (error) => { this.saving.set(false); this.showError(error); } });
+  }
+
+  private showError(error: any): void { this.error.set(error?.error?.message || 'Unable to save access-control changes.'); }
 }

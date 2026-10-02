@@ -83,6 +83,6 @@ export class AuthService {
   }
 
   hasPermission(permission: string): boolean {
-    return this.currentUserSignal()?.permissions?.includes(permission) ?? this.isSuperAdmin();
+    return this.isSuperAdmin() || this.currentUserSignal()?.permissions?.includes(permission) === true;
   }
 }

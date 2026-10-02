@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse, PaginatedResponse, ListQueryParams } from './api.models';
-import { AgreementAction, OwnerAgreement, PaymentMode } from '../../shared/models/agreement.models';
+import { AgreementAction, AgreementScheduleInput, OwnerAgreement, PaymentMode } from '../../shared/models/agreement.models';
 
 @Injectable({
   providedIn: 'root',
@@ -27,13 +27,13 @@ export class OwnerAgreementsApiService {
     return this.http.get<ApiResponse<OwnerAgreement>>(`${this.baseUrl}/${id}`);
   }
 
-  createAgreement(payload: Partial<OwnerAgreement>): Observable<ApiResponse<OwnerAgreement>> {
+  createAgreement(payload: Omit<Partial<OwnerAgreement>, 'installments'> & { installments?: AgreementScheduleInput[] }): Observable<ApiResponse<OwnerAgreement>> {
     return this.http.post<ApiResponse<OwnerAgreement>>(this.baseUrl, payload);
   }
 
   updateAgreement(
     id: number,
-    payload: Partial<OwnerAgreement>,
+    payload: Omit<Partial<OwnerAgreement>, 'installments'> & { installments?: AgreementScheduleInput[] },
   ): Observable<ApiResponse<OwnerAgreement>> {
     return this.http.patch<ApiResponse<OwnerAgreement>>(`${this.baseUrl}/${id}`, payload);
   }

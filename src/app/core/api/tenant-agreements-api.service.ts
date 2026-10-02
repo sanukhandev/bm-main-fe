@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { ApiResponse, PaginatedResponse, ListQueryParams } from './api.models';
 import {
   AgreementAction,
+  AgreementScheduleInput,
   PaymentMode,
   TenantAgreement,
 } from '../../shared/models/agreement.models';
@@ -31,13 +32,13 @@ export class TenantAgreementsApiService {
     return this.http.get<ApiResponse<TenantAgreement>>(`${this.baseUrl}/${id}`);
   }
 
-  createAgreement(payload: Partial<TenantAgreement>): Observable<ApiResponse<TenantAgreement>> {
+  createAgreement(payload: Omit<Partial<TenantAgreement>, 'installments'> & { installments?: AgreementScheduleInput[] }): Observable<ApiResponse<TenantAgreement>> {
     return this.http.post<ApiResponse<TenantAgreement>>(this.baseUrl, payload);
   }
 
   updateAgreement(
     id: number,
-    payload: Partial<TenantAgreement>,
+    payload: Omit<Partial<TenantAgreement>, 'installments'> & { installments?: AgreementScheduleInput[] },
   ): Observable<ApiResponse<TenantAgreement>> {
     return this.http.patch<ApiResponse<TenantAgreement>>(`${this.baseUrl}/${id}`, payload);
   }

@@ -1832,14 +1832,15 @@ export interface PageSearchItem {
                   class="block px-3 py-1.5 rounded-lg text-xs text-[#334155] hover:bg-slate-100"
                   >Roles</a
                 >
-                @if (hasPermission('audit.view')) {
-                  <a
-                    routerLink="/app/administration/audit"
-                    (click)="closeMobileDrawer()"
-                    class="block px-3 py-1.5 rounded-lg text-xs text-[#334155] hover:bg-slate-100"
-                    >Audit Log</a
-                  >
-                }
+              }
+
+              @if (hasPermission('audit.view')) {
+                <a
+                  routerLink="/app/administration/audit"
+                  (click)="closeMobileDrawer()"
+                  class="block px-3 py-1.5 rounded-lg text-xs text-[#334155] hover:bg-slate-100"
+                  >Audit Log</a
+                >
               }
 
               <div

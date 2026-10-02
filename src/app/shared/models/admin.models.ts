@@ -26,5 +26,20 @@ export interface RoleAdmin {
   name: string;
   label: string;
   description: string;
+  scope?: 'branch' | 'global';
+  is_system?: boolean;
   permissions: string[];
+}
+
+export interface PermissionAdmin {
+  id: number;
+  key: string;
+  name: string;
+}
+
+export interface RoleAdminPayload {
+  key?: string;
+  name: string;
+  description?: string;
+  permission_keys: string[];
 }

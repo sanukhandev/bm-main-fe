@@ -10,7 +10,6 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subscription } from 'rxjs';
 import { BmPageHeaderComponent } from '../../shared/components/bm-page-header/bm-page-header.component';
 import { BranchContextService } from '../../core/branch-context/branch-context.service';
@@ -443,7 +442,6 @@ export class ZaakiyComponent implements OnDestroy {
   private zaakiy = inject(ZaakiyApiService);
   private branchContext = inject(BranchContextService);
   private router = inject(Router);
-  private sanitizer = inject(DomSanitizer);
   private stream?: Subscription;
 
   @ViewChild('scrollContainer') private scrollContainer?: ElementRef<HTMLElement>;
@@ -570,7 +568,7 @@ export class ZaakiyComponent implements OnDestroy {
     });
   }
 
-  formatMarkdown(text: string): SafeHtml {
+  formatMarkdown(text: string): string {
     if (!text) return '';
 
     let formatted = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -627,7 +625,7 @@ export class ZaakiyComponent implements OnDestroy {
     if (inUnordered) output.push('</ul>');
     if (inOrdered) output.push('</ol>');
 
-    return this.sanitizer.bypassSecurityTrustHtml(output.join(''));
+    return output.join('');
   }
 
   navigate(url: string): void {

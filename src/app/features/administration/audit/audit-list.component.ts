@@ -7,6 +7,7 @@ import { BmLoadingStateComponent } from '../../../shared/components/bm-loading-s
 import { BmPageHeaderComponent } from '../../../shared/components/bm-page-header/bm-page-header.component';
 import { BmPaginationComponent } from '../../../shared/components/bm-pagination/bm-pagination.component';
 import { PaginationMeta } from '../../../core/api/api.models';
+import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
   selector: 'bm-audit-list',
@@ -22,8 +23,12 @@ import { PaginationMeta } from '../../../core/api/api.models';
   template: `
     <div class="max-w-[1740px] mx-auto space-y-6 font-sans text-[#0F172A]">
       <bm-page-header
-        title="Audit Trail"
-        subtitle="Append-only branch activity history, user actions, and system access telemetry"
+        [title]="auth.isSuperAdmin() ? 'Super Admin Activity Log' : 'Audit Trail'"
+        [subtitle]="
+          auth.isSuperAdmin()
+            ? 'All-branch user activity, page usage, and operational history'
+            : 'Append-only branch activity history, user actions, and system access telemetry'
+        "
       ></bm-page-header>
 
       <!-- TOP BENTO SUMMARY STRIP -->
@@ -173,6 +178,7 @@ import { PaginationMeta } from '../../../core/api/api.models';
                 >
                   <th class="p-4">Date & Time</th>
                   <th class="p-4">User</th>
+                  <th class="p-4">Page</th>
                   <th class="p-4">Action</th>
                   <th class="p-4">Entity</th>
                   <th class="p-4">Details</th>
@@ -187,11 +193,14 @@ import { PaginationMeta } from '../../../core/api/api.models';
                     <td class="p-4 font-semibold text-slate-900">
                       {{ log.actor?.name || 'System' }}
                     </td>
+                    <td class="p-4 text-slate-700 max-w-xs truncate" [title]="log.page || ''">
+                      {{ log.page || '—' }}
+                    </td>
                     <td class="p-4">
                       <span
                         class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200/60"
                       >
-                        {{ label(log.action) }}
+                        {{ label(log.activity || log.action) }}
                       </span>
                     </td>
                     <td class="p-4 text-slate-700 font-medium">
@@ -240,7 +249,7 @@ import { PaginationMeta } from '../../../core/api/api.models';
                   </tr>
                 } @empty {
                   <tr>
-                    <td colspan="5" class="p-8 text-center text-slate-500 font-medium">
+                    <td colspan="6" class="p-8 text-center text-slate-500 font-medium">
                       No audit activity found for the selected filters.
                     </td>
                   </tr>
@@ -259,6 +268,7 @@ import { PaginationMeta } from '../../../core/api/api.models';
 })
 export class AuditListComponent implements OnInit {
   private api = inject(AuditApiService);
+  readonly auth = inject(AuthService);
 
   logs = signal<AuditLog[]>([]);
   loading = signal(true);
@@ -295,7 +305,14 @@ export class AuditListComponent implements OnInit {
   load(page = 1): void {
     this.loading.set(true);
     this.error.set(null);
-    this.api.getLogs({ ...this.filters, page, per_page: 20 }).subscribe({
+    this.api
+      .getLogs({
+        ...this.filters,
+        ...(this.auth.isSuperAdmin() ? { all_branches: true } : {}),
+        page,
+        per_page: 20,
+      })
+      .subscribe({
       next: (response) => {
         this.logs.set(response.data);
         this.paginationMeta.set(response.meta);

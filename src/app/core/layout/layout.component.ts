@@ -23,6 +23,7 @@ import { BmLoadingService } from '../services/bm-loading.service';
 import { BranchContextService } from '../branch-context/branch-context.service';
 import { Branch } from '../branch-context/branch.models';
 import { BmFooterComponent } from '../../shared/components/bm-footer/bm-footer.component';
+import { UserActivityService } from '../api/user-activity.service';
 
 export type MegaMenuTab = 'operations' | 'agreements' | 'accounts' | 'reports' | 'admin' | null;
 
@@ -2193,6 +2194,7 @@ export interface PageSearchItem {
   `,
 })
 export class LayoutComponent {
+  private activity = inject(UserActivityService);
   private authService = inject(AuthService);
   private router = inject(Router);
   private elementRef = inject(ElementRef);
@@ -2640,6 +2642,13 @@ export class LayoutComponent {
         event instanceof NavigationError
       ) {
         this.loadingService.setRouteLoading(false);
+        if (event instanceof NavigationEnd && event.urlAfterRedirects.startsWith('/app/')) {
+          const page = event.urlAfterRedirects;
+          this.activity.track('opened', page);
+          setTimeout(() => {
+            if (this.router.url === page) this.activity.track('viewed', page);
+          }, 250);
+        }
       }
     });
   }
@@ -2908,6 +2917,8 @@ export class LayoutComponent {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     const target = event.target as Node;
+    const download = (event.target as Element | null)?.closest('a[download]') as HTMLAnchorElement | null;
+    if (download) this.activity.track('downloaded', this.router.url, { filename: download.download });
 
     if (
       this.isSearchOpen() &&
@@ -2932,6 +2943,11 @@ export class LayoutComponent {
       this.closeHelpMenu();
       this.closeLogoBranchDropdown();
     }
+  }
+
+  @HostListener('window:beforeprint')
+  onPrint(): void {
+    this.activity.track('printed', this.router.url);
   }
 
   userInitials(): string {

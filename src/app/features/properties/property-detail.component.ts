@@ -19,14 +19,14 @@ import { Property, PropertyProfile } from '../../shared/models/property.models';
     BmErrorStateComponent,
   ],
   template: `
-    <div class="max-w-[1740px] mx-auto space-y-6 font-sans text-slate-900">
+    <div class="max-w-[1740px] mx-auto space-y-6 font-sans text-slate-900 pb-12">
       @if (isLoading()) {
         <bm-loading-state type="detail"></bm-loading-state>
       } @else if (error()) {
         <bm-error-state [message]="error()!" (retry)="loadProperty()"></bm-error-state>
       } @else if (property()) {
         <!-- TOP BREADCRUMB & HEADER ACTIONS -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-4">
           <div>
             <a
               routerLink="/app/properties"
@@ -143,16 +143,11 @@ import { Property, PropertyProfile } from '../../shared/models/property.models';
           </div>
         </div>
 
-        <!-- EDITORIAL BENTO HERO PROPERTY PORTFOLIO CARD -->
+        <!-- HERO BENTO PORTFOLIO CARD -->
         <div
-          class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-gradient-to-br from-white via-slate-50/90 to-slate-100/70 p-6 sm:p-8 shadow-[0_10px_30px_rgba(15,23,42,0.06)] relative overflow-hidden"
+          class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-gradient-to-br from-white via-slate-50/90 to-slate-100/70 p-6 sm:p-8 shadow-xs relative overflow-hidden"
         >
-          <!-- Static Top Light Overlay -->
-          <div
-            class="absolute inset-0 bg-gradient-to-b from-amber-400/8 via-amber-300/2 to-transparent pointer-events-none z-0"
-          ></div>
-
-          <!-- Background Decorative Building Silhouette -->
+          <!-- Background Decorative Silhouette -->
           <div
             class="absolute -right-6 -bottom-10 text-slate-800 opacity-[0.035] pointer-events-none select-none z-0"
           >
@@ -173,7 +168,7 @@ import { Property, PropertyProfile } from '../../shared/models/property.models';
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
-            <!-- Left Info Block (6 cols) -->
+            <!-- Left Hero Summary (6 cols) -->
             <div class="lg:col-span-6 space-y-4">
               <div class="flex items-center gap-2">
                 <span
@@ -239,9 +234,9 @@ import { Property, PropertyProfile } from '../../shared/models/property.models';
               </div>
             </div>
 
-            <!-- Right 4-Card Quick Metrics Grid (6 cols) -->
+            <!-- Right 4-Metric Grid (6 cols) -->
             <div class="lg:col-span-6 grid grid-cols-2 gap-4">
-              <!-- Metric 1: Total Area -->
+              <!-- Metric 1: Area -->
               <div class="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs">
                 <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block"
                   >Gross Area</span
@@ -286,44 +281,12 @@ import { Property, PropertyProfile } from '../../shared/models/property.models';
                 <p class="text-[11px] text-slate-500 mt-0.5">Maintenance requests</p>
               </div>
             </div>
-
-            <!-- UTILITY CONNECTIONS BENTO CARD -->
-            <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-2xs space-y-4">
-              <div class="flex items-center gap-2.5 pb-3 border-b border-slate-100">
-                <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-xs">U</div>
-                <div>
-                  <h2 class="text-base font-extrabold text-slate-900">Utility Connections</h2>
-                  <p class="text-xs text-slate-500">Optional electricity, cooling, and gas details</p>
-                </div>
-              </div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                <div>
-                  <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Electricity</span>
-                  <div class="text-slate-900 font-semibold">{{ formatType(property()!.electricity_provider || '') || '—' }}</div>
-                  <div class="text-slate-500 mt-0.5">{{ property()!.electricity_account_number || 'No account number' }}</div>
-                </div>
-                <div>
-                  <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Cooling</span>
-                  <div class="text-slate-900 font-semibold">{{ formatType(property()!.cooling_provider || '') || '—' }}</div>
-                  <div class="text-slate-500 mt-0.5">{{ property()!.cooling_account_number || 'No account number' }}</div>
-                </div>
-                <div>
-                  <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Gas</span>
-                  <div class="text-slate-900 font-semibold">{{ formatType(property()!.gas_provider || '') || '—' }}</div>
-                  <div class="text-slate-500 mt-0.5">{{ formatType(property()!.gas_connection_type || '') || 'Type not specified' }}</div>
-                </div>
-                <div>
-                  <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Gas Connection</span>
-                  <div class="text-slate-900 font-semibold">{{ property()!.gas_connection_number || 'No connection number' }}</div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
         <!-- BENTO DETAILS GRID (2 COLUMNS) -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <!-- LEFT COLUMN (7 COLS): Specifications & Address -->
+          <!-- LEFT COLUMN (7 COLS): Specifications, Address & Utilities -->
           <div class="lg:col-span-7 space-y-6">
             <!-- ASSET SPECIFICATIONS BENTO CARD -->
             <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-2xs space-y-4">
@@ -486,6 +449,46 @@ import { Property, PropertyProfile } from '../../shared/models/property.models';
                       {{ property()!.country_code || 'AE' }}
                     </span>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- UTILITY CONNECTIONS BENTO CARD -->
+            <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-2xs space-y-4">
+              <div class="flex items-center gap-2.5 pb-3 border-b border-slate-100">
+                <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold text-xs">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 class="text-base font-extrabold text-slate-900">Utility Connections</h2>
+                  <p class="text-xs text-slate-500">Electricity, cooling, and gas account details</p>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                  <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Electricity</span>
+                  <div class="text-slate-900 font-bold">{{ formatType(property()!.electricity_provider || '') || '—' }}</div>
+                  <div class="text-slate-500 font-mono text-[11px] mt-0.5">{{ property()!.electricity_account_number || 'No account number' }}</div>
+                </div>
+
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                  <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Cooling</span>
+                  <div class="text-slate-900 font-bold">{{ formatType(property()!.cooling_provider || '') || '—' }}</div>
+                  <div class="text-slate-500 font-mono text-[11px] mt-0.5">{{ property()!.cooling_account_number || 'No account number' }}</div>
+                </div>
+
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                  <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Gas Provider</span>
+                  <div class="text-slate-900 font-bold">{{ formatType(property()!.gas_provider || '') || '—' }}</div>
+                  <div class="text-slate-500 text-[11px] mt-0.5">{{ formatType(property()!.gas_connection_type || '') || 'Type not specified' }}</div>
+                </div>
+
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                  <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Gas Connection</span>
+                  <div class="text-slate-900 font-mono font-bold">{{ property()!.gas_connection_number || 'No connection number' }}</div>
                 </div>
               </div>
             </div>

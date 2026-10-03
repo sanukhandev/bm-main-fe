@@ -265,7 +265,7 @@ import {
             </div>
           </div>
 
-          @if (workflowRole() === 'owner') {
+          @if (selectedRoles().includes('owner')) {
             <!-- OPTIONAL OWNER REPRESENTATIVE -->
             <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
               <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
@@ -1149,7 +1149,7 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
       val.representative_phone,
       val.representative_identity_no,
     ].some((value) => String(value || '').trim() !== '');
-    if (this.workflowRole() === 'owner' && representativeDetails && !val.representative_identity_no) {
+    if (this.selectedRoles().includes('owner') && representativeDetails && !val.representative_identity_no) {
       this.serverError.set('Representative Emirates ID is required when representative details are entered.');
       this.customerForm.get('representative_identity_no')?.markAsTouched();
       return;
@@ -1183,7 +1183,7 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
       country_code: val.country_code || 'AE',
       notes: val.notes || null,
       roles: this.selectedRoles(),
-      ...(this.workflowRole() === 'owner'
+      ...(this.selectedRoles().includes('owner')
         ? {
             representative: representativeDetails
               ? {

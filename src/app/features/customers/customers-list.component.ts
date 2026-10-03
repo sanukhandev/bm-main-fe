@@ -244,6 +244,9 @@ import { PaginationMeta } from '../../core/api/api.models';
                     >
                       {{ cust.display_name }}
                     </a>
+                    @if (cust.legal_name && cust.legal_name !== cust.display_name) {
+                      <div class="text-[11px] text-slate-400 font-normal">{{ cust.legal_name }}</div>
+                    }
                   </td>
                   <td class="py-3.5 px-4">
                     <bm-status-badge [status]="cust.customer_type"></bm-status-badge>
@@ -256,7 +259,23 @@ import { PaginationMeta } from '../../core/api/api.models';
                     </div>
                   </td>
                   <td class="py-3.5 px-4 text-slate-600">
-                    <div>{{ cust.phone || '—' }}</div>
+                    @if (phoneNumbers(cust).length > 0) {
+                      @for (phone of phoneNumbers(cust).slice(0, 3); track phone.type + phone.number) {
+                        <div class="whitespace-nowrap">
+                          <span class="text-[10px] uppercase tracking-wide text-slate-400 mr-1.5">
+                            {{ phoneTypeLabel(phone.type) }}
+                          </span>
+                          {{ phone.number }}
+                        </div>
+                      }
+                      @if (phoneNumbers(cust).length > 3) {
+                        <div class="text-[11px] text-slate-400">
+                          +{{ phoneNumbers(cust).length - 3 }} more
+                        </div>
+                      }
+                    } @else {
+                      <div>—</div>
+                    }
                     <div class="text-[11px] text-slate-400">{{ cust.email || '' }}</div>
                   </td>
                   <td class="py-3.5 px-4">
@@ -523,6 +542,25 @@ export class CustomersListComponent implements OnInit, OnDestroy {
 
   hasActiveFilters(): boolean {
     return !!(this.searchQuery() || this.selectedType() || this.selectedStatus());
+  }
+
+  phoneNumbers(customer: Customer) {
+    const numbers = (customer.phone_numbers || [])
+      .filter((phone) => !!phone?.number?.trim())
+      .map((phone) => ({ type: phone.type || 'contact', number: phone.number.trim() }));
+
+    if (numbers.length > 0) return numbers;
+    return customer.phone?.trim() ? [{ type: 'contact' as const, number: customer.phone.trim() }] : [];
+  }
+
+  phoneTypeLabel(type: string): string {
+    return type === 'whatsapp'
+      ? 'WhatsApp'
+      : type === 'landline'
+        ? 'Landline'
+        : type === 'other'
+          ? 'Other'
+          : 'Contact';
   }
 
   navigateToCreate(): void {

@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ZaakiyOrbComponent } from './zaakiy-orb.component';
-import { ZaakiyMetricCard, ZaakiyStructuredBlock } from '../../../core/api/zaakiy-api.service';
+import { ZaakiyMetricCard, ZaakiyStructuredBlock, ZaakiyStructuredRecord } from '../../../core/api/zaakiy-api.service';
 
 export interface ZaakiyMessageModel {
   role: 'user' | 'model';
@@ -74,7 +74,7 @@ export interface ZaakiyMessageModel {
           }
         </div>
 
-        <!-- Structured SSE Events rendered as Clean Rich Text (instead of aggressive cards) -->
+        <!-- Response Data Blocks, Badges, Suggestions & CTAs -->
         @if (message.role === 'model' && message.blocks.length > 0) {
           <div class="mt-3 space-y-3 w-full">
             @for (block of message.blocks; track $index) {
@@ -90,7 +90,7 @@ export interface ZaakiyMessageModel {
                 </div>
               }
 
-              <!-- Verified Records: Clean Structured List -->
+              <!-- Verified Records: Clean Structured List with View Details CTAs -->
               @if (block.type === 'records' && block.records?.length) {
                 <div class="my-3 p-3 rounded-2xl bg-slate-50/80 border border-slate-200/70 space-y-2 text-xs font-poppins">
                   <div class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
@@ -105,11 +105,25 @@ export interface ZaakiyMessageModel {
                             <div class="text-[10px] text-slate-400 font-mono">ID: #{{ record.id }}</div>
                           }
                         </div>
-                        @if (record.status) {
-                          <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60 shrink-0">
-                            {{ record.status }}
-                          </span>
-                        }
+                        <div class="flex items-center gap-1.5 shrink-0">
+                          @if (record.status) {
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                              {{ record.status }}
+                            </span>
+                          }
+                          @if (recordRoute(record)) {
+                            <button
+                              type="button"
+                              (click)="onNavigate.emit(recordRoute(record)!)"
+                              class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-brand-50 text-brand-800 hover:bg-brand-100 border border-brand-200/60 cursor-pointer transition flex items-center gap-1 shadow-2xs"
+                            >
+                              <span>Details</span>
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                              </svg>
+                            </button>
+                          }
+                        </div>
                       </div>
                     }
                   </div>
@@ -205,9 +219,9 @@ export interface ZaakiyMessageModel {
                 </div>
               }
 
-              <!-- Next Question Suggestions (chips below message) -->
+              <!-- Next Question Suggestions (shown ONLY with response message) -->
               @if (block.type === 'suggestions' && block.suggestions?.length) {
-                <div class="mt-3 pt-2 border-t border-slate-100 flex flex-wrap items-center gap-2">
+                <div class="mt-3 pt-2.5 border-t border-slate-100 flex flex-wrap items-center gap-2">
                   <span class="text-[11px] font-semibold text-slate-400 shrink-0">Follow-up questions:</span>
                   @for (sug of block.suggestions; track sug) {
                     <button
@@ -227,7 +241,7 @@ export interface ZaakiyMessageModel {
           </div>
         }
 
-        <!-- Next CTA Action Buttons (Prominent navigation pills) -->
+        <!-- Next CTA Action Navigation Buttons (Shown with response) -->
         @if (message.role === 'model' && isLast && actions.length > 0) {
           <div class="flex flex-wrap items-center gap-2 mt-4 pt-1">
             <span class="text-[11px] font-semibold text-slate-400 shrink-0 w-full sm:w-auto">Suggested Actions:</span>
@@ -315,6 +329,17 @@ export class ZaakiyMessageComponent {
       this.copied.set(true);
       setTimeout(() => this.copied.set(false), 2000);
     });
+  }
+
+  recordRoute(record: ZaakiyStructuredRecord): string | null {
+    if (!record.id) return null;
+    const type = (record.type || '').toLowerCase();
+    if (type.includes('property')) return `/app/properties/${record.id}`;
+    if (type.includes('tenant') || type.includes('lease')) return `/app/tenant-agreements/${record.id}`;
+    if (type.includes('owner') || type.includes('management')) return `/app/owner-agreements/${record.id}`;
+    if (type.includes('customer') || type.includes('tenant_profile')) return `/app/customers/${record.id}`;
+    if (type.includes('work_order') || type.includes('maintenance')) return `/app/maintenance/work-orders/${record.id}`;
+    return null;
   }
 
   formatMetricValue(metric: ZaakiyMetricCard): string {

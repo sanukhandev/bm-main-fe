@@ -336,3 +336,56 @@ dirham-symbol svg {
 .font-poppins {
   font-family: 'Poppins', sans-serif;
 }
+
+/* UI/UX Micro-Interactions & Tactile Animations */
+.active-press {
+  transition: transform 0.1s ease-in-out;
+}
+
+.active-press:active {
+  transform: scale(0.97);
+}
+
+@keyframes bmSkeletonShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-skeleton {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 37%, #f1f5f9 63%);
+  background-size: 200% 100%;
+  animation: bmSkeletonShimmer 1.5s infinite ease-in-out;
+}
+
+@keyframes bmFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: bmFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes bmScaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-up {
+  animation: bmScaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+

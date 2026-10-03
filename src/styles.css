@@ -1,6 +1,29 @@
-@import url('https://fonts.googleapis.com/css2?family=Anta&family=Instrument+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anta&family=Instrument+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Poppins:wght@400;500;600;700&display=swap');
 @import 'dirham/css';
 @import 'tailwindcss';
+
+@theme {
+  --font-poppins: 'Poppins', 'Instrument Sans', sans-serif;
+
+  --color-brand-950: #022C22;
+  --color-brand-900: #064E3B;
+  --color-brand-800: #065F46;
+  --color-brand-700: #047857;
+  --color-brand-600: #059669;
+  --color-brand-500: #10B981;
+  --color-brand-400: #34D399;
+  --color-brand-100: #D1FAE5;
+  --color-brand-50:  #ECFDF5;
+
+  --color-ink: #101214;
+  --color-ink-soft: #2B2F31;
+
+  --color-surface-200: #E9EEEA;
+  --color-surface-100: #F1F4F1;
+  --color-surface-50:  #F7F9F6;
+
+  --color-lime-accent: #DFFF62;
+}
 
 :root {
   --font-ui: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
@@ -295,4 +318,21 @@ dirham-symbol svg {
 
 .animate-bm-top-loader {
   animation: bmTopLoaderBar 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Zaakiy V3RSE Gradients & Styling */
+.bg-zaakiy-gradient {
+  background: linear-gradient(135deg, #064E3B 0%, #047857 45%, #10B981 100%);
+}
+
+.bg-zaakiy-highlight {
+  background: linear-gradient(135deg, #10B981 0%, #67D888 55%, #DFFF62 100%);
+}
+
+.bg-zaakiy-soft {
+  background: linear-gradient(135deg, #ECFDF5 0%, #F7F9F6 60%, #F3FFC1 100%);
+}
+
+.font-poppins {
+  font-family: 'Poppins', sans-serif;
 }

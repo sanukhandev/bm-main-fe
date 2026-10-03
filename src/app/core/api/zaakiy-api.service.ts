@@ -10,11 +10,88 @@ export interface ZaakiyHistoryItem {
   text: string;
 }
 
+export interface ZaakiyConversationContext {
+  intent?: string | null;
+  domain?: string | null;
+  subject?: string | null;
+  metric?: string | null;
+  entities: Array<{ type: string; id: number; label?: string }>;
+  time_range?: { from: string; to: string; label?: string } | null;
+  comparison_range?: { from: string; to: string; label?: string } | null;
+  filters: Record<string, unknown>;
+  sort: Record<string, unknown>;
+  result_references: Array<{ type: string; id: number; label?: string }>;
+  branch_context: { branch_id?: number; branch_code?: string };
+  meta?: Record<string, unknown>;
+}
+
+export interface ZaakiyMetricCard {
+  metric: string;
+  label: string;
+  value: string | number | boolean;
+  unit: 'AED' | 'count' | 'percent' | 'days' | 'date' | string;
+  format_hint?: string;
+}
+
+export interface ZaakiyStructuredRecord {
+  type?: string;
+  id?: number;
+  label?: string;
+  status?: string;
+  fields?: Record<string, unknown>;
+}
+
+export interface ZaakiyStructuredBlock {
+  type: 'summary' | 'records' | 'comparison' | 'trend' | 'explanation' | 'anomalies' | 'sections' | 'warnings' | 'suggestions';
+  metrics?: ZaakiyMetricCard[];
+  records?: ZaakiyStructuredRecord[];
+  comparisons?: Array<Record<string, unknown>>;
+  trends?: Array<Record<string, unknown>>;
+  explanations?: Array<Record<string, unknown>>;
+  anomalies?: Array<Record<string, unknown>>;
+  sections?: Array<Record<string, unknown>>;
+  warnings?: Array<Record<string, unknown>>;
+  suggestions?: string[];
+}
+
+export type ZaakiyStructuredEventType = ZaakiyStructuredBlock['type'];
+
 export interface ZaakiyStreamEvent {
-  type: 'token' | 'done' | 'navigation';
+  type: 'token' | 'done' | 'navigation' | 'error' | ZaakiyStructuredEventType;
   text?: string;
   label?: string;
   url?: string;
+  context?: ZaakiyConversationContext | null;
+  block?: ZaakiyStructuredBlock;
+}
+
+export function normalizeZaakiyEvent(type: string | undefined, payload: Record<string, unknown>): ZaakiyStreamEvent | null {
+  if (type === 'error') {
+    throw new Error((payload['message'] as string | undefined) || 'Zaakiy is temporarily unavailable.');
+  }
+  if (type === 'done' || type === 'navigation' || type === 'token') {
+    return {
+      type,
+      text: payload['text'] as string | undefined,
+      label: payload['label'] as string | undefined,
+      url: payload['url'] as string | undefined,
+      context: payload['context'] as ZaakiyConversationContext | null | undefined,
+    };
+  }
+  const structuredTypes: ZaakiyStructuredEventType[] = [
+    'summary',
+    'records',
+    'comparison',
+    'trend',
+    'explanation',
+    'anomalies',
+    'sections',
+    'warnings',
+    'suggestions',
+  ];
+  if (!type || !structuredTypes.includes(type as ZaakiyStructuredEventType)) return null;
+
+  return { type: type as ZaakiyStructuredEventType, block: { type: type as ZaakiyStructuredEventType, ...payload } };
 }
 
 function xsrfToken(): string | null {
@@ -26,7 +103,11 @@ function xsrfToken(): string | null {
 export class ZaakiyApiService {
   private branchContext = inject(BranchContextService);
 
-  stream(message: string, history: ZaakiyHistoryItem[]): Observable<ZaakiyStreamEvent> {
+  stream(
+    message: string,
+    history: ZaakiyHistoryItem[],
+    conversationContext: ZaakiyConversationContext | null = null,
+  ): Observable<ZaakiyStreamEvent> {
     return new Observable((subscriber) => {
       const controller = new AbortController();
       const headers: Record<string, string> = {
@@ -42,7 +123,11 @@ export class ZaakiyApiService {
         method: 'POST',
         credentials: 'include',
         headers,
-        body: JSON.stringify({ message, history: history.slice(-20) }),
+        body: JSON.stringify({
+          message,
+          history: history.slice(-20),
+          ...(conversationContext ? { conversation_context: conversationContext } : {}),
+        }),
         signal: controller.signal,
       })
         .then(async (response) => {
@@ -75,15 +160,19 @@ export class ZaakiyApiService {
                 message?: string;
                 label?: string;
                 url?: string;
+                context?: ZaakiyConversationContext | null;
+                metrics?: ZaakiyMetricCard[];
+                records?: ZaakiyStructuredRecord[];
+                comparisons?: Array<Record<string, unknown>>;
+                trends?: Array<Record<string, unknown>>;
+                explanations?: Array<Record<string, unknown>>;
+                anomalies?: Array<Record<string, unknown>>;
+                sections?: Array<Record<string, unknown>>;
+                warnings?: Array<Record<string, unknown>>;
+                suggestions?: string[];
               };
-              if (type === 'error')
-                throw new Error(payload.message || 'Zaakiy is temporarily unavailable.');
-              subscriber.next({
-                type: type === 'done' ? 'done' : type === 'navigation' ? 'navigation' : 'token',
-                text: payload.text,
-                label: payload.label,
-                url: payload.url,
-              });
+              const normalized = normalizeZaakiyEvent(type, payload);
+              if (normalized) subscriber.next(normalized);
             }
             if (done) break;
           }

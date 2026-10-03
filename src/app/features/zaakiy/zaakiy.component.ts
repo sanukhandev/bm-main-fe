@@ -103,9 +103,7 @@ import { ZaakiyComposerComponent } from './components/zaakiy-composer.component'
               <bm-zaakiy-composer
                 [(draft)]="draft"
                 [isLoading]="loading()"
-                [suggestions]="latestSuggestions()"
                 (onSend)="send()"
-                (onSendPrompt)="ask($event)"
                 (onStop)="stopStreaming()"
               />
             </div>

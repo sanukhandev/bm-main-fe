@@ -390,6 +390,38 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                       <span>{{ ownerCustomer()?.phone }}</span>
                     </div>
                   }
+                  @if (ownerCustomer()?.representative) {
+                    <div class="mt-3 rounded-xl border border-blue-100 bg-blue-50/50 p-3 text-xs">
+                      <div class="font-semibold text-slate-700">Owner Representative</div>
+                      <div class="mt-1.5 space-y-0.5 text-slate-600">
+                        <div>
+                          <span class="text-slate-400">Name:</span>
+                          {{ ownerCustomer()?.representative?.name }}
+                        </div>
+                        @if (ownerCustomer()?.representative?.relationship) {
+                          <div>
+                            <span class="text-slate-400">Relationship:</span>
+                            {{ ownerCustomer()?.representative?.relationship }}
+                          </div>
+                        }
+                        @if (ownerCustomer()?.representative?.phone) {
+                          <div>
+                            <span class="text-slate-400">Phone:</span>
+                            <a
+                              class="text-blue-700 hover:underline"
+                              [href]="'tel:' + ownerCustomer()?.representative?.phone"
+                            >
+                              {{ ownerCustomer()?.representative?.phone }}
+                            </a>
+                          </div>
+                        }
+                        <div>
+                          <span class="text-slate-400">Emirates ID:</span>
+                          <span class="font-mono">{{ ownerCustomer()?.representative?.identity_no }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  }
                 }
               </div>
               @if (ownerCustomer()) {

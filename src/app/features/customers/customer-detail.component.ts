@@ -177,9 +177,9 @@ import { Customer, CustomerProfile } from '../../shared/models/customer.models';
             <div
               class="flex flex-wrap items-center gap-3 w-full md:w-auto pt-2 md:pt-0 border-t md:border-t-0 border-slate-200/80"
             >
-              @if (customer()!.phone) {
+              @for (phone of phoneNumbers(); track $index) {
                 <a
-                  [href]="'tel:' + customer()!.phone"
+                  [href]="'tel:' + phone.number"
                   class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 text-xs font-semibold shadow-2xs hover:bg-slate-50 hover:border-slate-300 transition"
                 >
                   <svg
@@ -196,7 +196,7 @@ import { Customer, CustomerProfile } from '../../shared/models/customer.models';
                       d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
                     />
                   </svg>
-                  <span>{{ customer()!.phone }}</span>
+                  <span>{{ phone.number }} · {{ phone.type }}</span>
                 </a>
               }
               @if (customer()!.email) {
@@ -782,6 +782,20 @@ import { Customer, CustomerProfile } from '../../shared/models/customer.models';
               </div>
             </div>
 
+            @if (isOwner() && customer()!.representative) {
+              <div class="rounded-2xl border border-blue-200/90 bg-blue-50/40 p-6 shadow-2xs space-y-3">
+                <h3 class="text-base font-bold text-slate-900 pb-3 border-b border-blue-100">Owner Representative</h3>
+                <div class="text-xs space-y-2">
+                  <div><span class="text-slate-400 font-medium block">Name</span><span class="font-semibold text-slate-900">{{ customer()!.representative!.name }}</span></div>
+                  <div><span class="text-slate-400 font-medium block">Relationship</span><span class="font-semibold text-slate-900">{{ customer()!.representative!.relationship || '—' }}</span></div>
+                  <div><span class="text-slate-400 font-medium block">Emirates ID</span><span class="font-semibold text-slate-900 font-mono">{{ customer()!.representative!.identity_no }}</span></div>
+                  @if (customer()!.representative!.phone) {
+                    <div><span class="text-slate-400 font-medium block">Phone</span><a class="font-semibold text-blue-700 hover:underline" [href]="'tel:' + customer()!.representative!.phone">{{ customer()!.representative!.phone }}</a></div>
+                  }
+                </div>
+              </div>
+            }
+
             <!-- ADDRESS & LOCATION CARD -->
             <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-2xs space-y-4">
               <h3 class="text-base font-bold text-slate-900 pb-3 border-b border-slate-100">
@@ -915,6 +929,16 @@ export class CustomerDetailComponent implements OnInit {
 
   receiptRoute(direction: string): string {
     return direction === 'inward' ? '/app/accounts/inward' : '/app/accounts/outward';
+  }
+
+  phoneNumbers(): { type: string; number: string }[] {
+    const customer = this.customer();
+    if (!customer) return [];
+    return customer.phone_numbers?.length
+      ? customer.phone_numbers
+      : customer.phone
+        ? [{ type: 'contact', number: customer.phone }]
+        : [];
   }
 
   paymentLineParams(line: { line_type: string; id: number }): Record<string, number> {

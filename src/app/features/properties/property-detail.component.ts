@@ -286,6 +286,38 @@ import { Property, PropertyProfile } from '../../shared/models/property.models';
                 <p class="text-[11px] text-slate-500 mt-0.5">Maintenance requests</p>
               </div>
             </div>
+
+            <!-- UTILITY CONNECTIONS BENTO CARD -->
+            <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-2xs space-y-4">
+              <div class="flex items-center gap-2.5 pb-3 border-b border-slate-100">
+                <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-xs">U</div>
+                <div>
+                  <h2 class="text-base font-extrabold text-slate-900">Utility Connections</h2>
+                  <p class="text-xs text-slate-500">Optional electricity, cooling, and gas details</p>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div>
+                  <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Electricity</span>
+                  <div class="text-slate-900 font-semibold">{{ formatType(property()!.electricity_provider || '') || '—' }}</div>
+                  <div class="text-slate-500 mt-0.5">{{ property()!.electricity_account_number || 'No account number' }}</div>
+                </div>
+                <div>
+                  <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Cooling</span>
+                  <div class="text-slate-900 font-semibold">{{ formatType(property()!.cooling_provider || '') || '—' }}</div>
+                  <div class="text-slate-500 mt-0.5">{{ property()!.cooling_account_number || 'No account number' }}</div>
+                </div>
+                <div>
+                  <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Gas</span>
+                  <div class="text-slate-900 font-semibold">{{ formatType(property()!.gas_provider || '') || '—' }}</div>
+                  <div class="text-slate-500 mt-0.5">{{ formatType(property()!.gas_connection_type || '') || 'Type not specified' }}</div>
+                </div>
+                <div>
+                  <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Gas Connection</span>
+                  <div class="text-slate-900 font-semibold">{{ property()!.gas_connection_number || 'No connection number' }}</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

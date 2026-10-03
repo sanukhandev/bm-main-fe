@@ -379,7 +379,80 @@ import {
             </div>
           </div>
 
-          <!-- SECTION 4: Notes & Specifications -->
+          <!-- SECTION 4: Utility Connections -->
+          <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
+            <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
+              <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
+                <span class="text-sm font-extrabold">U</span>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">Utility Connections</h3>
+                <p class="text-xs text-slate-500 font-normal">Optional UAE electricity, cooling, and gas account details</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+              <div>
+                <label class="block text-[13px] font-semibold text-[#26312C] mb-2">Electricity Provider</label>
+                <select formControlName="electricity_provider" class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10">
+                  <option value="">Not specified</option>
+                  <option value="dewa">DEWA</option>
+                  <option value="addc">ADDC</option>
+                  <option value="aadc">AADC</option>
+                  <option value="sewa">SEWA</option>
+                  <option value="etihadwe">EtihadWE (formerly FEWA)</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[13px] font-semibold text-[#26312C] mb-2">Electricity Account Number</label>
+                <input type="text" formControlName="electricity_account_number" placeholder="DEWA / utility account number" class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10" />
+              </div>
+              <div>
+                <label class="block text-[13px] font-semibold text-[#26312C] mb-2">Cooling Provider</label>
+                <select formControlName="cooling_provider" class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10">
+                  <option value="">Not specified</option>
+                  <option value="empower">Empower</option>
+                  <option value="emicool">Emicool</option>
+                  <option value="tabreed">Tabreed</option>
+                  <option value="nakheel">Nakheel / Palm Utilities</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[13px] font-semibold text-[#26312C] mb-2">Cooling Account Number</label>
+                <input type="text" formControlName="cooling_account_number" placeholder="District cooling account number" class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10" />
+              </div>
+              <div>
+                <label class="block text-[13px] font-semibold text-[#26312C] mb-2">Gas Provider</label>
+                <select formControlName="gas_provider" class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10">
+                  <option value="">Not specified</option>
+                  <option value="emirates_gas">Emirates Gas</option>
+                  <option value="enoc">ENOC</option>
+                  <option value="adnoc">ADNOC Distribution</option>
+                  <option value="lootah_gas">Lootah Gas</option>
+                  <option value="dubai_gas">Dubai Gas</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[13px] font-semibold text-[#26312C] mb-2">Gas Connection Type</label>
+                <select formControlName="gas_connection_type" class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10">
+                  <option value="">Not specified</option>
+                  <option value="piped_gas">Piped gas</option>
+                  <option value="lpg_cylinder">LPG cylinder</option>
+                  <option value="bulk_lpg">Bulk LPG</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-[13px] font-semibold text-[#26312C] mb-2">Gas Connection Number</label>
+                <input type="text" formControlName="gas_connection_number" placeholder="Gas account or connection number" class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10" />
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 5: Notes & Specifications -->
           <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
             <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
               <div
@@ -511,6 +584,13 @@ export class PropertyFormComponent implements OnInit {
     state_or_emirate: ['Dubai'],
     country_code: ['AE'],
     area: [''],
+    electricity_provider: [''],
+    electricity_account_number: [''],
+    cooling_provider: [''],
+    cooling_account_number: [''],
+    gas_provider: [''],
+    gas_connection_type: [''],
+    gas_connection_number: [''],
     notes: [''],
   });
 
@@ -589,6 +669,13 @@ export class PropertyFormComponent implements OnInit {
           state_or_emirate: p.state_or_emirate || 'Dubai',
           country_code: p.country_code || 'AE',
           area: p.area !== null && p.area !== undefined ? String(p.area) : '',
+          electricity_provider: p.electricity_provider || '',
+          electricity_account_number: p.electricity_account_number || '',
+          cooling_provider: p.cooling_provider || '',
+          cooling_account_number: p.cooling_account_number || '',
+          gas_provider: p.gas_provider || '',
+          gas_connection_type: p.gas_connection_type || '',
+          gas_connection_number: p.gas_connection_number || '',
           notes: p.notes || '',
         });
         this.isLoading.set(false);
@@ -626,6 +713,13 @@ export class PropertyFormComponent implements OnInit {
       state_or_emirate: val.state_or_emirate || null,
       country_code: val.country_code || 'AE',
       area: val.area || null,
+      electricity_provider: val.electricity_provider || null,
+      electricity_account_number: val.electricity_account_number || null,
+      cooling_provider: val.cooling_provider || null,
+      cooling_account_number: val.cooling_account_number || null,
+      gas_provider: val.gas_provider || null,
+      gas_connection_type: val.gas_connection_type || null,
+      gas_connection_number: val.gas_connection_number || null,
       notes: val.notes || null,
     };
 

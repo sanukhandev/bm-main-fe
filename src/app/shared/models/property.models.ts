@@ -21,6 +21,13 @@ export interface Property {
   state_or_emirate?: string | null;
   country_code?: string | null;
   area?: string | number | null;
+  electricity_provider?: string | null;
+  electricity_account_number?: string | null;
+  cooling_provider?: string | null;
+  cooling_account_number?: string | null;
+  gas_provider?: string | null;
+  gas_connection_type?: string | null;
+  gas_connection_number?: string | null;
   status: PropertyStatus;
   notes?: string | null;
   created_at?: string;
@@ -40,6 +47,13 @@ export interface CreatePropertyDto {
   state_or_emirate?: string | null;
   country_code?: string | null;
   area?: string | number | null;
+  electricity_provider?: string | null;
+  electricity_account_number?: string | null;
+  cooling_provider?: string | null;
+  cooling_account_number?: string | null;
+  gas_provider?: string | null;
+  gas_connection_type?: string | null;
+  gas_connection_number?: string | null;
   notes?: string | null;
 }
 

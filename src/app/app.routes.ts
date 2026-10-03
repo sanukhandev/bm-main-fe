@@ -32,6 +32,11 @@ export const routes: Routes = [
           import('./features/zaakiy/zaakiy.component').then((m) => m.ZaakiyComponent),
       },
       {
+        path: 'about-zaakiy',
+        loadComponent: () =>
+          import('./features/zaakiy/about-zaakiy.component').then((m) => m.AboutZaakiyComponent),
+      },
+      {
         path: 'faq',
         loadComponent: () => import('./features/help/faq.component').then((m) => m.FaqComponent),
       },

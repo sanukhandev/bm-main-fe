@@ -9,13 +9,13 @@ import {
   computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { BmPageHeaderComponent } from '../../shared/components/bm-page-header/bm-page-header.component';
 import { BmLoadingStateComponent } from '../../shared/components/bm-loading-state/bm-loading-state.component';
 import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm-error-state.component';
 import { CustomersApiService } from '../../core/api/customers-api.service';
-import { CustomerRole, CustomerType } from '../../shared/models/customer.models';
+import { CustomerPhoneType, CustomerRole, CustomerType } from '../../shared/models/customer.models';
 import {
   formatEmiratesId,
   emiratesIdValidator,
@@ -265,6 +265,51 @@ import {
             </div>
           </div>
 
+          @if (workflowRole() === 'owner') {
+            <!-- OPTIONAL OWNER REPRESENTATIVE -->
+            <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
+              <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
+                <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
+                  <span class="text-sm font-extrabold">R</span>
+                </div>
+                <div>
+                  <h3 class="text-lg font-semibold text-slate-900 tracking-tight">Owner Representative</h3>
+                  <p class="text-xs text-slate-500 font-normal">Optional son, family member, or authorised representative</p>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+                <div>
+                  <label class="block text-[13px] font-semibold text-[#26312C] mb-2">Representative Name</label>
+                  <input type="text" formControlName="representative_name" placeholder="Full name" class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10" />
+                </div>
+                <div>
+                  <label class="block text-[13px] font-semibold text-[#26312C] mb-2">Relationship</label>
+                  <select formControlName="representative_relationship" class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium focus:outline-none focus:border-emerald-600">
+                    <option value="">Select relationship</option>
+                    <option value="son">Son</option>
+                    <option value="daughter">Daughter</option>
+                    <option value="spouse">Spouse</option>
+                    <option value="family_member">Family member</option>
+                    <option value="authorised_representative">Authorised representative</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[13px] font-semibold text-[#26312C] mb-2">Representative Phone</label>
+                  <input type="text" formControlName="representative_phone" placeholder="+971 50 000 0000" (input)="onRepresentativePhoneInput($event)" class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10" />
+                </div>
+                <div>
+                  <label class="block text-[13px] font-semibold text-[#26312C] mb-2">Representative Emirates ID</label>
+                  <input type="text" formControlName="representative_identity_no" placeholder="784-1990-1234567-1" (input)="onRepresentativeIdentityInput($event)" [attr.aria-invalid]="isFieldInvalid('representative_identity_no')" class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium tabular-nums focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10" />
+                  @if (isFieldInvalid('representative_identity_no')) {
+                    <span class="text-xs font-medium text-rose-600 mt-1.5 flex items-center gap-1">Enter a valid Emirates ID: 784-YYYY-XXXXXXX-X.</span>
+                  }
+                </div>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-4">If any representative detail is entered, the representative Emirates ID is required.</p>
+            </div>
+          }
+
           <!-- SECTION 2: Contact & Identification -->
           <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
             <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
@@ -297,21 +342,29 @@ import {
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-              <!-- Phone -->
+              <!-- Primary Phone -->
               <div>
                 <label class="block text-[13px] font-semibold text-[#26312C] mb-2">
-                  Phone Number
+                  Primary Phone Number
                 </label>
-                <input
-                  type="text"
-                  formControlName="phone"
-                  placeholder="+971 50 000 0000"
-                  (input)="onPhoneInput($event)"
-                  (focus)="onPhoneFocus()"
-                  [attr.aria-invalid]="isFieldInvalid('phone')"
-                  aria-describedby="phone-error"
-                  class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium tabular-nums shadow-2xs placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
-                />
+                <div class="flex gap-2">
+                  <select formControlName="phone_type" class="w-32 h-11 px-2 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium focus:outline-none focus:border-emerald-600">
+                    <option value="contact">Contact</option>
+                    <option value="whatsapp">WhatsApp</option>
+                    <option value="landline">Landline</option>
+                    <option value="other">Other</option>
+                  </select>
+                  <input
+                    type="text"
+                    formControlName="phone"
+                    placeholder="+971 50 000 0000"
+                    (input)="onPhoneInput($event)"
+                    (focus)="onPhoneFocus()"
+                    [attr.aria-invalid]="isFieldInvalid('phone')"
+                    aria-describedby="phone-error"
+                    class="min-w-0 flex-1 h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium tabular-nums shadow-2xs placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
+                  />
+                </div>
                 @if (isFieldInvalid('phone')) {
                   <span
                     id="phone-error"
@@ -384,6 +437,29 @@ import {
                     {{ customerType() === 'organization' ? 'Trade Licence number must be 5-50 letters, numbers, / or -.' : 'Emirates ID must match format 784-YYYY-XXXXXXX-X.' }}
                   </span>
                 }
+              </div>
+
+              <!-- Additional Phones -->
+              <div class="md:col-span-2">
+                <div class="flex items-center justify-between mb-2">
+                  <label class="block text-[13px] font-semibold text-[#26312C]">Additional Phone Numbers</label>
+                  <button type="button" class="text-xs font-bold text-emerald-700 hover:text-emerald-800" (click)="addPhoneNumber()">+ Add number</button>
+                </div>
+                <div formArrayName="additional_phone_numbers" class="space-y-2">
+                  @for (phone of additionalPhoneNumbers.controls; track $index; let i = $index) {
+                    <div [formGroupName]="i" class="flex gap-2 items-start">
+                      <select formControlName="type" class="w-32 h-10 px-2 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-xs font-medium focus:outline-none focus:border-emerald-600">
+                        <option value="contact">Contact</option>
+                        <option value="whatsapp">WhatsApp</option>
+                        <option value="landline">Landline</option>
+                        <option value="other">Other</option>
+                      </select>
+                      <input type="text" formControlName="number" placeholder="+971 50 000 0000" (input)="onAdditionalPhoneInput(i, $event)" class="min-w-0 flex-1 h-10 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium tabular-nums focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10" />
+                      <button type="button" class="h-10 px-3 rounded-xl border border-rose-200 text-rose-700 text-xs font-bold hover:bg-rose-50" (click)="removePhoneNumber(i)">Remove</button>
+                    </div>
+                  }
+                </div>
+                <p class="text-[11px] text-slate-400 mt-2">Use this for WhatsApp, landline, or other contact numbers.</p>
               </div>
 
               @if (customerType() === 'organization') {
@@ -741,6 +817,8 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
     display_name: ['', Validators.required],
     legal_name: [''],
     phone: ['+971 ', [uaePhoneValidator()]],
+    phone_type: ['contact' as CustomerPhoneType],
+    additional_phone_numbers: this.fb.array([]),
     email: ['', [Validators.email]],
     tax_registration_no: [''],
     identity_no: ['', [emiratesIdValidator()]],
@@ -750,6 +828,10 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
     state_or_emirate: ['Dubai'],
     country_code: ['AE'],
     notes: [''],
+    representative_name: [''],
+    representative_relationship: [''],
+    representative_phone: [''],
+    representative_identity_no: ['', [emiratesIdValidator()]],
   });
 
   onIdentityInput(event: Event): void {
@@ -775,6 +857,38 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
     if (!current || current.trim() === '') {
       this.customerForm.get('phone')?.setValue('+971 ');
     }
+  }
+
+  onRepresentativePhoneInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.customerForm.get('representative_phone')?.setValue(formatUaePhone(input.value), { emitEvent: false });
+  }
+
+  onRepresentativeIdentityInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.customerForm.get('representative_identity_no')?.setValue(formatEmiratesId(input.value), { emitEvent: false });
+  }
+
+  get additionalPhoneNumbers(): FormArray {
+    return this.customerForm.get('additional_phone_numbers') as FormArray;
+  }
+
+  addPhoneNumber(number = '', type: CustomerPhoneType = 'contact'): void {
+    this.additionalPhoneNumbers.push(
+      this.fb.group({ type: [type], number: [number, [uaePhoneValidator()]] }),
+    );
+  }
+
+  removePhoneNumber(index: number): void {
+    this.additionalPhoneNumbers.removeAt(index);
+  }
+
+  onAdditionalPhoneInput(index: number, event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.additionalPhoneNumbers
+      .at(index)
+      .get('number')
+      ?.setValue(formatUaePhone(input.value), { emitEvent: false });
   }
 
   onIdentityDocumentSelected(event: Event): void {
@@ -946,7 +1060,8 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
           customer_type: cust.customer_type,
           display_name: cust.display_name,
           legal_name: cust.legal_name || '',
-          phone: cust.phone || '',
+          phone: cust.phone || cust.phone_numbers?.[0]?.number || '',
+          phone_type: cust.phone_numbers?.[0]?.type || 'contact',
           email: cust.email || '',
           tax_registration_no: cust.tax_registration_no || '',
           identity_no:
@@ -959,7 +1074,15 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
           state_or_emirate: cust.state_or_emirate || 'Dubai',
           country_code: cust.country_code || 'AE',
           notes: cust.notes || '',
+          representative_name: cust.representative?.name || '',
+          representative_relationship: cust.representative?.relationship || '',
+          representative_phone: cust.representative?.phone || '',
+          representative_identity_no: cust.representative?.identity_no || '',
         });
+        this.additionalPhoneNumbers.clear();
+        for (const phone of (cust.phone_numbers || []).slice(1)) {
+          this.addPhoneNumber(phone.number, phone.type);
+        }
         this.identityVerified.set(Boolean(cust.identity_verified));
         this.isLoading.set(false);
       },
@@ -1020,11 +1143,35 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
     this.serverError.set(null);
 
     const val = this.customerForm.value;
+    const representativeDetails = [
+      val.representative_name,
+      val.representative_relationship,
+      val.representative_phone,
+      val.representative_identity_no,
+    ].some((value) => String(value || '').trim() !== '');
+    if (this.workflowRole() === 'owner' && representativeDetails && !val.representative_identity_no) {
+      this.serverError.set('Representative Emirates ID is required when representative details are entered.');
+      this.customerForm.get('representative_identity_no')?.markAsTouched();
+      return;
+    }
+    const primaryPhone = (val.phone || '').trim();
+    const phoneNumbers = [
+      ...(primaryPhone && primaryPhone !== '+971'
+        ? [{ type: (val.phone_type || 'contact') as CustomerPhoneType, number: primaryPhone }]
+        : []),
+      ...this.additionalPhoneNumbers.controls
+        .map((control) => ({
+          type: control.get('type')?.value as CustomerPhoneType,
+          number: (control.get('number')?.value || '').trim(),
+        }))
+        .filter((phone) => phone.number && phone.number !== '+971'),
+    ];
     const dto = {
       customer_type: val.customer_type as CustomerType,
       display_name: val.display_name!,
       legal_name: val.legal_name || null,
-      phone: val.phone || null,
+      phone: phoneNumbers[0]?.number || null,
+      phone_numbers: phoneNumbers.length ? phoneNumbers : null,
       email: val.email || null,
       tax_registration_no: val.tax_registration_no || null,
       identity_no: val.identity_no || null,
@@ -1036,6 +1183,18 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
       country_code: val.country_code || 'AE',
       notes: val.notes || null,
       roles: this.selectedRoles(),
+      ...(this.workflowRole() === 'owner'
+        ? {
+            representative: representativeDetails
+              ? {
+                  name: val.representative_name?.trim() || '',
+                  relationship: val.representative_relationship || null,
+                  phone: val.representative_phone || null,
+                  identity_no: val.representative_identity_no || '',
+                }
+              : null,
+          }
+        : {}),
     };
 
     const redirectPath = this.cancelRoute();

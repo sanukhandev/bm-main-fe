@@ -1,6 +1,19 @@
 export type CustomerType = 'individual' | 'organization';
 export type CustomerStatus = 'active' | 'inactive' | 'archived';
 export type CustomerRole = 'owner' | 'tenant' | 'vendor';
+export type CustomerPhoneType = 'contact' | 'whatsapp' | 'landline' | 'other';
+
+export interface CustomerPhoneNumber {
+  type: CustomerPhoneType;
+  number: string;
+}
+
+export interface CustomerRepresentative {
+  name: string;
+  relationship?: string | null;
+  phone?: string | null;
+  identity_no: string;
+}
 
 export interface Customer {
   id: number;
@@ -10,6 +23,8 @@ export interface Customer {
   display_name: string;
   legal_name?: string | null;
   phone?: string | null;
+  phone_numbers?: CustomerPhoneNumber[] | null;
+  representative?: CustomerRepresentative | null;
   email?: string | null;
   tax_registration_no?: string | null;
   identity_no?: string | null;
@@ -89,6 +104,8 @@ export interface CreateCustomerDto {
   display_name: string;
   legal_name?: string | null;
   phone?: string | null;
+  phone_numbers?: CustomerPhoneNumber[] | null;
+  representative?: CustomerRepresentative | null;
   email?: string | null;
   tax_registration_no?: string | null;
   identity_no?: string | null;

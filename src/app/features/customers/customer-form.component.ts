@@ -19,6 +19,8 @@ import { CustomerRole, CustomerType } from '../../shared/models/customer.models'
 import {
   formatEmiratesId,
   emiratesIdValidator,
+  formatTradeLicense,
+  tradeLicenseValidator,
   formatUaePhone,
   uaePhoneValidator,
 } from '../../shared/utils/uae-formatters';
@@ -38,7 +40,7 @@ import {
     <div class="max-w-[1240px] w-full mx-auto pb-12">
       <!-- Page Header -->
       <bm-page-header [title]="pageTitle()" [subtitle]="pageSubtitle()">
-        @if (!isEditMode() && workflowRole()) {
+        @if (!isEditMode() && workflowRole() && customerType() === 'individual') {
           <input
             #identityDocument
             type="file"
@@ -344,47 +346,47 @@ import {
               </div>
 
               <!-- Dynamic ID Field -->
-              @if (customerType() === 'individual') {
-                <div>
-                  <label
-                    class="block text-[13px] font-semibold text-[#26312C] mb-2 flex items-center gap-2"
-                  >
-                    Emirates ID / National ID
-                    @if (identityVerified()) {
-                      <span
-                        class="inline-flex items-center gap-1 text-emerald-700 text-[11px] font-bold"
-                        title="Verified Emirates ID"
-                      >
-                        <span
-                          class="inline-flex items-center justify-center w-4 h-4 rounded-full bg-emerald-100"
-                          >✓</span
-                        >
-                        Verified
-                      </span>
-                    }
-                  </label>
-                  <input
-                    type="text"
-                    formControlName="identity_no"
-                    placeholder="784-1990-1234567-1"
-                    (input)="onEmiratesIdInput($event)"
-                    [readonly]="identityVerified()"
-                    [class.bg-slate-100]="identityVerified()"
-                    [class.cursor-not-allowed]="identityVerified()"
-                    [attr.aria-invalid]="isFieldInvalid('identity_no')"
-                    aria-describedby="identity_no-error"
-                    class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium tabular-nums shadow-2xs placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
-                  />
-                  @if (isFieldInvalid('identity_no')) {
+              <div>
+                <label
+                  class="block text-[13px] font-semibold text-[#26312C] mb-2 flex items-center gap-2"
+                >
+                  {{ customerType() === 'organization' ? 'Trade Licence Number' : 'Emirates ID / National ID' }}
+                  @if (identityVerified()) {
                     <span
-                      id="identity_no-error"
-                      class="text-xs font-medium text-rose-600 mt-1.5 flex items-center gap-1"
+                      class="inline-flex items-center gap-1 text-emerald-700 text-[11px] font-bold"
+                      title="Verified Emirates ID"
                     >
-                      Emirates ID must match format 784-YYYY-XXXXXXX-X.
+                      <span
+                        class="inline-flex items-center justify-center w-4 h-4 rounded-full bg-emerald-100"
+                        >✓</span
+                      >
+                      Verified
                     </span>
                   }
-                </div>
-              } @else {
+                </label>
+                <input
+                  type="text"
+                  formControlName="identity_no"
+                  [placeholder]="customerType() === 'organization' ? 'e.g. 1234567' : '784-1990-1234567-1'"
+                  (input)="onIdentityInput($event)"
+                  [readonly]="identityVerified()"
+                  [class.bg-slate-100]="identityVerified()"
+                  [class.cursor-not-allowed]="identityVerified()"
+                  [attr.aria-invalid]="isFieldInvalid('identity_no')"
+                  aria-describedby="identity_no-error"
+                  class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium tabular-nums shadow-2xs placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
+                />
+                @if (isFieldInvalid('identity_no')) {
+                  <span
+                    id="identity_no-error"
+                    class="text-xs font-medium text-rose-600 mt-1.5 flex items-center gap-1"
+                  >
+                    {{ customerType() === 'organization' ? 'Trade Licence number must be 5-50 letters, numbers, / or -.' : 'Emirates ID must match format 784-YYYY-XXXXXXX-X.' }}
+                  </span>
+                }
+              </div>
+
+              @if (customerType() === 'organization') {
                 <div>
                   <label class="block text-[13px] font-semibold text-[#26312C] mb-2">
                     Company Registration No.
@@ -750,9 +752,11 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
     notes: [''],
   });
 
-  onEmiratesIdInput(event: Event): void {
+  onIdentityInput(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const formatted = formatEmiratesId(input.value);
+    const formatted = this.customerType() === 'organization'
+      ? formatTradeLicense(input.value)
+      : formatEmiratesId(input.value);
     this.customerForm.get('identity_no')?.setValue(formatted, { emitEvent: false });
     if (this.identityVerificationToken()) {
       this.identityVerificationToken.set(null);
@@ -892,8 +896,12 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
     this.customerForm.get('customer_type')?.valueChanges.subscribe((val) => {
       if (val) {
         this.customerType.set(val as CustomerType);
+        const identity = this.customerForm.get('identity_no');
+        identity?.setValidators([val === 'organization' ? tradeLicenseValidator() : emiratesIdValidator()]);
+        identity?.updateValueAndValidity({ emitEvent: false });
       }
     });
+    this.customerForm.get('identity_no')?.updateValueAndValidity({ emitEvent: false });
 
     const id = this.route.snapshot.paramMap.get('id');
     if (id && id !== 'new') {
@@ -941,7 +949,10 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
           phone: cust.phone || '',
           email: cust.email || '',
           tax_registration_no: cust.tax_registration_no || '',
-          identity_no: cust.identity_no || '',
+          identity_no:
+            cust.customer_type === 'organization'
+              ? formatTradeLicense(cust.identity_no)
+              : formatEmiratesId(cust.identity_no),
           company_registration_no: cust.company_registration_no || '',
           address_line_1: cust.address_line_1 || '',
           city: cust.city || 'Dubai',

@@ -64,6 +64,24 @@ export function emiratesIdValidator(): ValidatorFn {
   };
 }
 
+/** Format a UAE trade licence number without changing its significant characters. */
+export function formatTradeLicense(value: string | null | undefined): string {
+  if (!value) return '';
+  return value.trim().toUpperCase().replace(/\s+/g, '').slice(0, 50);
+}
+
+/** UAE trade licence numbers may be numeric or alphanumeric, with common separators. */
+export function tradeLicenseValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const val = control.value;
+    if (!val || val.trim() === '') return null;
+    if (!/^[A-Z0-9][A-Z0-9/-]{4,49}$/i.test(val)) {
+      return { invalidTradeLicense: 'Trade Licence number must be 5-50 letters, numbers, / or -.' };
+    }
+    return null;
+  };
+}
+
 /**
  * Format UAE Phone Number with default +971 prefix
  */

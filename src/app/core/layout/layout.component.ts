@@ -2898,6 +2898,9 @@ export class LayoutComponent {
       event.preventDefault();
       this.openSearch();
       setTimeout(() => this.searchInputRef?.nativeElement.focus(), 50);
+    } else if ((event.ctrlKey || event.metaKey) && (key === '/' || key === '?')) {
+      event.preventDefault();
+      this.openZaakiy();
     } else if ((event.ctrlKey || event.metaKey) && key === 'k') {
       event.preventDefault();
       this.openSearch();

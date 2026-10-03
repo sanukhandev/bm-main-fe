@@ -23,7 +23,6 @@ import { ZaakiyHeaderComponent } from './components/zaakiy-header.component';
 import { ZaakiyEmptyStateComponent } from './components/zaakiy-empty-state.component';
 import { ZaakiyMessageComponent, ZaakiyMessageModel } from './components/zaakiy-message.component';
 import { ZaakiyComposerComponent } from './components/zaakiy-composer.component';
-import { ZaakiyBentoIntelligenceComponent } from './components/zaakiy-bento-intelligence.component';
 
 @Component({
   selector: 'bm-zaakiy',
@@ -34,13 +33,12 @@ import { ZaakiyBentoIntelligenceComponent } from './components/zaakiy-bento-inte
     ZaakiyEmptyStateComponent,
     ZaakiyMessageComponent,
     ZaakiyComposerComponent,
-    ZaakiyBentoIntelligenceComponent,
   ],
   template: `
-    <div class="max-w-[1400px] w-full mx-auto pb-4 flex flex-col h-[calc(100vh-5.5rem)]">
-      <!-- App Shell Workspace Box -->
-      <div class="flex-1 bg-surface-50 border border-surface-200 rounded-[28px] shadow-xs overflow-hidden flex flex-col min-h-0">
-        <!-- Header Surface -->
+    <div class="w-full max-w-5xl mx-auto flex flex-col h-[calc(100vh-5rem)] pb-3 px-2 sm:px-4">
+      <!-- Gemini-Style Main Chat Canvas Surface -->
+      <div class="flex-1 bg-white border border-surface-200/90 rounded-3xl shadow-xs overflow-hidden flex flex-col min-h-0">
+        <!-- Top Workspace Header -->
         <bm-zaakiy-header
           [activeBranch]="activeBranch()"
           [isStreaming]="loading()"
@@ -48,27 +46,20 @@ import { ZaakiyBentoIntelligenceComponent } from './components/zaakiy-bento-inte
           (onReset)="resetChat()"
         />
 
-        <!-- Desktop 12-Column Bento Workspace Body -->
-        <div class="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-0 gap-0">
-          <!-- Main Conversation Area (7 Cols when Intelligence Panel present, 12 when Empty/Full) -->
+        <!-- Centered Single-Column Chat Area (No Sidebars) -->
+        <div class="flex-1 flex flex-col min-h-0 relative bg-slate-50/30">
+          <!-- Scrollable Messages Container -->
           <div
-            class="flex flex-col min-h-0 h-full border-r border-surface-200/80 bg-white"
-            [ngClass]="{
-              'lg:col-span-8': messages().length > 0,
-              'lg:col-span-12': messages().length === 0
-            }"
+            #scrollContainer
+            class="flex-1 overflow-y-auto px-4 sm:px-8 py-6 space-y-6"
+            aria-live="polite"
           >
-            <!-- Scrollable Messages Container -->
-            <div
-              #scrollContainer
-              class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6"
-              aria-live="polite"
-            >
-              @if (messages().length === 0) {
-                <!-- Empty State Prompt Showcase -->
-                <bm-zaakiy-empty-state (onSelectPrompt)="ask($event)" />
-              } @else {
-                <!-- Chat Message Trajectory -->
+            @if (messages().length === 0) {
+              <!-- Empty State Showcase -->
+              <bm-zaakiy-empty-state (onSelectPrompt)="ask($event)" />
+            } @else {
+              <!-- Chat Messages Flow -->
+              <div class="max-w-3xl mx-auto space-y-6">
                 @for (message of messages(); track $index) {
                   <bm-zaakiy-message
                     [message]="message"
@@ -79,13 +70,15 @@ import { ZaakiyBentoIntelligenceComponent } from './components/zaakiy-bento-inte
                     (onNavigate)="navigate($event)"
                   />
                 }
-              }
-            </div>
+              </div>
+            }
+          </div>
 
-            <!-- Error Banner -->
-            @if (error()) {
+          <!-- Error Alert Banner -->
+          @if (error()) {
+            <div class="max-w-3xl mx-auto w-full px-4 sm:px-8 mb-2">
               <div
-                class="mx-4 sm:mx-6 mb-2 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs px-4 py-3 flex items-center justify-between shadow-2xs"
+                class="rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs px-4 py-3 flex items-center justify-between shadow-2xs"
               >
                 <div class="flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -101,28 +94,22 @@ import { ZaakiyBentoIntelligenceComponent } from './components/zaakiy-bento-inte
                   Dismiss
                 </button>
               </div>
-            }
-
-            <!-- Sticky Bottom Composer -->
-            <bm-zaakiy-composer
-              [(draft)]="draft"
-              [isLoading]="loading()"
-              [suggestions]="latestSuggestions()"
-              (onSend)="send()"
-              (onSendPrompt)="ask($event)"
-              (onStop)="stopStreaming()"
-            />
-          </div>
-
-          <!-- Supporting Bento Intelligence Workspace Sidebar (Desktop 4 Cols) -->
-          @if (messages().length > 0) {
-            <div class="hidden lg:block lg:col-span-4 h-full min-h-0 bg-surface-50 p-4 border-l border-surface-200/80">
-              <bm-zaakiy-bento-intelligence
-                [blocks]="allStructuredBlocks()"
-                (onSelectPrompt)="ask($event)"
-              />
             </div>
           }
+
+          <!-- Sticky Floating Gemini Composer -->
+          <div class="px-4 sm:px-8 pb-4 pt-1 bg-gradient-to-t from-white via-white/95 to-transparent shrink-0">
+            <div class="max-w-3xl mx-auto">
+              <bm-zaakiy-composer
+                [(draft)]="draft"
+                [isLoading]="loading()"
+                [suggestions]="latestSuggestions()"
+                (onSend)="send()"
+                (onSendPrompt)="ask($event)"
+                (onStop)="stopStreaming()"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -148,6 +148,8 @@ export interface AgreementInstallment {
 
 export interface AgreementScheduleInput {
   installment_no: number;
+  due_date?: string;
+  amount?: number;
   category: 'rent' | 'security' | 'commission';
   particulars: string;
 }

@@ -499,7 +499,7 @@ import {
                       class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[11px]"
                     >
                       <th class="py-3 px-4">Payment No</th>
-                      <th class="py-3 px-4">Estimated Due Date</th>
+                      <th class="py-3 px-4">Due Date</th>
                       <th class="py-3 px-4">Reference / Particulars <span class="text-rose-600">*</span></th>
                       <th class="py-3 px-4 text-right">Rent Installment Amount</th>
                     </tr>
@@ -510,8 +510,16 @@ import {
                         <td class="py-3 px-4 font-bold text-slate-800">
                           Payment {{ item.installment_number }}
                         </td>
-                        <td class="py-3 px-4 text-slate-600 tabular-nums font-mono">
-                          {{ item.due_date }}
+                        <td class="py-3 px-4">
+                          <input
+                            [value]="item.due_date"
+                            (input)="updateScheduleDate(item.installment_number, $event)"
+                            type="date"
+                            [min]="agreementForm.value.start_date || null"
+                            [max]="agreementForm.value.end_date || null"
+                            class="h-9 rounded-lg border border-slate-200 bg-white px-2 text-xs tabular-nums"
+                            required
+                          />
                         </td>
                         <td class="py-3 px-4 min-w-[360px]">
                           <div class="text-[10px] text-slate-400 font-mono truncate mb-1">
@@ -537,19 +545,38 @@ import {
                           </div>
                         </td>
                         <td class="py-3 px-4 text-right font-extrabold text-slate-900 tabular-nums">
-                          <div class="flex items-center justify-end">
+                          <div class="flex items-center justify-end gap-1">
                             <dirham-symbol
                               size="0.85em"
                               weight="bold"
                               class="mr-1 text-slate-400 select-none"
                             ></dirham-symbol>
-                            <span>{{ item.amount | number: '1.2-2' }}</span>
+                            <input
+                              [value]="item.amount"
+                              (input)="updateScheduleAmount(item.installment_number, $event)"
+                              type="number"
+                              min="0.01"
+                              step="0.01"
+                              class="h-9 w-28 rounded-lg border border-slate-200 bg-white px-2 text-right text-xs tabular-nums"
+                              required
+                            />
                           </div>
                         </td>
                       </tr>
                     }
                   </tbody>
                 </table>
+              </div>
+              <div class="mt-3 flex items-center justify-end gap-2 text-xs">
+                <span class="text-slate-500">Schedule total:</span>
+                <span
+                  class="font-bold tabular-nums"
+                  [class.text-rose-700]="!scheduleMatchesTotal()"
+                  [class.text-emerald-700]="scheduleMatchesTotal()"
+                >
+                  AED {{ scheduleTotal() | number: '1.2-2' }} /
+                  {{ (agreementForm.value.total_amount || 0) | number: '1.2-2' }}
+                </span>
               </div>
             } @else {
               <div class="py-6 text-center text-xs text-slate-400 italic">
@@ -683,8 +710,9 @@ export class TenantAgreementFormComponent implements OnInit {
   error = signal<string | null>(null);
   serverError = signal<string | null>(null);
   private availabilityRequest = 0;
-  scheduleDetails = signal<Record<number, { category: InstallmentItem['category']; particulars: string }>>({});
+  scheduleDetails = signal<Record<number, { category: InstallmentItem['category']; particulars: string; due_date?: string; amount?: number }>>({});
   private formVersion = signal(0);
+  private scheduleInputSignature = '';
 
   agreementForm = this.fb.group({
     agreement_no: [''],
@@ -709,7 +737,9 @@ export class TenantAgreementFormComponent implements OnInit {
 
     if (total <= 0 || count <= 0) return [];
 
-    const perInstallment = total / count;
+    const totalCents = Math.round(total * 100);
+    const baseCents = Math.floor(totalCents / count);
+    const remainderCents = totalCents - baseCents * count;
     const items: InstallmentItem[] = [];
     let baseDate = new Date(`${startDateStr || uaeDateInput()}T12:00:00Z`);
     if (isNaN(baseDate.getTime())) baseDate = new Date(`${uaeDateInput()}T12:00:00Z`);
@@ -725,8 +755,8 @@ export class TenantAgreementFormComponent implements OnInit {
 
       items.push({
         installment_number: i,
-        due_date: dueDate.toISOString().split('T')[0],
-        amount: perInstallment,
+        due_date: this.scheduleDetails()[i]?.due_date || dueDate.toISOString().split('T')[0],
+        amount: this.scheduleDetails()[i]?.amount ?? (baseCents + (i === 1 ? remainderCents : 0)) / 100,
         category: this.scheduleDetails()[i]?.category || 'rent',
         particulars: this.scheduleDetails()[i]?.particulars || '',
         status: 'pending',
@@ -735,6 +765,10 @@ export class TenantAgreementFormComponent implements OnInit {
 
     return items;
   });
+
+  scheduleTotal = computed(() => this.installmentPreview().reduce((total, item) => total + Number(item.amount || 0), 0));
+
+  scheduleMatchesTotal = computed(() => Math.round(this.scheduleTotal() * 100) === Math.round(Number(this.agreementForm.value.total_amount || 0) * 100));
 
   scheduleReference(item: InstallmentItem): string {
     const customerCode = this.tenants().find((tenant) => String(tenant.id) === String(this.agreementForm.value.tenant_customer_id))?.customer_code || 'CUSTOMER';
@@ -751,8 +785,33 @@ export class TenantAgreementFormComponent implements OnInit {
     this.scheduleDetails.update((details) => ({ ...details, [number]: { ...details[number], category: details[number]?.category || 'rent', particulars } }));
   }
 
+  updateScheduleDate(number: number, event: Event): void {
+    const dueDate = (event.target as HTMLInputElement).value;
+    this.scheduleDetails.update((details) => ({ ...details, [number]: { ...details[number], due_date: dueDate, category: details[number]?.category || 'rent', particulars: details[number]?.particulars || '' } }));
+  }
+
+  updateScheduleAmount(number: number, event: Event): void {
+    const amount = Number((event.target as HTMLInputElement).value);
+    this.scheduleDetails.update((details) => ({ ...details, [number]: { ...details[number], amount: Number.isFinite(amount) ? amount : 0, category: details[number]?.category || 'rent', particulars: details[number]?.particulars || '' } }));
+  }
+
+  private resetScheduleOverrides(): void {
+    this.scheduleDetails.update((details) => Object.fromEntries(Object.entries(details).map(([number, value]) => [number, { category: value.category, particulars: value.particulars }])));
+  }
+
+  private scheduleSignature(): string {
+    const value = this.agreementForm.getRawValue();
+    return [value.total_amount, value.payment_count, value.start_date, value.payment_frequency].join('|');
+  }
+
   ngOnInit(): void {
-    this.agreementForm.valueChanges.subscribe(() => this.formVersion.update((version) => version + 1));
+    this.scheduleInputSignature = this.scheduleSignature();
+    this.agreementForm.valueChanges.subscribe(() => {
+      const signature = this.scheduleSignature();
+      if (signature !== this.scheduleInputSignature) this.resetScheduleOverrides();
+      this.scheduleInputSignature = signature;
+      this.formVersion.update((version) => version + 1);
+    });
     this.loadTenants();
     this.loadOwnerAgreements();
 
@@ -931,7 +990,7 @@ export class TenantAgreementFormComponent implements OnInit {
           payment_mode: agr.payment_mode || 'cheque',
           notes: agr.notes || '',
         });
-        this.scheduleDetails.set(Object.fromEntries((agr.installments || []).map((line) => [Number(line.installment_no), { category: line.category, particulars: line.particulars }])));
+        this.scheduleDetails.set(Object.fromEntries((agr.installments || []).filter((line) => !line.is_extra).map((line) => [Number(line.installment_no), { category: line.category, particulars: line.particulars, due_date: line.due_date, amount: Number(line.amount) }])));
         this.loadAvailableProperties();
         this.isLoading.set(false);
       },
@@ -1000,6 +1059,10 @@ export class TenantAgreementFormComponent implements OnInit {
       this.serverError.set('Particulars are required for every installment in the schedule preview.');
       return;
     }
+    if (!this.scheduleMatchesTotal()) {
+      this.serverError.set('Installment amounts must add up exactly to the total rent amount.');
+      return;
+    }
 
     this.isSubmitting.set(true);
     this.serverError.set(null);
@@ -1015,7 +1078,7 @@ export class TenantAgreementFormComponent implements OnInit {
       payment_count: Number(val.payment_count),
       payment_frequency: val.payment_frequency || 'monthly',
       payment_mode: val.payment_mode as PaymentMode,
-      installments: this.installmentPreview().map((item) => ({ installment_no: item.installment_number, category: item.category, particulars: item.particulars.trim() })),
+      installments: this.installmentPreview().map((item) => ({ installment_no: item.installment_number, due_date: item.due_date, amount: Number(item.amount.toFixed(2)), category: item.category, particulars: item.particulars.trim() })),
       properties: selectedPropertyIds.map((propertyId) => ({
         property_id: propertyId,
         source_owner_agreement_id: Number(val.source_owner_agreement_id),

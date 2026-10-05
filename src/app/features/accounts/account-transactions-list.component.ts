@@ -133,7 +133,9 @@ import { formatUaeDate } from '../../shared/utils/uae-formatters';
                   <td class="p-4 font-semibold text-slate-800 tabular-nums">
                     {{ row.document_no }}
                   </td>
-                  <td class="p-4 text-slate-600 tabular-nums">{{ formatDate(row.transaction_date) }}</td>
+                  <td class="p-4 text-slate-600 tabular-nums">
+                    {{ formatDate(row.transaction_date) }}
+                  </td>
                   <td class="p-4 font-medium text-slate-900">
                     {{ row.party?.display_name || 'Miscellaneous' }}
                   </td>

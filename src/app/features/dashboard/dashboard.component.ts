@@ -177,10 +177,16 @@ import { formatUaeDate, formatMoney } from '../../shared/utils/uae-formatters';
           <!-- Top Row Grid Structure: Left Balances | Center Hero Metric | Right Inward/Outward -->
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center z-10 relative">
             <!-- LEFT COLUMN (Col 3): Cash Balance & Bank/Cheque Summary -->
-            <div class="lg:col-span-3 space-y-6">
+            <div class="lg:col-span-3 space-y-4">
               <!-- Petty Cash Balance -->
-              <div class="flex items-center gap-3">
-                <div class="w-8 h-8 text-[#0F172A] flex items-center justify-center shrink-0">
+              <a
+                routerLink="/app/accounts/dashboard"
+                class="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-100/70 transition-all group cursor-pointer"
+                title="View Petty Cash Details in Accounts"
+              >
+                <div
+                  class="w-8 h-8 text-[#0F172A] group-hover:scale-110 flex items-center justify-center shrink-0 transition-transform"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     class="h-6 w-6"
@@ -197,7 +203,8 @@ import { formatUaeDate, formatMoney } from '../../shared/utils/uae-formatters';
                   </svg>
                 </div>
                 <div class="flex flex-col justify-center">
-                  <span class="text-xs font-semibold text-[#64748B] uppercase tracking-wider"
+                  <span
+                    class="text-xs font-semibold text-[#64748B] group-hover:text-[#0F172A] uppercase tracking-wider transition-colors"
                     >Petty Cash Balance</span
                   >
                   <div
@@ -211,11 +218,17 @@ import { formatUaeDate, formatMoney } from '../../shared/utils/uae-formatters';
                     <span>{{ formatMoney(accountsSnapshot()?.petty_cash_balance) }}</span>
                   </div>
                 </div>
-              </div>
+              </a>
 
               <!-- Pending Cheques Inward -->
-              <div class="flex items-center gap-3">
-                <div class="w-8 h-8 text-[#D97706] flex items-center justify-center shrink-0">
+              <a
+                routerLink="/app/accounts/dashboard"
+                class="flex items-center gap-3 p-2 rounded-xl hover:bg-amber-50/70 transition-all group cursor-pointer"
+                title="View Pending Cheques in Accounts"
+              >
+                <div
+                  class="w-8 h-8 text-[#D97706] group-hover:scale-110 flex items-center justify-center shrink-0 transition-transform"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     class="h-6 w-6"
@@ -232,7 +245,8 @@ import { formatUaeDate, formatMoney } from '../../shared/utils/uae-formatters';
                   </svg>
                 </div>
                 <div class="flex flex-col justify-center">
-                  <span class="text-xs font-semibold text-[#64748B] uppercase tracking-wider"
+                  <span
+                    class="text-xs font-semibold text-[#64748B] group-hover:text-[#D97706] uppercase tracking-wider transition-colors"
                     >Pending Cheques (In)</span
                   >
                   <div
@@ -246,11 +260,11 @@ import { formatUaeDate, formatMoney } from '../../shared/utils/uae-formatters';
                     <span>{{ formatMoney(accountsSnapshot()?.pending_cheque_inward) }}</span>
                   </div>
                 </div>
-              </div>
+              </a>
             </div>
 
             <!-- CENTER COLUMN (Col 6): Editorial Hero Net Cash Movement Metric -->
-            <div class="lg:col-span-6 flex items-center justify-center py-2">
+            <div class="lg:col-span-6 flex flex-col items-center justify-center py-2 text-center">
               <div class="flex items-center gap-4 sm:gap-5">
                 <!-- Center Colored Icon without Background Box -->
                 <div
@@ -298,7 +312,7 @@ import { formatUaeDate, formatMoney } from '../../shared/utils/uae-formatters';
                     </span>
                   </div>
 
-                  <div class="flex items-center gap-2 text-xs text-[#64748B]">
+                  <div class="flex flex-wrap items-center gap-2 text-xs text-[#64748B]">
                     <span class="font-medium"
                       >Scope: {{ activeBranch()?.name || 'All Branches' }}</span
                     >
@@ -317,16 +331,79 @@ import { formatUaeDate, formatMoney } from '../../shared/utils/uae-formatters';
                             : '0 Balance'
                       }}
                     </span>
+                    <span>•</span>
+                    <button
+                      type="button"
+                      (click)="refreshAllData()"
+                      title="Click to refresh live dashboard metrics"
+                      class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#047857] hover:text-[#065f46] bg-[#ECFDF5] hover:bg-emerald-100 px-2.5 py-0.5 rounded-full border border-[#A7F3D0] transition cursor-pointer shadow-2xs"
+                    >
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#047857] animate-pulse"></span>
+                      <span>Live Sync</span>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="w-3 h-3 transition-transform duration-500"
+                        [class.animate-spin]="isLoading() || isAccountsLoading()"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                        />
+                      </svg>
+                    </button>
                   </div>
                 </div>
               </div>
+
+              <!-- Cash Movement Inward vs Outward Ratio Bar -->
+              @if (accountsSnapshot()?.today_inward || accountsSnapshot()?.today_outward) {
+                <div class="w-full max-w-sm mt-3.5 space-y-1 z-10 text-left">
+                  <div
+                    class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden flex shadow-inner border border-slate-200/60"
+                  >
+                    <div
+                      class="bg-[#047857] h-full transition-all duration-500"
+                      [style.width.%]="inwardRatio()"
+                      title="Inward Cash Ratio"
+                    ></div>
+                    <div
+                      class="bg-[#DC2626] h-full transition-all duration-500"
+                      [style.width.%]="outwardRatio()"
+                      title="Outward Cash Ratio"
+                    ></div>
+                  </div>
+                  <div
+                    class="flex items-center justify-between text-[10px] font-bold tracking-tight px-0.5"
+                  >
+                    <span class="text-[#047857] flex items-center gap-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#047857]"></span>
+                      {{ inwardRatio() }}% Inward
+                    </span>
+                    <span class="text-[#DC2626] flex items-center gap-1">
+                      {{ outwardRatio() }}% Outward
+                      <span class="w-1.5 h-1.5 rounded-full bg-[#DC2626]"></span>
+                    </span>
+                  </div>
+                </div>
+              }
             </div>
 
             <!-- RIGHT COLUMN (Col 3): Inward & Outward Summary -->
-            <div class="lg:col-span-3 space-y-6">
+            <div class="lg:col-span-3 space-y-4">
               <!-- Today's Inward -->
-              <div class="flex items-center gap-3">
-                <div class="w-8 h-8 text-[#047857] flex items-center justify-center shrink-0">
+              <a
+                routerLink="/app/accounts/dashboard"
+                class="flex items-center gap-3 p-2 rounded-xl hover:bg-emerald-50/70 transition-all group cursor-pointer"
+                title="View Receipts in Accounts Dashboard"
+              >
+                <div
+                  class="w-8 h-8 text-[#047857] group-hover:scale-110 flex items-center justify-center shrink-0 transition-transform"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     class="h-6 w-6"
@@ -357,11 +434,17 @@ import { formatUaeDate, formatMoney } from '../../shared/utils/uae-formatters';
                     <span>{{ formatMoney(accountsSnapshot()?.today_inward) }}</span>
                   </div>
                 </div>
-              </div>
+              </a>
 
               <!-- Today's Outward -->
-              <div class="flex items-center gap-3">
-                <div class="w-8 h-8 text-[#DC2626] flex items-center justify-center shrink-0">
+              <a
+                routerLink="/app/accounts/dashboard"
+                class="flex items-center gap-3 p-2 rounded-xl hover:bg-rose-50/70 transition-all group cursor-pointer"
+                title="View Outward Disbursements in Accounts Dashboard"
+              >
+                <div
+                  class="w-8 h-8 text-[#DC2626] group-hover:scale-110 flex items-center justify-center shrink-0 transition-transform"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     class="h-6 w-6"
@@ -392,7 +475,7 @@ import { formatUaeDate, formatMoney } from '../../shared/utils/uae-formatters';
                     <span>{{ formatMoney(accountsSnapshot()?.today_outward) }}</span>
                   </div>
                 </div>
-              </div>
+              </a>
             </div>
           </div>
 
@@ -430,8 +513,17 @@ import { formatUaeDate, formatMoney } from '../../shared/utils/uae-formatters';
               routerLink="/app/properties"
               class="flex flex-col hover:opacity-80 transition group px-3 sm:px-4 lg:px-6"
             >
-              <div class="text-xl sm:text-2xl font-normal text-[#047857] tabular-nums">
-                <span>{{ metrics()?.occupancy?.occupied_properties || 0 }}</span>
+              <div class="flex items-center gap-2">
+                <div class="text-xl sm:text-2xl font-normal text-[#047857] tabular-nums">
+                  <span>{{ metrics()?.occupancy?.occupied_properties || 0 }}</span>
+                </div>
+                @if (occupancyRate() > 0) {
+                  <span
+                    class="text-[10px] font-bold text-[#047857] bg-[#ECFDF5] px-1.5 py-0.5 rounded-full border border-[#A7F3D0] shadow-2xs"
+                  >
+                    {{ occupancyRate() }}% Occupancy
+                  </span>
+                }
               </div>
               <span
                 class="text-xs sm:text-sm font-normal text-[#64748B] group-hover:text-[#047857] transition-colors mt-0.5"
@@ -1419,6 +1511,36 @@ export class DashboardComponent implements OnInit, OnDestroy {
   accountsSnapshot = signal<AccountsDashboardSnapshot | null>(null);
   isAccountsLoading = signal(true);
   accountsError = signal<string | null>(null);
+
+  inwardRatio = computed(() => {
+    const inward = Number(this.accountsSnapshot()?.today_inward || 0);
+    const outward = Number(this.accountsSnapshot()?.today_outward || 0);
+    const total = inward + outward;
+    if (total <= 0) return 50;
+    return Math.round((inward / total) * 100);
+  });
+
+  outwardRatio = computed(() => {
+    const inward = Number(this.accountsSnapshot()?.today_inward || 0);
+    const outward = Number(this.accountsSnapshot()?.today_outward || 0);
+    const total = inward + outward;
+    if (total <= 0) return 50;
+    return 100 - this.inwardRatio();
+  });
+
+  occupancyRate = computed(() => {
+    const occ = this.metrics()?.occupancy;
+    const occupied = Number(occ?.occupied_properties || 0);
+    const available = Number(occ?.available_properties || 0);
+    const total = occupied + available;
+    if (total <= 0) return 0;
+    return Math.round((occupied / total) * 100);
+  });
+
+  refreshAllData(): void {
+    this.loadData();
+    this.loadAccounts();
+  }
 
   private branchSub?: Subscription;
 

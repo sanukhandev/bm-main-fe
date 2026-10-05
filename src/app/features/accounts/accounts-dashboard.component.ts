@@ -13,7 +13,7 @@ import { AccountsApiService, AccountsDashboardSnapshot } from '../../core/api/ac
 import { BranchContextService } from '../../core/branch-context/branch-context.service';
 import { BmLoadingStateComponent } from '../../shared/components/bm-loading-state/bm-loading-state.component';
 import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm-error-state.component';
-import { formatUaeDate } from '../../shared/utils/uae-formatters';
+import { formatUaeDate, formatMoney } from '../../shared/utils/uae-formatters';
 
 @Component({
   selector: 'bm-accounts-dashboard',
@@ -849,8 +849,5 @@ export class AccountsDashboardComponent implements OnInit, OnDestroy {
     return val < 0;
   }
 
-  formatMoney(val: string | number | undefined | null): string {
-    const num = Number(val || 0);
-    return num.toLocaleString('en-AE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  }
+  formatMoney = formatMoney;
 }

@@ -217,3 +217,15 @@ export function numberToWords(amountStr: string | number | null | undefined): st
   }
   return result + ' Only';
 }
+
+/**
+ * Format monetary amount into standard 2-decimal localized string (e.g. 15800 -> 15,800.00)
+ */
+export function formatMoney(val: string | number | null | undefined): string {
+  const num = typeof val === 'number' ? val : Number(val || 0);
+  if (isNaN(num)) return '0.00';
+  return num.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}

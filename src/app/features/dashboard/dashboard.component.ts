@@ -19,7 +19,7 @@ import {
   AccountsDashboardSnapshot,
   RecentAccountTransaction,
 } from '../../core/api/accounts-api.service';
-import { formatUaeDate } from '../../shared/utils/uae-formatters';
+import { formatUaeDate, formatMoney } from '../../shared/utils/uae-formatters';
 
 @Component({
   selector: 'bm-dashboard',
@@ -1465,10 +1465,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return val === 0;
   }
 
-  formatMoney(val: string | number | undefined | null): string {
-    const num = Number(val || 0);
-    return num.toLocaleString('en-AE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  }
+  formatMoney = formatMoney;
 
   ngOnDestroy(): void {
     this.branchSub?.unsubscribe();

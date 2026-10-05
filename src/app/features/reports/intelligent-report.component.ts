@@ -26,15 +26,15 @@ import { BmLoadingStateComponent } from '../../shared/components/bm-loading-stat
             <span
               class="text-xs font-extrabold uppercase tracking-widest text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2.5 py-0.5 rounded-md"
             >
-              AI Analytics & Intelligence
+              Management Intelligence
             </span>
           </div>
           <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 mt-1">
-            Intelligent Report & Leakage Detection
+            Authoritative Management Report
           </h1>
           <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Automated financial performance, operating margin analysis, and deterministic leakage
-            findings.
+            A backend-calculated view of posted financial activity, collections, occupancy, and
+            control exceptions for the selected scope and period.
           </p>
         </div>
 
@@ -175,7 +175,7 @@ import { BmLoadingStateComponent } from '../../shared/components/bm-loading-stat
                   d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
                 />
               </svg>
-              <span>Generate AI Analysis</span>
+              <span>Run Report Analysis</span>
             </button>
           </div>
         </div>
@@ -199,6 +199,84 @@ import { BmLoadingStateComponent } from '../../shared/components/bm-loading-stat
             >Granularity: {{ report()!.period.granularity }}</span
           >
         </div>
+
+        <!-- REPORT AUTHORITY & DATA BASIS -->
+        <section
+          class="rounded-2xl border border-sky-200/80 bg-gradient-to-br from-sky-50/80 via-white to-slate-50 p-5 sm:p-6 shadow-2xs"
+        >
+          <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5">
+            <div class="flex items-start gap-3">
+              <div
+                class="w-10 h-10 rounded-xl bg-sky-100 text-sky-700 border border-sky-200 flex items-center justify-center shrink-0"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 12c0 5.591 3.824 10.291 9 11.622C17.176 22.291 21 17.591 21 12c0-1.04-.133-2.049-.382-3.016z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <h2 class="text-sm font-extrabold text-slate-900">Authoritative ERP snapshot</h2>
+                  <span
+                    class="inline-flex items-center rounded-full border border-sky-200 bg-sky-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-sky-800"
+                  >
+                    Deterministic analysis
+                  </span>
+                </div>
+                <p class="text-xs leading-relaxed text-slate-600 mt-1 max-w-3xl">
+                  This is not a free-form generative-AI answer. The figures are calculated by the
+                  backend from records available to your current branch context; findings are
+                  triggered by documented business rules and can be traced back to ERP records.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 lg:max-w-sm lg:justify-end">
+              <span class="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-bold text-slate-600"
+                >{{ report()!.scope.label }}</span
+              >
+              <span class="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-bold text-slate-600"
+                >Posted transactions</span
+              >
+              <span class="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-bold text-slate-600"
+                >Review before statutory use</span
+              >
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5 pt-4 border-t border-sky-100">
+            <div>
+              <h3 class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
+                Included source records
+              </h3>
+              <ul class="mt-2 space-y-1.5 text-xs text-slate-700">
+                <li class="flex gap-2"><span class="text-sky-600">•</span>Posted inward and outward account transactions</li>
+                <li class="flex gap-2"><span class="text-sky-600">•</span>Tenant and owner installment schedules and allocations</li>
+                <li class="flex gap-2"><span class="text-sky-600">•</span>Active properties, occupancy links, and agreement dates</li>
+              </ul>
+            </div>
+            <div>
+              <h3 class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">
+                Interpretation guardrails
+              </h3>
+              <ul class="mt-2 space-y-1.5 text-xs text-slate-700">
+                <li class="flex gap-2"><span class="text-amber-600">•</span>Leakage findings are alerts for review, not confirmed fraud</li>
+                <li class="flex gap-2"><span class="text-amber-600">•</span>Operational result is income less cost captured in this ERP</li>
+                <li class="flex gap-2"><span class="text-amber-600">•</span>Use linked source records and the accounting note for final decisions</li>
+              </ul>
+            </div>
+          </div>
+        </section>
 
         <!-- 1. EDITORIAL BENTO HERO CARD: OPERATIONAL PROFIT / LOSS & LIQUIDITY -->
         <div

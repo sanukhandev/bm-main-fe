@@ -118,107 +118,76 @@ import { formatUaeDate, formatMoney } from '../../shared/utils/uae-formatters';
           (retry)="loadData()"
         ></bm-error-state>
       } @else {
-        <!-- CREATIVE BENTO HERO 3-GRID ASYMMETRIC SECTION -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-4 mb-6">
-          <!-- Grid 1: Dark Slate Executive Cash Movement Hero Card (lg:col-span-5) -->
+        <!-- 1. EDITORIAL FINANCIAL HERO CARD (~320px Height, Tactile 3D Depth & Bottom Wave Animation) -->
+        <div
+          class="rounded-2xl sm:rounded-3xl border border-[#E2E8F0] bg-white relative overflow-hidden p-6 sm:p-8 shadow-[0_12px_36px_rgba(15,23,42,0.06)] hover:shadow-[0_20px_45px_rgba(15,23,42,0.09)] transition-all duration-300 min-h-[320px] flex flex-col justify-between mb-6"
+        >
+          <!-- Static Top-to-Bottom Light Yellow Ambient Shade Overlay -->
           <div
-            class="lg:col-span-5 bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-950 text-white rounded-2xl p-6 shadow-md relative overflow-hidden flex flex-col justify-between group transition-all duration-300"
+            class="absolute inset-0 bg-gradient-to-b from-amber-400/12 via-amber-300/4 to-transparent pointer-events-none z-0"
+          ></div>
+
+          <!-- Bottom Fluid Wave Animation Overlay (Green for Positive, Red for Negative, Hidden for Zero) -->
+          <div
+            class="absolute bottom-0 inset-x-0 h-44 sm:h-52 pointer-events-none overflow-hidden z-0 transition-opacity duration-500"
+            [class.opacity-100]="!isNetMovementZero()"
+            [class.opacity-0]="isNetMovementZero()"
           >
-            <!-- Animated Background Glow & Wave Silhouette -->
+            <!-- Background Gradient Tint -->
             <div
-              class="absolute -right-12 -bottom-12 opacity-10 pointer-events-none group-hover:scale-110 transition-transform duration-500"
+              class="absolute inset-0 transition-colors duration-500 bg-gradient-to-t"
+              [class.from-emerald-500/15]="isNetMovementPositive()"
+              [class.via-emerald-500/5]="isNetMovementPositive()"
+              [class.from-rose-500/15]="isNetMovementNegative()"
+              [class.via-rose-500/5]="isNetMovementNegative()"
+              [class.to-transparent]="true"
+            ></div>
+
+            <!-- Secondary Soft Background Wave Silhouette -->
+            <svg
+              class="absolute bottom-0 inset-x-0 w-full h-full animate-wave-bottom-slow transition-colors duration-500 select-none opacity-40"
+              [class.text-emerald-500/25]="isNetMovementPositive()"
+              [class.text-rose-500/25]="isNetMovementNegative()"
+              [class.text-transparent]="isNetMovementZero()"
+              viewBox="0 0 1440 120"
+              preserveAspectRatio="none"
+              fill="currentColor"
             >
-              <svg class="w-64 h-64 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path
-                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 12v-2m0 0c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
+              <path
+                d="M0,45 C200,85 400,35 600,65 C800,25 1000,70 1200,40 C1300,25 1380,60 1440,50 L1440,120 L0,120 Z"
+              ></path>
+            </svg>
 
-            <div class="relative z-10">
-              <div class="flex items-center justify-between gap-2 mb-3">
-                <div class="flex items-center gap-2">
-                  <span class="relative flex h-2.5 w-2.5">
-                    <span
-                      class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"
-                    ></span>
-                    <span
-                      class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"
-                    ></span>
-                  </span>
-                  <span class="text-[11px] font-bold uppercase tracking-widest text-emerald-300">
-                    Live Cash Flow Tracker
-                  </span>
-                </div>
-
-                <span
-                  class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-800/80 text-slate-300 border border-slate-700/60"
-                >
-                  {{ activeBranch()?.code || 'ALL' }}
-                </span>
-              </div>
-
-              <div class="mt-2">
-                <span class="text-xs font-medium text-slate-400 block mb-1"
-                  >Today's Net Cash Movement</span
-                >
-                <div
-                  class="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight tabular-nums flex items-baseline gap-2"
-                >
-                  <dirham-symbol
-                    size="0.8em"
-                    weight="bold"
-                    class="text-emerald-400 select-none shrink-0"
-                  ></dirham-symbol>
-                  <span
-                    [class.text-emerald-400]="isNetMovementPositive()"
-                    [class.text-rose-400]="isNetMovementNegative()"
-                    [class.text-slate-300]="isNetMovementZero()"
-                  >
-                    {{ formatMoney(accountsSnapshot()?.today_net_movement) }}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div
-              class="mt-6 pt-4 border-t border-slate-700/60 flex items-center justify-between relative z-10 text-xs"
+            <!-- Primary Animated SVG Bottom Wave Silhouette -->
+            <svg
+              class="absolute bottom-0 inset-x-0 w-full h-full animate-wave-bottom transition-colors duration-500 select-none"
+              [class.text-emerald-500/20]="isNetMovementPositive()"
+              [class.text-rose-500/20]="isNetMovementNegative()"
+              [class.text-transparent]="isNetMovementZero()"
+              viewBox="0 0 1440 120"
+              preserveAspectRatio="none"
+              fill="currentColor"
             >
-              <span class="text-slate-400 font-medium">Position:</span>
-              <span
-                class="px-2.5 py-1 rounded-lg text-xs font-bold transition-colors duration-200"
-                [class.bg-emerald-500/20]="isNetMovementPositive()"
-                [class.text-emerald-300]="isNetMovementPositive()"
-                [class.bg-rose-500/20]="isNetMovementNegative()"
-                [class.text-rose-300]="isNetMovementNegative()"
-                [class.bg-slate-800]="isNetMovementZero()"
-                [class.text-slate-300]="isNetMovementZero()"
-              >
-                {{
-                  isNetMovementNegative()
-                    ? '↓ Net Outflow'
-                    : isNetMovementPositive()
-                      ? '↑ Net Inflow'
-                      : '• Balanced'
-                }}
-              </span>
-            </div>
+              <path
+                d="M0,65 C160,25 320,95 480,50 C640,10 800,75 960,35 C1120,70 1280,20 1440,55 L1440,120 L0,120 Z"
+              ></path>
+            </svg>
           </div>
 
-          <!-- Grid 2: 2x2 Interactive KPI Bento Cards (lg:col-span-4) -->
-          <div class="lg:col-span-4 grid grid-cols-2 gap-3">
-            <!-- Stat 1: Petty Cash -->
-            <div
-              class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 flex flex-col justify-between cursor-pointer group"
-            >
-              <div class="flex items-center justify-between">
-                <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider"
-                  >Petty Cash</span
-                >
-                <div
-                  class="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center group-hover:bg-slate-900 group-hover:text-white transition-colors"
-                >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <!-- Top Row Grid Structure: Left Balances | Center Hero Metric | Right Inward/Outward -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center z-10 relative">
+            <!-- LEFT COLUMN (Col 3): Cash Balance & Bank/Cheque Summary -->
+            <div class="lg:col-span-3 space-y-6">
+              <!-- Petty Cash Balance -->
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 text-[#0F172A] flex items-center justify-center shrink-0">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -227,28 +196,33 @@ import { formatUaeDate, formatMoney } from '../../shared/utils/uae-formatters';
                     />
                   </svg>
                 </div>
-              </div>
-              <div class="my-1">
-                <div class="text-[11px] text-slate-400 font-semibold">AED</div>
-                <div class="text-lg font-extrabold text-slate-900 tracking-tight tabular-nums">
-                  {{ formatMoney(accountsSnapshot()?.petty_cash_balance) }}
+                <div class="flex flex-col justify-center">
+                  <span class="text-xs font-semibold text-[#64748B] uppercase tracking-wider"
+                    >Petty Cash Balance</span
+                  >
+                  <div
+                    class="text-2xl sm:text-3xl font-bold text-[#0F172A] tabular-nums tracking-tight flex items-center"
+                  >
+                    <dirham-symbol
+                      size="0.95em"
+                      weight="bold"
+                      class="mr-1.5 text-[#64748B] select-none"
+                    ></dirham-symbol>
+                    <span>{{ formatMoney(accountsSnapshot()?.petty_cash_balance) }}</span>
+                  </div>
                 </div>
               </div>
-              <span class="text-[10px] text-slate-500 font-medium">Available Cash</span>
-            </div>
 
-            <!-- Stat 2: Pending Cheques -->
-            <div
-              class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 flex flex-col justify-between cursor-pointer group"
-            >
-              <div class="flex items-center justify-between">
-                <span class="text-[11px] font-semibold text-amber-700 uppercase tracking-wider"
-                  >Pending Cheques</span
-                >
-                <div
-                  class="w-7 h-7 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center group-hover:bg-amber-600 group-hover:text-white transition-colors"
-                >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <!-- Pending Cheques Inward -->
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 text-[#D97706] flex items-center justify-center shrink-0">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -257,28 +231,109 @@ import { formatUaeDate, formatMoney } from '../../shared/utils/uae-formatters';
                     />
                   </svg>
                 </div>
-              </div>
-              <div class="my-1">
-                <div class="text-[11px] text-amber-600 font-semibold">AED</div>
-                <div class="text-lg font-extrabold text-amber-600 tracking-tight tabular-nums">
-                  {{ formatMoney(accountsSnapshot()?.pending_cheque_inward) }}
+                <div class="flex flex-col justify-center">
+                  <span class="text-xs font-semibold text-[#64748B] uppercase tracking-wider"
+                    >Pending Cheques (In)</span
+                  >
+                  <div
+                    class="text-2xl sm:text-3xl font-bold text-[#0F172A] tabular-nums tracking-tight flex items-center"
+                  >
+                    <dirham-symbol
+                      size="0.95em"
+                      weight="bold"
+                      class="mr-1.5 text-[#64748B] select-none"
+                    ></dirham-symbol>
+                    <span>{{ formatMoney(accountsSnapshot()?.pending_cheque_inward) }}</span>
+                  </div>
                 </div>
               </div>
-              <span class="text-[10px] text-amber-700 font-medium">Inward Clearing</span>
             </div>
 
-            <!-- Stat 3: Today's Inward -->
-            <div
-              class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 flex flex-col justify-between cursor-pointer group"
-            >
-              <div class="flex items-center justify-between">
-                <span class="text-[11px] font-semibold text-emerald-700 uppercase tracking-wider"
-                  >Today's Inward</span
-                >
+            <!-- CENTER COLUMN (Col 6): Editorial Hero Net Cash Movement Metric -->
+            <div class="lg:col-span-6 flex items-center justify-center py-2">
+              <div class="flex items-center gap-4 sm:gap-5">
+                <!-- Center Colored Icon without Background Box -->
                 <div
-                  class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-colors"
+                  class="w-10 h-10 flex items-center justify-center shrink-0 transition-colors duration-300"
+                  [class.text-[#047857]]="isNetMovementPositive()"
+                  [class.text-[#DC2626]]="isNetMovementNegative()"
+                  [class.text-[#64748B]]="isNetMovementZero()"
                 >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-8 w-8 sm:h-9 sm:w-9"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                    />
+                  </svg>
+                </div>
+
+                <div class="flex flex-col items-start text-left">
+                  <!-- Subtext Label ABOVE the number -->
+                  <span class="text-xs font-bold text-[#64748B] uppercase tracking-widest">
+                    Today's Net Cash Movement
+                  </span>
+
+                  <!-- Clean Sans-Serif Hero Number (Font Fix: font-extrabold tabular-nums) -->
+                  <div
+                    class="flex items-center gap-2.5 my-0.5 text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight tabular-nums transition-colors duration-300"
+                    [class.text-[#047857]]="isNetMovementPositive()"
+                    [class.text-[#DC2626]]="isNetMovementNegative()"
+                    [class.text-[#64748B]]="isNetMovementZero()"
+                  >
+                    <dirham-symbol
+                      size="0.85em"
+                      weight="bold"
+                      class="select-none shrink-0"
+                    ></dirham-symbol>
+                    <span>
+                      {{ formatMoney(accountsSnapshot()?.today_net_movement) }}
+                    </span>
+                  </div>
+
+                  <div class="flex items-center gap-2 text-xs text-[#64748B]">
+                    <span class="font-medium"
+                      >Scope: {{ activeBranch()?.name || 'All Branches' }}</span
+                    >
+                    <span>•</span>
+                    <span
+                      class="font-semibold transition-colors duration-300"
+                      [class.text-[#047857]]="isNetMovementPositive()"
+                      [class.text-[#DC2626]]="isNetMovementNegative()"
+                      [class.text-[#64748B]]="isNetMovementZero()"
+                    >
+                      {{
+                        isNetMovementNegative()
+                          ? '- Net Outflow'
+                          : isNetMovementPositive()
+                            ? '+ Net Inflow'
+                            : '0 Balance'
+                      }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT COLUMN (Col 3): Inward & Outward Summary -->
+            <div class="lg:col-span-3 space-y-6">
+              <!-- Today's Inward -->
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 text-[#047857] flex items-center justify-center shrink-0">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -287,28 +342,33 @@ import { formatUaeDate, formatMoney } from '../../shared/utils/uae-formatters';
                     />
                   </svg>
                 </div>
-              </div>
-              <div class="my-1">
-                <div class="text-[11px] text-emerald-600 font-semibold">AED</div>
-                <div class="text-lg font-extrabold text-emerald-600 tracking-tight tabular-nums">
-                  {{ formatMoney(accountsSnapshot()?.today_inward) }}
+                <div class="flex flex-col justify-center">
+                  <span class="text-xs font-semibold uppercase tracking-wider text-[#047857]"
+                    >Today's Inward</span
+                  >
+                  <div
+                    class="text-2xl sm:text-3xl font-bold text-[#047857] tabular-nums tracking-tight flex items-center"
+                  >
+                    <dirham-symbol
+                      size="0.95em"
+                      weight="bold"
+                      class="mr-1.5 select-none text-[#047857]/80"
+                    ></dirham-symbol>
+                    <span>{{ formatMoney(accountsSnapshot()?.today_inward) }}</span>
+                  </div>
                 </div>
               </div>
-              <span class="text-[10px] text-emerald-700 font-medium">Collections</span>
-            </div>
 
-            <!-- Stat 4: Today's Outward -->
-            <div
-              class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 flex flex-col justify-between cursor-pointer group"
-            >
-              <div class="flex items-center justify-between">
-                <span class="text-[11px] font-semibold text-rose-700 uppercase tracking-wider"
-                  >Today's Outward</span
-                >
-                <div
-                  class="w-7 h-7 rounded-lg bg-rose-50 text-rose-700 flex items-center justify-center group-hover:bg-rose-600 group-hover:text-white transition-colors"
-                >
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <!-- Today's Outward -->
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 text-[#DC2626] flex items-center justify-center shrink-0">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -317,92 +377,80 @@ import { formatUaeDate, formatMoney } from '../../shared/utils/uae-formatters';
                     />
                   </svg>
                 </div>
-              </div>
-              <div class="my-1">
-                <div class="text-[11px] text-rose-600 font-semibold">AED</div>
-                <div class="text-lg font-extrabold text-rose-600 tracking-tight tabular-nums">
-                  {{ formatMoney(accountsSnapshot()?.today_outward) }}
+                <div class="flex flex-col justify-center">
+                  <span class="text-xs font-semibold uppercase tracking-wider text-[#DC2626]"
+                    >Today's Outward</span
+                  >
+                  <div
+                    class="text-2xl sm:text-3xl font-bold text-[#DC2626] tabular-nums tracking-tight flex items-center"
+                  >
+                    <dirham-symbol
+                      size="0.95em"
+                      weight="bold"
+                      class="mr-1.5 select-none text-[#DC2626]/80"
+                    ></dirham-symbol>
+                    <span>{{ formatMoney(accountsSnapshot()?.today_outward) }}</span>
+                  </div>
                 </div>
               </div>
-              <span class="text-[10px] text-rose-700 font-medium">Disbursements</span>
             </div>
           </div>
 
-          <!-- Grid 3: Portfolio Highlights & Quick Launcher (lg:col-span-3) -->
+          <!-- High-Level Operational Summary Strip (Counts Row) -->
           <div
-            class="lg:col-span-3 bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs flex flex-col justify-between space-y-3"
+            class="mt-6 pt-5 border-t border-slate-200/60 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-y-4 lg:gap-y-0 z-10 relative lg:divide-x divide-slate-200/60"
           >
-            <div>
-              <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
-                <span class="text-xs font-bold text-slate-800 uppercase tracking-wider"
-                  >Operational Portfolio</span
-                >
-                <span
-                  class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60"
-                  >Live</span
-                >
+            <a
+              routerLink="/app/tenant-agreements"
+              class="flex flex-col hover:opacity-80 transition group px-3 sm:px-4 lg:px-6 lg:first:pl-0"
+            >
+              <div class="text-xl sm:text-2xl font-normal text-[#0F172A] tabular-nums">
+                <span>{{ metrics()?.total_tenant_agreements || 0 }}</span>
               </div>
-
-              <div class="grid grid-cols-2 gap-2 text-xs">
-                <a
-                  routerLink="/app/tenant-agreements"
-                  class="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 transition"
-                >
-                  <div class="text-base font-extrabold text-slate-900 tabular-nums">
-                    {{ metrics()?.total_tenant_agreements || 0 }}
-                  </div>
-                  <div class="text-[10px] font-semibold text-slate-500">Tenant Leases</div>
-                </a>
-
-                <a
-                  routerLink="/app/owner-agreements"
-                  class="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 transition"
-                >
-                  <div class="text-base font-extrabold text-slate-900 tabular-nums">
-                    {{ metrics()?.total_owner_agreements || 0 }}
-                  </div>
-                  <div class="text-[10px] font-semibold text-slate-500">Owner Contracts</div>
-                </a>
-
-                <a
-                  routerLink="/app/properties"
-                  class="p-2 rounded-xl bg-emerald-50/60 hover:bg-emerald-100/60 transition"
-                >
-                  <div class="text-base font-extrabold text-emerald-700 tabular-nums">
-                    {{ metrics()?.occupancy?.occupied_properties || 0 }}
-                  </div>
-                  <div class="text-[10px] font-semibold text-emerald-800">Occupied Units</div>
-                </a>
-
-                <a
-                  routerLink="/app/properties"
-                  class="p-2 rounded-xl bg-blue-50/60 hover:bg-blue-100/60 transition"
-                >
-                  <div class="text-base font-extrabold text-blue-700 tabular-nums">
-                    {{ metrics()?.occupancy?.available_properties || 0 }}
-                  </div>
-                  <div class="text-[10px] font-semibold text-blue-800">Available Units</div>
-                </a>
-              </div>
-            </div>
-
-            <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-              <span class="text-slate-500 font-medium">Quick Launcher</span>
-              <a
-                routerLink="/app/tenant-agreements/new"
-                class="text-xs font-semibold text-emerald-700 hover:text-emerald-800 transition flex items-center gap-1"
+              <span
+                class="text-xs sm:text-sm font-normal text-[#64748B] group-hover:text-[#047857] transition-colors mt-0.5"
+                >Tenant Leases</span
               >
-                <span>+ New Lease</span>
-                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </a>
-            </div>
+            </a>
+
+            <a
+              routerLink="/app/owner-agreements"
+              class="flex flex-col hover:opacity-80 transition group px-3 sm:px-4 lg:px-6"
+            >
+              <div class="text-xl sm:text-2xl font-normal text-[#0F172A] tabular-nums">
+                <span>{{ metrics()?.total_owner_agreements || 0 }}</span>
+              </div>
+              <span
+                class="text-xs sm:text-sm font-normal text-[#64748B] group-hover:text-[#2563EB] transition-colors mt-0.5"
+                >Owner Contracts</span
+              >
+            </a>
+
+            <a
+              routerLink="/app/properties"
+              class="flex flex-col hover:opacity-80 transition group px-3 sm:px-4 lg:px-6"
+            >
+              <div class="text-xl sm:text-2xl font-normal text-[#047857] tabular-nums">
+                <span>{{ metrics()?.occupancy?.occupied_properties || 0 }}</span>
+              </div>
+              <span
+                class="text-xs sm:text-sm font-normal text-[#64748B] group-hover:text-[#047857] transition-colors mt-0.5"
+                >Occupied Units</span
+              >
+            </a>
+
+            <a
+              routerLink="/app/properties"
+              class="flex flex-col hover:opacity-80 transition group px-3 sm:px-4 lg:px-6"
+            >
+              <div class="text-xl sm:text-2xl font-normal text-[#2563EB] tabular-nums">
+                <span>{{ metrics()?.occupancy?.available_properties || 0 }}</span>
+              </div>
+              <span
+                class="text-xs sm:text-sm font-normal text-[#64748B] group-hover:text-[#2563EB] transition-colors mt-0.5"
+                >Available Units</span
+              >
+            </a>
           </div>
         </div>
 

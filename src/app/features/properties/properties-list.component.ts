@@ -167,6 +167,7 @@ import { PaginationMeta } from '../../core/api/api.models';
           <option value="labor_camp">Labor Camp</option>
           <option value="warehouse">Warehouse</option>
           <option value="land">Land</option>
+          <option value="garage">Garage</option>
         </select>
 
         <select

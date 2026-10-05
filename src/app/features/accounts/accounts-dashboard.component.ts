@@ -13,6 +13,7 @@ import { AccountsApiService, AccountsDashboardSnapshot } from '../../core/api/ac
 import { BranchContextService } from '../../core/branch-context/branch-context.service';
 import { BmLoadingStateComponent } from '../../shared/components/bm-loading-state/bm-loading-state.component';
 import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm-error-state.component';
+import { formatUaeDate } from '../../shared/utils/uae-formatters';
 
 @Component({
   selector: 'bm-accounts-dashboard',
@@ -68,79 +69,106 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
       } @else if (error()) {
         <bm-error-state [message]="error()!" (retry)="load()"></bm-error-state>
       } @else {
-        <!-- 1. EDITORIAL FINANCIAL HERO STRIP (Tactile 3D Elevation, Dubai Skyline Watermark) -->
-        <div
-          class="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-white via-slate-50/90 to-slate-100/70 border border-slate-200/80 p-6 sm:p-7 shadow-[0_10px_30px_rgba(15,23,42,0.06)] hover:shadow-[0_20px_40px_rgba(15,23,42,0.12)] transition-all duration-300"
-        >
-          <!-- Static Top-to-Bottom Light Yellow Ambient Shade Overlay -->
+        <!-- CREATIVE BENTO HERO 3-GRID ASYMMETRIC SECTION -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-4 mb-6">
+          <!-- Grid 1: Dark Slate Executive Net Movement Hero Card (lg:col-span-5) -->
           <div
-            class="absolute inset-0 bg-gradient-to-b from-amber-400/12 via-amber-300/4 to-transparent pointer-events-none z-0"
-          ></div>
-
-          <!-- Bottom Fluid Wave Animation Overlay (Green for Positive, Red for Negative, Hidden for Zero) -->
-          <div
-            class="absolute bottom-0 inset-x-0 h-44 sm:h-52 pointer-events-none overflow-hidden z-0 transition-opacity duration-500"
-            [class.opacity-100]="!isNetMovementZero()"
-            [class.opacity-0]="isNetMovementZero()"
+            class="lg:col-span-5 bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-950 text-white rounded-2xl p-6 shadow-md relative overflow-hidden flex flex-col justify-between group transition-all duration-300"
           >
-            <!-- Background Gradient Tint -->
             <div
-              class="absolute inset-0 transition-colors duration-500 bg-gradient-to-t"
-              [class.from-emerald-500/15]="isNetMovementPositive()"
-              [class.via-emerald-500/5]="isNetMovementPositive()"
-              [class.from-rose-500/15]="isNetMovementNegative()"
-              [class.via-rose-500/5]="isNetMovementNegative()"
-              [class.to-transparent]="true"
-            ></div>
-
-            <!-- Secondary Soft Background Wave Silhouette -->
-            <svg
-              class="absolute bottom-0 inset-x-0 w-full h-full animate-wave-bottom-slow transition-colors duration-500 select-none opacity-40"
-              [class.text-emerald-500/25]="isNetMovementPositive()"
-              [class.text-rose-500/25]="isNetMovementNegative()"
-              [class.text-transparent]="isNetMovementZero()"
-              viewBox="0 0 1440 120"
-              preserveAspectRatio="none"
-              fill="currentColor"
+              class="absolute -right-12 -bottom-12 opacity-10 pointer-events-none group-hover:scale-110 transition-transform duration-500"
             >
-              <path
-                d="M0,45 C200,85 400,35 600,65 C800,25 1000,70 1200,40 C1300,25 1380,60 1440,50 L1440,120 L0,120 Z"
-              ></path>
-            </svg>
+              <svg class="w-64 h-64 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 12v-2m0 0c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
 
-            <!-- Primary Animated SVG Bottom Wave Silhouette -->
-            <svg
-              class="absolute bottom-0 inset-x-0 w-full h-full animate-wave-bottom transition-colors duration-500 select-none"
-              [class.text-emerald-500/20]="isNetMovementPositive()"
-              [class.text-rose-500/20]="isNetMovementNegative()"
-              [class.text-transparent]="isNetMovementZero()"
-              viewBox="0 0 1440 120"
-              preserveAspectRatio="none"
-              fill="currentColor"
+            <div class="relative z-10">
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <div class="flex items-center gap-2">
+                  <span class="relative flex h-2.5 w-2.5">
+                    <span
+                      class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"
+                    ></span>
+                    <span
+                      class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"
+                    ></span>
+                  </span>
+                  <span class="text-[11px] font-bold uppercase tracking-widest text-emerald-300">
+                    Accounts Ledger Net Position
+                  </span>
+                </div>
+
+                <span
+                  class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-800/80 text-slate-300 border border-slate-700/60"
+                >
+                  {{ activeBranch()?.code || 'ALL' }}
+                </span>
+              </div>
+
+              <div class="mt-2">
+                <span class="text-xs font-medium text-slate-400 block mb-1"
+                  >Today's Net Cash Movement</span
+                >
+                <div
+                  class="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight tabular-nums flex items-baseline gap-2"
+                >
+                  <dirham-symbol
+                    size="0.8em"
+                    weight="bold"
+                    class="text-emerald-400 select-none shrink-0"
+                  ></dirham-symbol>
+                  <span
+                    [class.text-emerald-400]="isNetMovementPositive()"
+                    [class.text-rose-400]="isNetMovementNegative()"
+                    [class.text-slate-300]="isNetMovementZero()"
+                  >
+                    {{ formatMoney(snapshot()?.today_net_movement) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="mt-6 pt-4 border-t border-slate-700/60 flex items-center justify-between relative z-10 text-xs"
             >
-              <path
-                d="M0,65 C160,25 320,95 480,50 C640,10 800,75 960,35 C1120,70 1280,20 1440,55 L1440,120 L0,120 Z"
-              ></path>
-            </svg>
+              <span class="text-slate-400 font-medium">Flow Status:</span>
+              <span
+                class="px-2.5 py-1 rounded-lg text-xs font-bold transition-colors duration-200"
+                [class.bg-emerald-500/20]="isNetMovementPositive()"
+                [class.text-emerald-300]="isNetMovementPositive()"
+                [class.bg-rose-500/20]="isNetMovementNegative()"
+                [class.text-rose-300]="isNetMovementNegative()"
+                [class.bg-slate-800]="isNetMovementZero()"
+                [class.text-slate-300]="isNetMovementZero()"
+              >
+                {{
+                  isNetMovementNegative()
+                    ? '↓ Net Outflow'
+                    : isNetMovementPositive()
+                      ? '↑ Net Inflow'
+                      : '• Balanced'
+                }}
+              </span>
+            </div>
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center relative z-10">
-            <!-- LEFT COLUMN (Col 3): Petty Cash Balance & Pending Cheques Inward -->
+          <!-- Grid 2: 2x2 Interactive Financial Metric Bento Cards (lg:col-span-4) -->
+          <div class="lg:col-span-4 grid grid-cols-2 gap-3">
+            <!-- Stat 1: Petty Cash -->
             <div
-              class="lg:col-span-3 space-y-6 border-b lg:border-b-0 lg:border-r border-slate-200/80 pb-6 lg:pb-0 lg:pr-6"
+              class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 flex flex-col justify-between cursor-pointer group"
             >
-              <!-- Petty Cash Balance -->
-              <div class="flex items-center gap-3.5">
-                <div
-                  class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-slate-100 text-[#0F172A] flex items-center justify-center shrink-0 border border-slate-200/80 shadow-2xs"
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider"
+                  >Petty Cash</span
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-6 w-6 sm:h-7 sm:w-7"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
+                <div
+                  class="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center group-hover:bg-slate-900 group-hover:text-white transition-colors"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -149,35 +177,28 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
                     />
                   </svg>
                 </div>
-                <div class="flex flex-col justify-center">
-                  <span class="text-xs font-semibold text-[#64748B] uppercase tracking-wider"
-                    >Petty Cash Balance</span
-                  >
-                  <div
-                    class="text-2xl sm:text-3xl font-bold text-[#0F172A] tabular-nums tracking-tight flex items-center"
-                  >
-                    <dirham-symbol
-                      size="0.95em"
-                      weight="bold"
-                      class="mr-1.5 text-[#64748B] select-none"
-                    ></dirham-symbol>
-                    <span>{{ formatMoney(snapshot()?.petty_cash_balance) }}</span>
-                  </div>
+              </div>
+              <div class="my-1">
+                <div class="text-[11px] text-slate-400 font-semibold">AED</div>
+                <div class="text-lg font-extrabold text-slate-900 tracking-tight tabular-nums">
+                  {{ formatMoney(snapshot()?.petty_cash_balance) }}
                 </div>
               </div>
+              <span class="text-[10px] text-slate-500 font-medium">Ledger Balance</span>
+            </div>
 
-              <!-- Pending Cheques Inward -->
-              <div class="flex items-center gap-3.5">
-                <div
-                  class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-slate-100 text-[#334155] flex items-center justify-center shrink-0 border border-slate-200/80 shadow-2xs"
+            <!-- Stat 2: Pending Cheques -->
+            <div
+              class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 flex flex-col justify-between cursor-pointer group"
+            >
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-semibold text-amber-700 uppercase tracking-wider"
+                  >Pending Cheques</span
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-6 w-6 sm:h-7 sm:w-7"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
+                <div
+                  class="w-7 h-7 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center group-hover:bg-amber-600 group-hover:text-white transition-colors"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -186,116 +207,28 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
                     />
                   </svg>
                 </div>
-                <div class="flex flex-col justify-center">
-                  <span class="text-xs font-semibold text-[#64748B] uppercase tracking-wider"
-                    >Pending Cheques (In)</span
-                  >
-                  <div
-                    class="text-2xl sm:text-3xl font-bold text-[#0F172A] tabular-nums tracking-tight flex items-center"
-                  >
-                    <dirham-symbol
-                      size="0.95em"
-                      weight="bold"
-                      class="mr-1.5 text-[#64748B] select-none"
-                    ></dirham-symbol>
-                    <span>{{ formatMoney(snapshot()?.pending_cheque_inward) }}</span>
-                  </div>
+              </div>
+              <div class="my-1">
+                <div class="text-[11px] text-amber-600 font-semibold">AED</div>
+                <div class="text-lg font-extrabold text-amber-600 tracking-tight tabular-nums">
+                  {{ formatMoney(snapshot()?.pending_cheque_inward) }}
                 </div>
               </div>
+              <span class="text-[10px] text-amber-700 font-medium">Inward Clearing</span>
             </div>
 
-            <!-- CENTER COLUMN (Col 6): Editorial Net Cash Movement Hero Number -->
-            <div class="lg:col-span-6 flex items-center justify-center py-2">
-              <div class="flex items-center gap-4 sm:gap-5">
-                <div
-                  class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shrink-0 shadow-2xs border transition-colors duration-300"
-                  [class.bg-[#ECFDF5]]="isNetMovementPositive()"
-                  [class.border-[#A7F3D0]]="isNetMovementPositive()"
-                  [class.text-[#047857]]="isNetMovementPositive()"
-                  [class.bg-[#FEF2F2]]="isNetMovementNegative()"
-                  [class.border-[#FECACA]]="isNetMovementNegative()"
-                  [class.text-[#DC2626]]="isNetMovementNegative()"
-                  [class.bg-slate-100]="isNetMovementZero()"
-                  [class.border-slate-200]="isNetMovementZero()"
-                  [class.text-[#64748B]]="isNetMovementZero()"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-7 w-7 sm:h-8 sm:w-8"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                    />
-                  </svg>
-                </div>
-
-                <div class="flex flex-col items-start text-left">
-                  <span class="text-xs font-bold text-[#64748B] uppercase tracking-widest">
-                    Today's Net Cash Movement
-                  </span>
-
-                  <div
-                    class="flex items-center gap-2.5 my-0.5 text-4xl sm:text-5xl lg:text-6xl font-serif font-normal tracking-tight tabular-nums transition-colors duration-300"
-                    [class.text-[#047857]]="isNetMovementPositive()"
-                    [class.text-[#DC2626]]="isNetMovementNegative()"
-                    [class.text-[#64748B]]="isNetMovementZero()"
-                  >
-                    <dirham-symbol
-                      size="0.85em"
-                      weight="bold"
-                      class="select-none shrink-0"
-                    ></dirham-symbol>
-                    <span>
-                      {{ formatMoney(snapshot()?.today_net_movement) }}
-                    </span>
-                  </div>
-
-                  <div class="flex items-center gap-2 text-xs text-[#64748B]">
-                    <span class="font-medium"
-                      >Scope: {{ activeBranch()?.name || 'All Branches' }}</span
-                    >
-                    <span>•</span>
-                    <span
-                      class="font-semibold transition-colors duration-300"
-                      [class.text-[#047857]]="isNetMovementPositive()"
-                      [class.text-[#DC2626]]="isNetMovementNegative()"
-                      [class.text-[#64748B]]="isNetMovementZero()"
-                    >
-                      {{
-                        isNetMovementNegative()
-                          ? '- Net Outflow'
-                          : isNetMovementPositive()
-                            ? '+ Net Inflow'
-                            : '0 Balance'
-                      }}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- RIGHT COLUMN (Col 3): Today's Inward & Outward Receipts -->
+            <!-- Stat 3: Today's Inward -->
             <div
-              class="lg:col-span-3 space-y-6 border-t lg:border-t-0 lg:border-l border-slate-200/80 pt-6 lg:pt-0 lg:pl-6"
+              class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 flex flex-col justify-between cursor-pointer group"
             >
-              <!-- Today's Inward -->
-              <div class="flex items-center gap-3.5">
-                <div
-                  class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#ECFDF5] border border-[#A7F3D0]/60 text-[#047857] flex items-center justify-center shrink-0 shadow-2xs"
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-semibold text-emerald-700 uppercase tracking-wider"
+                  >Today's Inward</span
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-6 w-6 sm:h-7 sm:w-7"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
+                <div
+                  class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-colors"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -304,35 +237,28 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
                     />
                   </svg>
                 </div>
-                <div class="flex flex-col justify-center">
-                  <span class="text-xs font-semibold uppercase tracking-wider text-[#047857]"
-                    >Today's Inward</span
-                  >
-                  <div
-                    class="text-2xl sm:text-3xl font-bold text-[#047857] tabular-nums tracking-tight flex items-center"
-                  >
-                    <dirham-symbol
-                      size="0.95em"
-                      weight="bold"
-                      class="mr-1.5 select-none text-[#047857]/80"
-                    ></dirham-symbol>
-                    <span>{{ formatMoney(snapshot()?.today_inward) }}</span>
-                  </div>
+              </div>
+              <div class="my-1">
+                <div class="text-[11px] text-emerald-600 font-semibold">AED</div>
+                <div class="text-lg font-extrabold text-emerald-600 tracking-tight tabular-nums">
+                  {{ formatMoney(snapshot()?.today_inward) }}
                 </div>
               </div>
+              <span class="text-[10px] text-emerald-700 font-medium">Total Receipts</span>
+            </div>
 
-              <!-- Today's Outward -->
-              <div class="flex items-center gap-3.5">
-                <div
-                  class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#FEF2F2] border border-[#FECACA]/60 text-[#DC2626] flex items-center justify-center shrink-0 shadow-2xs"
+            <!-- Stat 4: Today's Outward -->
+            <div
+              class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 flex flex-col justify-between cursor-pointer group"
+            >
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-semibold text-rose-700 uppercase tracking-wider"
+                  >Today's Outward</span
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-6 w-6 sm:h-7 sm:w-7"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
+                <div
+                  class="w-7 h-7 rounded-lg bg-rose-50 text-rose-700 flex items-center justify-center group-hover:bg-rose-600 group-hover:text-white transition-colors"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
@@ -341,41 +267,95 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
                     />
                   </svg>
                 </div>
-                <div class="flex flex-col justify-center">
-                  <span class="text-xs font-semibold uppercase tracking-wider text-[#DC2626]"
-                    >Today's Outward</span
-                  >
-                  <div
-                    class="text-2xl sm:text-3xl font-bold text-[#DC2626] tabular-nums tracking-tight flex items-center"
-                  >
-                    <dirham-symbol
-                      size="0.95em"
-                      weight="bold"
-                      class="mr-1.5 select-none text-[#DC2626]/80"
-                    ></dirham-symbol>
-                    <span>{{ formatMoney(snapshot()?.today_outward) }}</span>
-                  </div>
+              </div>
+              <div class="my-1">
+                <div class="text-[11px] text-rose-600 font-semibold">AED</div>
+                <div class="text-lg font-extrabold text-rose-600 tracking-tight tabular-nums">
+                  {{ formatMoney(snapshot()?.today_outward) }}
                 </div>
               </div>
+              <span class="text-[10px] text-rose-700 font-medium">Disbursements</span>
             </div>
           </div>
 
-          <!-- Bottom Skyline Vector Silhouette -->
-          <div class="absolute bottom-0 left-0 right-0 pointer-events-none overflow-hidden z-0">
-            <svg
-              class="w-full h-[100px] text-slate-800 opacity-[0.04] select-none"
-              viewBox="0 0 1200 120"
-              preserveAspectRatio="none"
-              fill="currentColor"
-            >
-              <path
-                d="M0,120 L0,110 L20,110 L20,95 L35,95 L35,110 L50,110 L50,80 L70,80 L70,60 L80,60 L80,45 L85,45 L85,60 L95,60 L95,80 L110,80 L110,110 L130,110 L130,100 L150,100 L150,110 L180,110 L180,75 L195,75 L195,65 L210,65 L210,75 L225,75 L225,110 L260,110 L260,90 L280,90 L280,110 L310,110 L310,50 L320,50 L320,30 L330,30 L330,20 L333,20 L333,5 L337,5 L337,20 L340,20 L340,30 L350,30 L350,50 L360,50 L360,110 L400,110 L400,85 L420,85 L420,110 L460,110 L460,70 L480,70 L480,110 L520,110 L520,60 L535,60 L535,40 L545,40 L545,60 L560,60 L560,110 L600,110 L600,95 L620,95 L620,110 L660,110 L660,55 L675,55 L675,35 L685,35 L685,55 L700,55 L700,110 L750,110 L750,80 L770,80 L770,110 L810,110 L810,65 L825,65 L825,45 L835,45 L835,25 L838,25 L838,0 L842,0 L842,25 L845,25 L845,45 L855,45 L855,65 L870,65 L870,110 L910,110 L910,90 L930,90 L930,110 L970,110 L970,75 L990,75 L990,110 L1030,110 L1030,85 L1050,85 L1050,110 L1100,110 L1100,95 L1120,95 L1120,110 L1200,110 L1200,120 Z"
-              />
-            </svg>
+          <!-- Grid 3: Financial Quick Launcher (lg:col-span-3) -->
+          <div
+            class="lg:col-span-3 bg-white rounded-2xl p-5 border border-slate-200/90 shadow-xs flex flex-col justify-between space-y-3"
+          >
+            <div>
+              <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-3">
+                <span class="text-xs font-bold text-slate-800 uppercase tracking-wider"
+                  >Accounts Actions</span
+                >
+                <span class="text-[10px] font-mono text-slate-400">LEDGER</span>
+              </div>
+
+              <div class="space-y-2">
+                <a
+                  routerLink="/app/accounts/inward"
+                  class="w-full p-2.5 rounded-xl bg-emerald-50/80 hover:bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center justify-between transition border border-emerald-200/60 shadow-2xs"
+                >
+                  <div class="flex items-center gap-2">
+                    <span
+                      class="w-5 h-5 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs"
+                      >+</span
+                    >
+                    <span>Inward Receipt</span>
+                  </div>
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </a>
+
+                <a
+                  routerLink="/app/accounts/outward"
+                  class="w-full p-2.5 rounded-xl bg-rose-50/80 hover:bg-rose-100 text-rose-800 text-xs font-bold flex items-center justify-between transition border border-rose-200/60 shadow-2xs"
+                >
+                  <div class="flex items-center gap-2">
+                    <span
+                      class="w-5 h-5 rounded-lg bg-rose-600 text-white flex items-center justify-center font-bold text-xs"
+                      >+</span
+                    >
+                    <span>Outward Voucher</span>
+                  </div>
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </a>
+
+                <a
+                  routerLink="/app/accounts/petty-cash"
+                  class="w-full p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-semibold flex items-center justify-between transition border border-slate-200/60"
+                >
+                  <span>Petty Cash Daybook</span>
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </a>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
+              <span class="text-slate-500 font-medium">Operating Currency</span>
+              <span class="font-bold text-slate-800">AED</span>
+            </div>
           </div>
         </div>
-
-        <div class="h-[4px] bg-[#0F172A] rounded-full w-full my-4 opacity-90"></div>
 
         <!-- 2. FRAMELESS ACCOUNTS BENTO GRID WITH ACCENT HIGHLIGHTED NUMBERS -->
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-stretch">
@@ -759,7 +739,7 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
                       <td class="py-3 font-semibold text-[#0F172A] font-mono">
                         {{ row.document_no }}
                       </td>
-                      <td class="py-3 text-[#64748B]">{{ row.transaction_date }}</td>
+                      <td class="py-3 text-[#64748B]">{{ formatDate(row.transaction_date) }}</td>
                       <td class="py-3 font-medium text-[#0F172A] max-w-[180px] truncate">
                         {{ row.party || 'Miscellaneous' }}
                       </td>
@@ -814,6 +794,7 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
   `,
 })
 export class AccountsDashboardComponent implements OnInit, OnDestroy {
+  formatDate = formatUaeDate;
   private api = inject(AccountsApiService);
   private branchContext = inject(BranchContextService);
 

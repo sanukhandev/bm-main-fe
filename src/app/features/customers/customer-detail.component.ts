@@ -6,6 +6,7 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
 import { BmStatusBadgeComponent } from '../../shared/components/bm-status-badge/bm-status-badge.component';
 import { CustomersApiService } from '../../core/api/customers-api.service';
 import { Customer, CustomerProfile } from '../../shared/models/customer.models';
+import { formatUaeDate } from '../../shared/utils/uae-formatters';
 
 @Component({
   selector: 'bm-customer-detail',
@@ -502,7 +503,7 @@ import { Customer, CustomerProfile } from '../../shared/models/customer.models';
                             </a>
                           </td>
                           <td class="py-3 px-3 text-slate-700 tabular-nums">
-                            {{ agreement.start_date }} – {{ agreement.end_date }}
+                            {{ formatDate(agreement.start_date) }} – {{ formatDate(agreement.end_date) }}
                           </td>
                           <td class="py-3 px-3">
                             <bm-status-badge [status]="agreement.status"></bm-status-badge>
@@ -570,7 +571,7 @@ import { Customer, CustomerProfile } from '../../shared/models/customer.models';
                                 <td class="py-2 px-2 text-slate-600">
                                   {{ line.particulars || line.category || '—' }}
                                 </td>
-                                <td class="py-2 px-2 text-slate-600">{{ line.due_date }}</td>
+                                <td class="py-2 px-2 text-slate-600">{{ formatDate(line.due_date) }}</td>
                                 <td class="py-2 px-2 text-right font-semibold tabular-nums">
                                   AED {{ formatMoney(line.amount) }}
                                 </td>
@@ -671,7 +672,7 @@ import { Customer, CustomerProfile } from '../../shared/models/customer.models';
                       @for (transaction of profile()!.transactions.data; track transaction.id) {
                         <tr class="hover:bg-slate-50/80 transition-colors">
                           <td class="py-3 px-3 text-slate-700 tabular-nums">
-                            {{ transaction.transaction_date }}
+                            {{ formatDate(transaction.transaction_date) }}
                           </td>
                           <td class="py-3 px-3 font-semibold text-slate-900">
                             <a
@@ -853,6 +854,7 @@ import { Customer, CustomerProfile } from '../../shared/models/customer.models';
   `,
 })
 export class CustomerDetailComponent implements OnInit {
+  formatDate = formatUaeDate;
   private api = inject(CustomersApiService);
   private route = inject(ActivatedRoute);
 

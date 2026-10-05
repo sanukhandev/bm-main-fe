@@ -14,6 +14,7 @@ import { OwnerAgreementsApiService } from '../../core/api/owner-agreements-api.s
 import { BranchContextService } from '../../core/branch-context/branch-context.service';
 import { OwnerAgreement } from '../../shared/models/agreement.models';
 import { PaginationMeta } from '../../core/api/api.models';
+import { formatUaeDate } from '../../shared/utils/uae-formatters';
 
 @Component({
   selector: 'bm-owner-agreements-list',
@@ -224,6 +225,11 @@ import { PaginationMeta } from '../../core/api/api.models';
                       class="hover:text-emerald-600 transition-colors"
                     >
                       {{ agr.agreement_no }}
+                      @if (agr.file_no) {
+                        <span class="block text-[10px] text-slate-500 font-normal"
+                          >File: {{ agr.file_no }}</span
+                        >
+                      }
                     </a>
                   </td>
                   <td class="py-3.5 px-4 font-medium text-slate-900">
@@ -233,7 +239,7 @@ import { PaginationMeta } from '../../core/api/api.models';
                     {{ getPropertyCount(agr) }} property asset(s)
                   </td>
                   <td class="py-3.5 px-4 text-slate-600 tabular-nums">
-                    {{ agr.start_date }} &rarr; {{ agr.end_date }}
+                    {{ formatDate(agr.start_date) }} &rarr; {{ formatDate(agr.end_date) }}
                   </td>
                   <td class="py-3.5 px-4 font-semibold text-slate-900 tabular-nums">
                     {{ agr.currency_code }} {{ agr.total_amount | number: '1.2-2' }}
@@ -355,6 +361,7 @@ import { PaginationMeta } from '../../core/api/api.models';
   `,
 })
 export class OwnerAgreementsListComponent implements OnInit, OnDestroy {
+  formatDate = formatUaeDate;
   private api = inject(OwnerAgreementsApiService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);

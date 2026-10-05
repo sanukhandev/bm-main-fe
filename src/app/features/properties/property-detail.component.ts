@@ -6,6 +6,7 @@ import { BmLoadingStateComponent } from '../../shared/components/bm-loading-stat
 import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm-error-state.component';
 import { PropertiesApiService } from '../../core/api/properties-api.service';
 import { Property, PropertyProfile } from '../../shared/models/property.models';
+import { formatUaeDate } from '../../shared/utils/uae-formatters';
 
 @Component({
   selector: 'bm-property-detail',
@@ -19,18 +20,20 @@ import { Property, PropertyProfile } from '../../shared/models/property.models';
     BmErrorStateComponent,
   ],
   template: `
-    <div class="max-w-[1740px] mx-auto space-y-6 font-sans text-slate-900 pb-12">
+    <div class="max-w-[1740px] mx-auto space-y-4 font-sans text-slate-900 pb-10 px-4 sm:px-6">
       @if (isLoading()) {
         <bm-loading-state type="detail"></bm-loading-state>
       } @else if (error()) {
         <bm-error-state [message]="error()!" (retry)="loadProperty()"></bm-error-state>
       } @else if (property()) {
         <!-- TOP BREADCRUMB & HEADER ACTIONS -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-4">
-          <div>
+        <div
+          class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-3"
+        >
+          <div class="flex items-center gap-3 flex-wrap">
             <a
               routerLink="/app/properties"
-              class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-emerald-700 transition mb-1"
+              class="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-emerald-700 transition"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -46,34 +49,35 @@ import { Property, PropertyProfile } from '../../shared/models/property.models';
                   d="M15 19l-7-7 7-7"
                 />
               </svg>
-              <span>Back to Properties Portfolio</span>
+              <span>Portfolio</span>
             </a>
-            <div class="flex items-center gap-3 flex-wrap">
-              <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
-                {{ property()!.name }}
-              </h1>
-              <span
-                class="px-2.5 py-0.5 rounded-md text-xs font-mono font-bold bg-slate-100 text-slate-700 border border-slate-200"
-              >
-                {{ property()!.property_code }}
-              </span>
-              <bm-status-badge [status]="property()!.property_type"></bm-status-badge>
-              <bm-status-badge [status]="property()!.status"></bm-status-badge>
-            </div>
+            <span class="text-slate-300">/</span>
+            <h1
+              class="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2"
+            >
+              <span>{{ property()!.name }}</span>
+            </h1>
+            <span
+              class="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-slate-100 text-slate-700 border border-slate-200"
+            >
+              {{ property()!.property_code }}
+            </span>
+            <bm-status-badge [status]="property()!.property_type"></bm-status-badge>
+            <bm-status-badge [status]="property()!.status"></bm-status-badge>
           </div>
 
-          <div class="flex items-center gap-2.5 flex-wrap">
-            <a routerLink="/app/properties" class="bm-btn bm-btn-secondary text-xs">
-              Back to List
+          <div class="flex items-center gap-2 flex-wrap">
+            <a routerLink="/app/properties" class="bm-btn bm-btn-secondary text-xs py-1.5 px-3">
+              Back
             </a>
 
             <a
               [routerLink]="['/app/properties', property()!.id, 'edit']"
-              class="bm-btn bm-btn-secondary text-xs flex items-center gap-1.5"
+              class="bm-btn bm-btn-secondary text-xs py-1.5 px-3 flex items-center gap-1.5"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="h-4 w-4 text-slate-500"
+                class="h-3.5 w-3.5 text-slate-500"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -95,11 +99,11 @@ import { Property, PropertyProfile } from '../../shared/models/property.models';
                   property_id: property()!.id,
                   owner_customer_id: property()!.owner_customer_id,
                 }"
-                class="bm-btn bm-btn-primary text-xs flex items-center gap-1.5"
+                class="bm-btn bm-btn-primary text-xs py-1.5 px-3 flex items-center gap-1"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  class="h-4 w-4"
+                  class="h-3.5 w-3.5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -111,7 +115,7 @@ import { Property, PropertyProfile } from '../../shared/models/property.models';
                     d="M12 4v16m8-8H4"
                   />
                 </svg>
-                <span>Create Owner Agreement</span>
+                <span>Owner Contract</span>
               </a>
             }
 
@@ -121,11 +125,11 @@ import { Property, PropertyProfile } from '../../shared/models/property.models';
                 [queryParams]="{
                   source_owner_agreement_id: profile()?.actions?.default_owner_agreement_id,
                 }"
-                class="bm-btn bm-btn-primary text-xs flex items-center gap-1.5"
+                class="bm-btn bm-btn-primary text-xs py-1.5 px-3 flex items-center gap-1"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  class="h-4 w-4"
+                  class="h-3.5 w-3.5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -137,72 +141,72 @@ import { Property, PropertyProfile } from '../../shared/models/property.models';
                     d="M12 4v16m8-8H4"
                   />
                 </svg>
-                <span>Create Tenant Lease</span>
+                <span>Tenant Lease</span>
               </a>
             }
           </div>
         </div>
 
-        <!-- HERO BENTO PORTFOLIO CARD -->
-        <div
-          class="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-gradient-to-br from-white via-slate-50/90 to-slate-100/70 p-6 sm:p-8 shadow-xs relative overflow-hidden"
-        >
-          <!-- Background Decorative Silhouette -->
+        <!-- FEATURED HIGHLIGHTS & OVERVIEW: BENTO STYLE 3 GRID ASYMMETRIC LAYOUT -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
+          <!-- BENTO TILE 1: FEATURED ASSET OVERVIEW (Asymmetric 5 Cols) -->
           <div
-            class="absolute -right-6 -bottom-10 text-slate-800 opacity-[0.035] pointer-events-none select-none z-0"
+            class="lg:col-span-5 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-950 p-5 text-white shadow-md relative overflow-hidden flex flex-col justify-between min-h-[200px]"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="w-[360px] h-[360px]"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="1.2"
-                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h5m-5 0V11m0 0V9a2 2 0 012-2h2a2 2 0 012 2v2m-6 0h6"
-              />
-            </svg>
-          </div>
+            <!-- Background Accent Glow -->
+            <div
+              class="absolute -right-10 -bottom-10 w-44 h-44 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"
+            ></div>
+            <div class="absolute right-4 top-4 text-emerald-400/15 pointer-events-none select-none">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-32 h-32"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1"
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h5m-5 0V11m0 0V9a2 2 0 012-2h2a2 2 0 012 2v2m-6 0h6"
+                />
+              </svg>
+            </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
-            <!-- Left Hero Summary (6 cols) -->
-            <div class="lg:col-span-6 space-y-4">
-              <div class="flex items-center gap-2">
+            <div class="relative z-10 space-y-2">
+              <div class="flex items-center gap-2 flex-wrap">
                 <span
-                  class="text-xs font-bold uppercase tracking-widest text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2.5 py-0.5 rounded-md"
+                  class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
                 >
-                  Real Estate Asset Profile
+                  Featured Asset
                 </span>
-                <span class="text-xs text-slate-400 font-medium">•</span>
-                <span class="text-xs font-semibold text-slate-600 capitalize">
+                <span class="text-[11px] text-slate-300 capitalize font-medium">
                   {{ formatType(property()!.property_type) }}
                 </span>
               </div>
 
               <div>
-                <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                <h2 class="text-2xl sm:text-3xl font-black tracking-tight text-white">
                   Unit {{ property()!.unit_number }}
                 </h2>
-                <p class="text-sm text-slate-600 font-medium mt-1">
-                  {{ property()!.building_name || 'Individual Building / Complex' }} ·
-                  {{ property()!.city || 'Dubai' }},
-                  {{ property()!.state_or_emirate || 'United Arab Emirates' }}
+                <p class="text-xs text-slate-300 font-medium mt-0.5">
+                  {{ property()!.building_name || 'Individual Property / Complex' }} ·
+                  {{ property()!.city || 'Dubai' }}, {{ property()!.state_or_emirate || 'UAE' }}
                 </p>
               </div>
+            </div>
 
-              <!-- Owner Link Badge -->
-              <div
-                class="inline-flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-200/90 shadow-2xs"
-              >
+            <div
+              class="relative z-10 pt-3 border-t border-slate-700/60 mt-3 flex items-center justify-between flex-wrap gap-2"
+            >
+              <div class="flex items-center gap-2.5">
                 <div
-                  class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs shrink-0"
+                  class="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-xs font-bold shrink-0"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
+                    class="h-4 w-4"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -216,88 +220,146 @@ import { Property, PropertyProfile } from '../../shared/models/property.models';
                   </svg>
                 </div>
                 <div>
-                  <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                    Property Owner
-                  </div>
-                  <div class="text-xs font-extrabold text-slate-900 flex items-center gap-2">
+                  <div class="text-[10px] uppercase font-bold text-slate-400">Owner</div>
+                  <div class="text-xs font-extrabold text-white flex items-center gap-1.5">
                     <span>{{ ownerName() }}</span>
                     @if (ownerCustomer()) {
                       <a
                         [routerLink]="['/app/customers', ownerCustomer()?.id]"
-                        class="text-emerald-700 hover:text-emerald-800 underline font-semibold text-[11px]"
+                        class="text-emerald-400 hover:text-emerald-300 underline text-[10px]"
                       >
-                        View Master Profile &rarr;
+                        Profile &rarr;
                       </a>
                     }
                   </div>
                 </div>
               </div>
+              <span
+                class="text-xs font-mono font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-800/80 px-2 py-0.5 rounded"
+              >
+                {{ property()!.property_code }}
+              </span>
             </div>
+          </div>
 
-            <!-- Right 4-Metric Grid (6 cols) -->
-            <div class="lg:col-span-6 grid grid-cols-2 gap-4">
-              <!-- Metric 1: Area -->
-              <div class="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs">
-                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block"
+          <!-- BENTO TILE 2: KEY METRICS DASHBOARD (Asymmetric 4 Cols) -->
+          <div class="lg:col-span-4 grid grid-cols-2 gap-2.5">
+            <!-- Metric 1: Area -->
+            <div
+              class="p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs flex flex-col justify-between hover:border-slate-300 transition"
+            >
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400"
                   >Gross Area</span
                 >
-                <div class="text-2xl font-extrabold text-slate-900 tabular-nums mt-1">
-                  {{ property()!.area || '—' }}
-                  <span class="text-xs text-slate-500 font-semibold">sq ft</span>
+                <div
+                  class="w-6 h-6 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center text-[10px]"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-3.5 w-3.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4 8V4m0 0h4M4 4l5 5m11-2V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"
+                    />
+                  </svg>
                 </div>
-                <p class="text-[11px] text-slate-500 mt-0.5">Floor layout area size</p>
               </div>
+              <div>
+                <div class="text-xl font-black text-slate-900 tabular-nums">
+                  {{ property()!.area || '—' }}
+                  <span class="text-xs font-semibold text-slate-500">sq ft</span>
+                </div>
+                <div class="text-[10px] text-slate-500 font-medium">Floor Area</div>
+              </div>
+            </div>
 
-              <!-- Metric 2: Owner Agreements -->
-              <div class="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs">
-                <span class="text-xs font-bold text-emerald-800 uppercase tracking-wider block"
+            <!-- Metric 2: Owner Agreements -->
+            <div
+              class="p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs flex flex-col justify-between hover:border-slate-300 transition"
+            >
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-700"
                   >Owner Coverage</span
                 >
-                <div class="text-2xl font-extrabold text-emerald-700 tabular-nums mt-1">
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              </div>
+              <div>
+                <div class="text-xl font-black text-emerald-700 tabular-nums">
                   {{ profile()?.owner_agreements?.length || 0 }}
                 </div>
-                <p class="text-[11px] text-slate-500 mt-0.5">Management agreements</p>
+                <div class="text-[10px] text-slate-500 font-medium">Agreements</div>
               </div>
+            </div>
 
-              <!-- Metric 3: Tenant Leases -->
-              <div class="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs">
-                <span class="text-xs font-bold text-blue-800 uppercase tracking-wider block"
+            <!-- Metric 3: Tenant Leases -->
+            <div
+              class="p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs flex flex-col justify-between hover:border-slate-300 transition"
+            >
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-blue-700"
                   >Tenant Leases</span
                 >
-                <div class="text-2xl font-extrabold text-blue-700 tabular-nums mt-1">
+                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+              </div>
+              <div>
+                <div class="text-xl font-black text-blue-700 tabular-nums">
                   {{ profile()?.tenant_agreements?.length || 0 }}
                 </div>
-                <p class="text-[11px] text-slate-500 mt-0.5">Occupancy agreement records</p>
+                <div class="text-[10px] text-slate-500 font-medium">Active Leases</div>
               </div>
+            </div>
 
-              <!-- Metric 4: Work Orders -->
-              <div class="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs">
-                <span class="text-xs font-bold text-amber-800 uppercase tracking-wider block"
+            <!-- Metric 4: Work Orders -->
+            <div
+              class="p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs flex flex-col justify-between hover:border-slate-300 transition"
+            >
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-amber-700"
                   >Work Orders</span
                 >
-                <div class="text-2xl font-extrabold text-amber-700 tabular-nums mt-1">
+                <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+              </div>
+              <div>
+                <div class="text-xl font-black text-amber-700 tabular-nums">
                   {{ profile()?.work_orders?.length || 0 }}
                 </div>
-                <p class="text-[11px] text-slate-500 mt-0.5">Maintenance requests</p>
+                <div class="text-[10px] text-slate-500 font-medium">Maintenance</div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- BENTO DETAILS GRID (2 COLUMNS) -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <!-- LEFT COLUMN (7 COLS): Specifications, Address & Utilities -->
-          <div class="lg:col-span-7 space-y-6">
-            <!-- ASSET SPECIFICATIONS BENTO CARD -->
-            <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-2xs space-y-4">
-              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                <div class="flex items-center gap-2.5">
-                  <div
-                    class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center"
+          <!-- BENTO TILE 3: ACTIONS & UTILITIES SNAPSHOT (Asymmetric 3 Cols) -->
+          <div
+            class="lg:col-span-3 rounded-2xl bg-white border border-slate-200/90 p-4 shadow-2xs flex flex-col justify-between space-y-3"
+          >
+            <div>
+              <div class="flex items-center justify-between pb-2 border-b border-slate-100 mb-2.5">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-700"
+                  >Quick Operations</span
+                >
+                <span class="text-[10px] font-bold text-slate-400">Actions</span>
+              </div>
+
+              <div class="space-y-1.5">
+                @if (profile()?.actions?.can_create_owner_agreement) {
+                  <a
+                    [routerLink]="['/app/owner-agreements/new']"
+                    [queryParams]="{
+                      property_id: property()!.id,
+                      owner_customer_id: property()!.owner_customer_id,
+                    }"
+                    class="w-full bm-btn bm-btn-primary text-xs py-1.5 justify-center flex items-center gap-1.5 font-bold"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
+                      class="h-3.5 w-3.5"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -306,80 +368,152 @@ import { Property, PropertyProfile } from '../../shared/models/property.models';
                         stroke-linecap="round"
                         stroke-linejoin="round"
                         stroke-width="2"
-                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h5m-5 0V11m0 0V9a2 2 0 012-2h2a2 2 0 012 2v2m-6 0h6"
+                        d="M12 4v16m8-8H4"
                       />
                     </svg>
+                    <span>+ Owner Agreement</span>
+                  </a>
+                }
+
+                @if (canCreateTenantAgreement()) {
+                  <a
+                    [routerLink]="['/app/tenant-agreements/new']"
+                    [queryParams]="{
+                      source_owner_agreement_id: profile()?.actions?.default_owner_agreement_id,
+                    }"
+                    class="w-full bm-btn bm-btn-secondary text-xs py-1.5 justify-center flex items-center gap-1.5 font-bold"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-3.5 w-3.5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 4v16m8-8H4"
+                      />
+                    </svg>
+                    <span>+ Tenant Lease</span>
+                  </a>
+                } @else if (
+                  profile()?.actions?.can_create_tenant_agreement &&
+                  !hasApprovedOrCommencedOwnerAgreement()
+                ) {
+                  <div
+                    class="p-2 rounded-lg bg-amber-50 border border-amber-200/70 text-[10px] text-amber-900 leading-tight"
+                  >
+                    ⚠️ Tenant Lease requires an Approved/Commenced Owner Agreement.
                   </div>
-                  <h2 class="text-base font-extrabold text-slate-900">
-                    Property Asset Specifications
-                  </h2>
+                }
+              </div>
+            </div>
+
+            <!-- Utilities Quick Pills -->
+            <div class="pt-2 border-t border-slate-100">
+              <div class="text-[10px] font-bold uppercase text-slate-400 mb-1.5">
+                Utility Accounts Connected
+              </div>
+              <div class="flex items-center gap-1.5 flex-wrap text-[11px]">
+                @for (utility of utilityDetails(); track $index) {
+                  <span
+                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200 font-medium"
+                  >
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    <span class="capitalize">{{ utility.type }}</span>
+                  </span>
+                } @empty {
+                  <span class="text-[11px] text-slate-400 italic">No utility details logged.</span>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MAIN CONTENT: 3-COLUMN ASYMMETRIC BENTO GRID LAYOUT -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 items-start">
+          <!-- ==================== COLUMN 1 (4 COLS): SPECS, ADDRESS & UTILITIES ==================== -->
+          <div class="lg:col-span-4 space-y-3 sm:space-y-4">
+            <!-- CARD 1.1: ASSET SPECIFICATIONS -->
+            <div class="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xs space-y-3">
+              <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
+                <div
+                  class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m0 0h5m-5 0V11m0 0V9a2 2 0 012-2h2a2 2 0 012 2v2m-6 0h6"
+                    />
+                  </svg>
                 </div>
+                <h3 class="text-sm font-extrabold text-slate-900">Asset Specifications</h3>
               </div>
 
-              <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-xs">
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                  <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                    Property Code
-                  </div>
-                  <div class="font-extrabold text-slate-900 mt-1 font-mono text-sm">
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                  <div class="text-[10px] font-bold text-slate-400 uppercase">Property Code</div>
+                  <div class="font-extrabold text-slate-900 mt-0.5 font-mono text-xs">
                     {{ property()!.property_code }}
                   </div>
                 </div>
 
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                  <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                    Unit Number
-                  </div>
-                  <div class="font-extrabold text-slate-900 mt-1 text-sm tabular-nums">
+                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                  <div class="text-[10px] font-bold text-slate-400 uppercase">Unit Number</div>
+                  <div class="font-extrabold text-slate-900 mt-0.5 text-xs tabular-nums">
                     {{ property()!.unit_number }}
                   </div>
                 </div>
 
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                  <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                  <div class="text-[10px] font-bold text-slate-400 uppercase mb-0.5">
                     Classification
                   </div>
-                  <div class="mt-1.5">
-                    <bm-status-badge [status]="property()!.property_type"></bm-status-badge>
-                  </div>
+                  <bm-status-badge [status]="property()!.property_type"></bm-status-badge>
                 </div>
 
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                  <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                    Building / Complex
-                  </div>
-                  <div class="font-bold text-slate-900 mt-1">
-                    {{ property()!.building_name || '—' }}
-                  </div>
-                </div>
-
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                  <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                    Area Size
-                  </div>
-                  <div class="font-bold text-slate-900 mt-1 tabular-nums">
-                    {{ property()!.area || '—' }} sq ft
-                  </div>
-                </div>
-
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                  <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                  <div class="text-[10px] font-bold text-slate-400 uppercase mb-0.5">
                     Asset Status
                   </div>
-                  <div class="mt-1.5">
-                    <bm-status-badge [status]="property()!.status"></bm-status-badge>
+                  <bm-status-badge [status]="property()!.status"></bm-status-badge>
+                </div>
+
+                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 col-span-2">
+                  <div class="text-[10px] font-bold text-slate-400 uppercase">
+                    Building / Complex
+                  </div>
+                  <div class="font-bold text-slate-900 mt-0.5 text-xs">
+                    {{ property()!.building_name || 'Individual Structure' }}
+                  </div>
+                </div>
+
+                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 col-span-2">
+                  <div class="text-[10px] font-bold text-slate-400 uppercase">Gross Area Size</div>
+                  <div class="font-bold text-slate-900 mt-0.5 text-xs tabular-nums">
+                    {{ property()!.area || '—' }} sq ft
                   </div>
                 </div>
               </div>
 
               @if (property()!.notes) {
-                <div class="pt-3 border-t border-slate-100">
-                  <span
-                    class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1"
+                <div class="pt-2 border-t border-slate-100">
+                  <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1"
                     >Asset Notes</span
                   >
                   <p
-                    class="text-xs text-slate-700 leading-relaxed whitespace-pre-line bg-slate-50 p-3 rounded-xl border border-slate-100"
+                    class="text-xs text-slate-700 leading-relaxed whitespace-pre-line bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-[11px]"
                   >
                     {{ property()!.notes }}
                   </p>
@@ -387,11 +521,11 @@ import { Property, PropertyProfile } from '../../shared/models/property.models';
               }
             </div>
 
-            <!-- LOCATION & ADDRESS BENTO CARD -->
-            <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-2xs space-y-3">
-              <div class="flex items-center gap-2.5 pb-3 border-b border-slate-100">
+            <!-- CARD 1.2: ADDRESS & LOCATION -->
+            <div class="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xs space-y-3">
+              <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
                 <div
-                  class="w-8 h-8 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center"
+                  class="w-7 h-7 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center shrink-0"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -414,141 +548,164 @@ import { Property, PropertyProfile } from '../../shared/models/property.models';
                     />
                   </svg>
                 </div>
-                <h2 class="text-base font-extrabold text-slate-900">
-                  Address & Location Coordinates
-                </h2>
+                <h3 class="text-sm font-extrabold text-slate-900">Address & Location</h3>
               </div>
 
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-medium">
+              <div class="space-y-2 text-xs">
                 <div>
-                  <span
-                    class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1"
+                  <span class="text-[10px] font-bold text-slate-400 uppercase block"
                     >Street Address</span
                   >
-                  <div class="text-slate-900 font-semibold">
+                  <div class="text-slate-900 font-semibold mt-0.5">
                     {{ property()!.address_line_1 || 'No street address provided.' }}
                     @if (property()!.address_line_2) {
-                      <div class="text-slate-600 font-normal mt-0.5">
-                        {{ property()!.address_line_2 }}
-                      </div>
+                      <div class="text-slate-600 font-normal">{{ property()!.address_line_2 }}</div>
                     }
                   </div>
                 </div>
 
-                <div>
-                  <span
-                    class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1"
-                    >City / Emirate / Country</span
-                  >
-                  <div class="text-slate-900 font-semibold">
-                    {{ property()!.city || 'Dubai' }}
-                    {{ property()!.state_or_emirate ? ', ' + property()!.state_or_emirate : '' }}
-                    <span
-                      class="inline-block ml-1.5 px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 font-mono text-[11px] border border-emerald-200"
+                <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+                  <div>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase block"
+                      >Emirate / City</span
                     >
-                      {{ property()!.country_code || 'AE' }}
-                    </span>
+                    <div class="text-slate-900 font-semibold">
+                      {{ property()!.city || 'Dubai'
+                      }}{{
+                        property()!.state_or_emirate ? ', ' + property()!.state_or_emirate : ''
+                      }}
+                    </div>
                   </div>
+                  <span
+                    class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 font-mono text-[10px] font-bold border border-emerald-200"
+                  >
+                    {{ property()!.country_code || 'AE' }}
+                  </span>
                 </div>
               </div>
             </div>
 
-            <!-- UTILITY CONNECTIONS BENTO CARD -->
-            <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-2xs space-y-4">
-              <div class="flex items-center gap-2.5 pb-3 border-b border-slate-100">
-                <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold text-xs">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            <!-- CARD 1.3: UTILITY CONNECTIONS -->
+            <div class="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xs space-y-3">
+              <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
+                <div
+                  class="w-7 h-7 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center font-bold text-xs shrink-0"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M13 10V3L4 14h7v7l9-11h-7z"
+                    />
                   </svg>
                 </div>
-                <div>
-                  <h2 class="text-base font-extrabold text-slate-900">Utility Connections</h2>
-                  <p class="text-xs text-slate-500">Electricity, cooling, and gas account details</p>
-                </div>
+                <h3 class="text-sm font-extrabold text-slate-900">Utility Accounts</h3>
               </div>
 
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                  <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Electricity</span>
-                  <div class="text-slate-900 font-bold">{{ formatType(property()!.electricity_provider || '') || '—' }}</div>
-                  <div class="text-slate-500 font-mono text-[11px] mt-0.5">{{ property()!.electricity_account_number || 'No account number' }}</div>
-                </div>
-
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                  <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Cooling</span>
-                  <div class="text-slate-900 font-bold">{{ formatType(property()!.cooling_provider || '') || '—' }}</div>
-                  <div class="text-slate-500 font-mono text-[11px] mt-0.5">{{ property()!.cooling_account_number || 'No account number' }}</div>
-                </div>
-
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                  <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Gas Provider</span>
-                  <div class="text-slate-900 font-bold">{{ formatType(property()!.gas_provider || '') || '—' }}</div>
-                  <div class="text-slate-500 text-[11px] mt-0.5">{{ formatType(property()!.gas_connection_type || '') || 'Type not specified' }}</div>
-                </div>
-
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                  <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Gas Connection</span>
-                  <div class="text-slate-900 font-mono font-bold">{{ property()!.gas_connection_number || 'No connection number' }}</div>
-                </div>
+              <div class="space-y-2 text-xs">
+                @for (utility of utilityDetails(); track $index) {
+                  <div
+                    class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-start justify-between gap-2"
+                  >
+                    <div>
+                      <span
+                        class="text-[10px] font-extrabold uppercase text-slate-500 tracking-wider block"
+                        >{{ formatType(utility.type) }}</span
+                      >
+                      @if (utility.type === 'furniture') {
+                        <div
+                          class="text-slate-900 font-medium text-[11px] mt-0.5 whitespace-pre-line"
+                        >
+                          {{ utility.details || '—' }}
+                        </div>
+                      } @else {
+                        <div class="text-slate-900 font-bold text-[11px] mt-0.5">
+                          {{ formatType(utility.provider || '') || 'Provider Unspecified' }}
+                        </div>
+                        @if (utility.type === 'gas') {
+                          <div class="text-slate-500 text-[10px]">
+                            {{ formatType(utility.connection_type || '') }}
+                          </div>
+                          <div class="text-slate-600 font-mono text-[10px] font-semibold">
+                            {{ utility.connection_number || 'No conn #' }}
+                          </div>
+                        } @else {
+                          <div class="text-slate-600 font-mono text-[10px] font-semibold">
+                            {{ utility.account_number || 'No acct #' }}
+                          </div>
+                        }
+                      }
+                    </div>
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0 mt-1"></span>
+                  </div>
+                } @empty {
+                  <div
+                    class="p-3 rounded-xl bg-slate-50 border border-slate-100 text-slate-400 text-[11px] text-center"
+                  >
+                    No utility details recorded.
+                  </div>
+                }
               </div>
             </div>
           </div>
 
-          <!-- RIGHT COLUMN (5 COLS): Owner Profile & Agreement Actions -->
-          <div class="lg:col-span-5 space-y-6">
-            <!-- PROPERTY OWNER MASTER CARD -->
-            <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-2xs space-y-4">
-              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                <div class="flex items-center gap-2.5">
-                  <div
-                    class="w-8 h-8 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center"
+          <!-- ==================== COLUMN 2 (4 COLS): OWNER & MANAGEMENT AGREEMENTS ==================== -->
+          <div class="lg:col-span-4 space-y-3 sm:space-y-4">
+            <!-- CARD 2.1: PROPERTY OWNER PROFILE -->
+            <div class="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xs space-y-3">
+              <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
+                <div
+                  class="w-7 h-7 rounded-lg bg-purple-50 text-purple-700 flex items-center justify-center shrink-0"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                      />
-                    </svg>
-                  </div>
-                  <h2 class="text-base font-extrabold text-slate-900">Property Owner</h2>
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
                 </div>
+                <h3 class="text-sm font-extrabold text-slate-900">Property Owner Profile</h3>
               </div>
 
-              <div class="space-y-3 text-xs">
+              <div class="space-y-2.5 text-xs">
                 <div>
-                  <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                    Owner Display Name
-                  </div>
-                  <div class="font-extrabold text-slate-900 mt-1 text-sm">{{ ownerName() }}</div>
+                  <div class="text-[10px] font-bold text-slate-400 uppercase">Owner Name</div>
+                  <div class="font-extrabold text-slate-900 text-sm mt-0.5">{{ ownerName() }}</div>
                 </div>
 
                 @if (ownerCustomer()) {
-                  <div>
-                    <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                      Customer Code
+                  <div class="flex items-center justify-between pt-2 border-t border-slate-100">
+                    <div>
+                      <div class="text-[10px] font-bold text-slate-400 uppercase">
+                        Customer Code
+                      </div>
+                      <div class="font-bold text-slate-800 font-mono text-xs">
+                        {{ ownerCustomer()?.customer_code }}
+                      </div>
                     </div>
-                    <div class="font-bold text-slate-800 mt-1 font-mono">
-                      {{ ownerCustomer()?.customer_code }}
-                    </div>
-                  </div>
-
-                  <div class="pt-3 border-t border-slate-100">
                     <a
                       [routerLink]="['/app/customers', ownerCustomer()?.id]"
-                      class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 px-3 py-2 rounded-xl border border-emerald-200/60 transition w-full justify-center"
+                      class="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200/60 transition"
                     >
-                      <span>View Owner Master Profile</span>
+                      <span>Profile</span>
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        class="h-4 w-4"
+                        class="h-3.5 w-3.5"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -566,389 +723,274 @@ import { Property, PropertyProfile } from '../../shared/models/property.models';
               </div>
             </div>
 
-            <!-- AGREEMENT COVERAGE & ACTIONS CARD -->
-            <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-2xs space-y-4">
-              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-                <h2 class="text-base font-extrabold text-slate-900">Agreement Actions</h2>
-              </div>
-
-              <div class="space-y-3">
-                @if (profile()?.actions?.can_create_owner_agreement) {
-                  <a
-                    [routerLink]="['/app/owner-agreements/new']"
-                    [queryParams]="{
-                      property_id: property()!.id,
-                      owner_customer_id: property()!.owner_customer_id,
-                    }"
-                    class="bm-btn bm-btn-primary w-full text-xs font-bold py-2.5 flex items-center justify-center gap-2"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M12 4v16m8-8H4"
-                      />
-                    </svg>
-                    <span>Create Owner Agreement</span>
-                  </a>
-                }
-
-                @if (profile()?.actions?.can_create_tenant_agreement) {
-                  @if (hasApprovedOrCommencedOwnerAgreement()) {
-                    <a
-                      [routerLink]="['/app/tenant-agreements/new']"
-                      [queryParams]="{ property_id: property()!.id }"
-                      class="bm-btn bm-btn-secondary w-full text-xs font-bold py-2.5 flex items-center justify-center gap-2"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-4 w-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M12 4v16m8-8H4"
-                        />
-                      </svg>
-                      <span>Create Tenant Lease</span>
-                    </a>
-                  } @else {
-                    <div
-                      class="p-3.5 rounded-xl bg-amber-50 border border-amber-200/80 text-xs text-amber-900 font-medium flex items-start gap-2.5"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-4 w-4 text-amber-600 shrink-0 mt-0.5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                        />
-                      </svg>
-                      <span
-                        >Creating a Tenant Lease requires an Owner Agreement in
-                        <strong>Approved</strong> or <strong>Commenced</strong> status.</span
-                      >
-                    </div>
-                  }
-                }
-
-                @if (
-                  !profile()?.actions?.can_create_owner_agreement &&
-                  !profile()?.actions?.can_create_tenant_agreement
-                ) {
+            <!-- CARD 2.2: OWNER MANAGEMENT AGREEMENTS -->
+            <div class="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xs space-y-3">
+              <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <div class="flex items-center gap-2">
                   <div
-                    class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 text-xs text-slate-600 font-medium"
+                    class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs shrink-0"
                   >
-                    ✓ Active owner and tenant agreements are currently linked to this property.
+                    01
                   </div>
-                }
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- FULL-WIDTH BENTO SECTIONS: OWNER AGREEMENTS, TENANT AGREEMENTS, MAINTENANCE WORK ORDERS -->
-        <div class="space-y-6 pt-2">
-          <!-- 1. OWNER MANAGEMENT AGREEMENTS BENTO CARD -->
-          <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-2xs space-y-4">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div class="flex items-center gap-2.5">
-                <div
-                  class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs"
+                  <h3 class="text-sm font-extrabold text-slate-900">Owner Agreements</h3>
+                </div>
+                <span
+                  class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200"
                 >
-                  01
-                </div>
-                <div>
-                  <h2 class="text-base font-extrabold text-slate-900">
-                    Owner Management Agreements
-                  </h2>
-                  <p class="text-xs text-slate-500">
-                    Property management contracts between owner and company
-                  </p>
-                </div>
+                  {{ profile()?.owner_agreements?.length || 0 }}
+                </span>
               </div>
-              <span
-                class="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200"
-              >
-                {{ profile()?.owner_agreements?.length || 0 }} Records
-              </span>
-            </div>
 
-            @if (!profile()?.owner_agreements?.length) {
-              <div class="p-8 text-center text-slate-500 text-xs font-medium">
-                No owner management agreements currently linked to this property.
-              </div>
-            } @else {
-              <div class="space-y-4">
-                @for (agreement of profile()?.owner_agreements || []; track agreement.id) {
-                  <div class="p-4 rounded-xl border border-slate-200/80 bg-slate-50/50 space-y-3">
-                    <div class="flex flex-wrap items-center justify-between gap-2">
-                      <div class="flex items-center gap-3">
+              @if (!profile()?.owner_agreements?.length) {
+                <div
+                  class="p-6 text-center text-slate-400 text-xs font-medium bg-slate-50/50 rounded-xl border border-slate-100"
+                >
+                  No owner management contracts linked.
+                </div>
+              } @else {
+                <div class="space-y-3">
+                  @for (agreement of profile()?.owner_agreements || []; track agreement.id) {
+                    <div class="p-3 rounded-xl border border-slate-200/80 bg-slate-50/60 space-y-2">
+                      <div class="flex items-center justify-between gap-1 flex-wrap">
                         <a
                           [routerLink]="['/app/owner-agreements', agreement.id]"
-                          class="font-extrabold text-emerald-700 hover:text-emerald-800 hover:underline text-sm"
+                          class="font-extrabold text-emerald-700 hover:text-emerald-800 hover:underline text-xs"
                         >
                           {{ agreement.agreement_no }}
                         </a>
                         <bm-status-badge [status]="agreement.status"></bm-status-badge>
                       </div>
-                      <div class="text-xs text-slate-500 font-semibold tabular-nums">
-                        {{ agreement.start_date }} to {{ agreement.end_date }}
+
+                      <div class="text-[11px] text-slate-500 font-mono">
+                        {{ formatDate(agreement.start_date) }} to
+                        {{ formatDate(agreement.end_date) }}
                       </div>
-                    </div>
 
-                    <div class="text-xs text-slate-700 font-medium">
-                      Owner:
-                      <strong class="text-slate-900">{{
-                        agreement.customer?.display_name || '—'
-                      }}</strong>
-                    </div>
+                      <div class="text-[11px] text-slate-700 font-medium">
+                        Owner:
+                        <strong class="text-slate-900">{{
+                          agreement.customer?.display_name || '—'
+                        }}</strong>
+                      </div>
 
-                    @if (!profile()?.financial_restricted) {
-                      <ng-container
-                        *ngTemplateOutlet="
-                          paymentLines;
-                          context: { lines: agreement.payment_lines }
-                        "
-                      ></ng-container>
-                    }
-                  </div>
-                }
-              </div>
-            }
+                      @if (!profile()?.financial_restricted) {
+                        <ng-container
+                          *ngTemplateOutlet="
+                            paymentLines;
+                            context: { lines: agreement.payment_lines }
+                          "
+                        ></ng-container>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
           </div>
 
-          <!-- 2. TENANT LEASE AGREEMENTS BENTO CARD -->
-          <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-2xs space-y-4">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div class="flex items-center gap-2.5">
-                <div
-                  class="w-8 h-8 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-xs"
+          <!-- ==================== COLUMN 3 (4 COLS): TENANT LEASES & MAINTENANCE ORDERS ==================== -->
+          <div class="lg:col-span-4 space-y-3 sm:space-y-4">
+            <!-- CARD 3.1: TENANT LEASE AGREEMENTS -->
+            <div class="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xs space-y-3">
+              <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <div class="flex items-center gap-2">
+                  <div
+                    class="w-7 h-7 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-xs shrink-0"
+                  >
+                    02
+                  </div>
+                  <h3 class="text-sm font-extrabold text-slate-900">Tenant Leases</h3>
+                </div>
+                <span
+                  class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-800 border border-blue-200"
                 >
-                  02
-                </div>
-                <div>
-                  <h2 class="text-base font-extrabold text-slate-900">Tenant Lease Agreements</h2>
-                  <p class="text-xs text-slate-500">Active tenant occupancy and lease contracts</p>
-                </div>
+                  {{ profile()?.tenant_agreements?.length || 0 }}
+                </span>
               </div>
-              <span
-                class="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-800 border border-blue-200"
-              >
-                {{ profile()?.tenant_agreements?.length || 0 }} Records
-              </span>
-            </div>
 
-            @if (!profile()?.tenant_agreements?.length) {
-              <div class="p-8 text-center text-slate-500 text-xs font-medium">
-                No tenant lease agreements currently linked to this property.
-              </div>
-            } @else {
-              <div class="space-y-4">
-                @for (agreement of profile()?.tenant_agreements || []; track agreement.id) {
-                  <div class="p-4 rounded-xl border border-slate-200/80 bg-slate-50/50 space-y-3">
-                    <div class="flex flex-wrap items-center justify-between gap-2">
-                      <div class="flex items-center gap-3">
+              @if (!profile()?.tenant_agreements?.length) {
+                <div
+                  class="p-6 text-center text-slate-400 text-xs font-medium bg-slate-50/50 rounded-xl border border-slate-100"
+                >
+                  No active tenant occupancy contracts linked.
+                </div>
+              } @else {
+                <div class="space-y-3">
+                  @for (agreement of profile()?.tenant_agreements || []; track agreement.id) {
+                    <div class="p-3 rounded-xl border border-slate-200/80 bg-slate-50/60 space-y-2">
+                      <div class="flex items-center justify-between gap-1 flex-wrap">
                         <a
                           [routerLink]="['/app/tenant-agreements', agreement.id]"
-                          class="font-extrabold text-blue-700 hover:text-blue-800 hover:underline text-sm"
+                          class="font-extrabold text-blue-700 hover:text-blue-800 hover:underline text-xs"
                         >
                           {{ agreement.agreement_no }}
                         </a>
                         <bm-status-badge [status]="agreement.status"></bm-status-badge>
                       </div>
-                      <div class="text-xs text-slate-500 font-semibold tabular-nums">
-                        {{ agreement.start_date }} to {{ agreement.end_date }}
+
+                      <div class="text-[11px] text-slate-500 font-mono">
+                        {{ formatDate(agreement.start_date) }} to
+                        {{ formatDate(agreement.end_date) }}
                       </div>
+
+                      <div class="text-[11px] text-slate-700 font-medium">
+                        Tenant:
+                        <strong class="text-slate-900">{{
+                          agreement.customer?.display_name || '—'
+                        }}</strong>
+                      </div>
+
+                      @if (!profile()?.financial_restricted) {
+                        <ng-container
+                          *ngTemplateOutlet="
+                            paymentLines;
+                            context: { lines: agreement.payment_lines }
+                          "
+                        ></ng-container>
+                      }
                     </div>
-
-                    <div class="text-xs text-slate-700 font-medium">
-                      Tenant:
-                      <strong class="text-slate-900">{{
-                        agreement.customer?.display_name || '—'
-                      }}</strong>
-                    </div>
-
-                    @if (!profile()?.financial_restricted) {
-                      <ng-container
-                        *ngTemplateOutlet="
-                          paymentLines;
-                          context: { lines: agreement.payment_lines }
-                        "
-                      ></ng-container>
-                    }
-                  </div>
-                }
-              </div>
-            }
-          </div>
-
-          <!-- 3. MAINTENANCE & WORK ORDERS BENTO CARD -->
-          <div class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-2xs space-y-4">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div class="flex items-center gap-2.5">
-                <div
-                  class="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold text-xs"
-                >
-                  03
+                  }
                 </div>
-                <div>
-                  <h2 class="text-base font-extrabold text-slate-900">Maintenance & Work Orders</h2>
-                  <p class="text-xs text-slate-500">
-                    Service requests, repairs, and maintenance activities
-                  </p>
-                </div>
-              </div>
-              <span
-                class="text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200"
-              >
-                {{ profile()?.work_orders?.length || 0 }} Records
-              </span>
+              }
             </div>
 
-            @if (!profile()?.work_orders?.length) {
-              <div class="p-8 text-center text-slate-500 text-xs font-medium">
-                No maintenance work orders logged for this property.
+            <!-- CARD 3.2: MAINTENANCE & WORK ORDERS -->
+            <div class="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xs space-y-3">
+              <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <div class="flex items-center gap-2">
+                  <div
+                    class="w-7 h-7 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center font-bold text-xs shrink-0"
+                  >
+                    03
+                  </div>
+                  <h3 class="text-sm font-extrabold text-slate-900">Maintenance Orders</h3>
+                </div>
+                <span
+                  class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200"
+                >
+                  {{ profile()?.work_orders?.length || 0 }}
+                </span>
               </div>
-            } @else {
-              <div class="space-y-4">
-                @for (workOrder of profile()?.work_orders || []; track workOrder.id) {
-                  <div class="p-4 rounded-xl border border-slate-200/80 bg-slate-50/50 space-y-3">
-                    <div class="flex flex-wrap items-center justify-between gap-2">
-                      <div class="flex items-center gap-3">
+
+              @if (!profile()?.work_orders?.length) {
+                <div
+                  class="p-6 text-center text-slate-400 text-xs font-medium bg-slate-50/50 rounded-xl border border-slate-100"
+                >
+                  No maintenance work orders logged.
+                </div>
+              } @else {
+                <div class="space-y-3">
+                  @for (workOrder of profile()?.work_orders || []; track workOrder.id) {
+                    <div class="p-3 rounded-xl border border-slate-200/80 bg-slate-50/60 space-y-2">
+                      <div class="flex items-center justify-between gap-1 flex-wrap">
                         <a
                           [routerLink]="['/app/maintenance/work-orders', workOrder.id]"
-                          class="font-extrabold text-emerald-700 hover:text-emerald-800 hover:underline text-sm"
+                          class="font-extrabold text-amber-800 hover:text-amber-900 hover:underline text-xs"
                         >
                           {{ workOrder.work_order_no }}
                         </a>
-                        <span
-                          class="px-2 py-0.5 rounded text-[11px] font-extrabold uppercase bg-slate-200 text-slate-800"
-                        >
-                          {{ workOrder.priority }}
-                        </span>
-                        <bm-status-badge [status]="workOrder.status"></bm-status-badge>
+                        <div class="flex items-center gap-1">
+                          <span
+                            class="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-200 text-slate-800"
+                          >
+                            {{ workOrder.priority }}
+                          </span>
+                          <bm-status-badge [status]="workOrder.status"></bm-status-badge>
+                        </div>
                       </div>
-                      <div class="text-xs text-slate-600 font-semibold">
+
+                      <div class="text-[11px] font-bold text-slate-900">
+                        {{ workOrder.title }}
+                      </div>
+
+                      <div class="text-[10px] text-slate-600">
                         Vendor:
-                        <strong class="text-slate-900">{{
-                          workOrder.vendor?.display_name || 'No vendor assigned'
+                        <strong class="text-slate-800">{{
+                          workOrder.vendor?.display_name || 'No vendor'
                         }}</strong>
                       </div>
-                    </div>
 
-                    <div class="text-xs font-bold text-slate-900">
-                      {{ workOrder.title }}
+                      @if (!profile()?.financial_restricted && workOrder.payments.length) {
+                        <ng-container
+                          *ngTemplateOutlet="paymentLines; context: { lines: workOrder.payments }"
+                        ></ng-container>
+                      }
                     </div>
-
-                    @if (!profile()?.financial_restricted && workOrder.payments.length) {
-                      <ng-container
-                        *ngTemplateOutlet="paymentLines; context: { lines: workOrder.payments }"
-                      ></ng-container>
-                    }
-                  </div>
-                }
-              </div>
-            }
+                  }
+                </div>
+              }
+            </div>
           </div>
         </div>
 
-        <!-- REUSABLE PAYMENT LINES TABLE TEMPLATE -->
+        <!-- REUSABLE PAYMENT LINES TABLE TEMPLATE (Compact) -->
         <ng-template #paymentLines let-lines="lines">
-          <div class="mt-2 overflow-x-auto rounded-xl border border-slate-200/60 bg-white">
-            <table class="w-full text-left text-[11px] border-collapse">
-              <thead>
-                <tr
-                  class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-200/80"
-                >
-                  <th class="py-2 px-3">Line #</th>
-                  <th class="py-2 px-3">Due Date</th>
-                  <th class="py-2 px-3">Amount</th>
-                  <th class="py-2 px-3">Balance</th>
-                  <th class="py-2 px-3 text-right">Receipt Reference</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100 font-medium">
-                @for (line of lines; track line.id) {
-                  <tr class="hover:bg-slate-50/80 transition-colors">
-                    <td class="py-2 px-3 font-bold text-slate-800">#{{ line.line_no }}</td>
-                    <td class="py-2 px-3 text-slate-600 tabular-nums font-mono">
-                      {{ line.due_date || '—' }}
-                    </td>
-                    <td class="py-2 px-3 font-bold text-slate-900 tabular-nums">
-                      <div class="flex items-center">
-                        <dirham-symbol
-                          size="0.85em"
-                          weight="bold"
-                          class="mr-1 text-slate-400 select-none"
-                        ></dirham-symbol>
-                        <span>{{ money(line.amount) }}</span>
-                      </div>
-                    </td>
-                    <td class="py-2 px-3 font-bold text-slate-900 tabular-nums">
-                      <div class="flex items-center">
-                        <dirham-symbol
-                          size="0.85em"
-                          weight="bold"
-                          class="mr-1 text-slate-400 select-none"
-                        ></dirham-symbol>
-                        <span>{{ money(line.balance) }}</span>
-                      </div>
-                    </td>
-                    <td class="py-2 px-3 text-right">
-                      @if (line.receipt) {
-                        <a
-                          [routerLink]="receiptRoute(line.receipt.direction)"
-                          class="inline-flex items-center gap-1 text-emerald-700 hover:text-emerald-800 font-bold hover:underline"
-                        >
-                          <span>{{ line.receipt.document_no }}</span>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="h-3 w-3"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                            />
-                          </svg>
-                        </a>
-                      } @else {
-                        <span class="text-slate-400">—</span>
-                      }
-                    </td>
+          @if (lines?.length) {
+            <div class="mt-2 overflow-x-auto rounded-lg border border-slate-200/60 bg-white">
+              <table class="w-full text-left text-[10px] border-collapse">
+                <thead>
+                  <tr
+                    class="bg-slate-50 text-slate-500 font-bold uppercase border-b border-slate-200/80"
+                  >
+                    <th class="py-1 px-2">Line</th>
+                    <th class="py-1 px-2">Due Date</th>
+                    <th class="py-1 px-2">Amount</th>
+                    <th class="py-1 px-2">Balance</th>
+                    <th class="py-1 px-2 text-right">Receipt</th>
                   </tr>
-                }
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody class="divide-y divide-slate-100 font-medium">
+                  @for (line of lines; track line.id) {
+                    <tr class="hover:bg-slate-50/80 transition-colors">
+                      <td class="py-1 px-2 font-bold text-slate-800">#{{ line.line_no }}</td>
+                      <td class="py-1 px-2 text-slate-600 font-mono">
+                        {{ formatDate(line.due_date) }}
+                      </td>
+                      <td class="py-1 px-2 font-bold text-slate-900">
+                        <div class="flex items-center">
+                          <dirham-symbol
+                            size="0.8em"
+                            weight="bold"
+                            class="mr-0.5 text-slate-400 select-none"
+                          ></dirham-symbol>
+                          <span>{{ money(line.amount) }}</span>
+                        </div>
+                      </td>
+                      <td class="py-1 px-2 font-bold text-slate-900">
+                        <div class="flex items-center">
+                          <dirham-symbol
+                            size="0.8em"
+                            weight="bold"
+                            class="mr-0.5 text-slate-400 select-none"
+                          ></dirham-symbol>
+                          <span>{{ money(line.balance) }}</span>
+                        </div>
+                      </td>
+                      <td class="py-1 px-2 text-right">
+                        @if (line.receipt) {
+                          <a
+                            [routerLink]="receiptRoute(line.receipt.direction)"
+                            class="inline-flex items-center gap-0.5 text-emerald-700 hover:text-emerald-800 font-bold underline text-[10px]"
+                          >
+                            <span>{{ line.receipt.document_no }}</span>
+                          </a>
+                        } @else {
+                          <span class="text-slate-300">—</span>
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
         </ng-template>
       }
     </div>
   `,
 })
 export class PropertyDetailComponent implements OnInit {
+  formatDate = formatUaeDate;
   private api = inject(PropertiesApiService);
   private route = inject(ActivatedRoute);
 
@@ -997,6 +1039,34 @@ export class PropertyDetailComponent implements OnInit {
 
   formatType(val: string): string {
     return (val || '').replace(/_/g, ' ');
+  }
+
+  utilityDetails(): Property['utility_details'] {
+    const property = this.property();
+    if (!property) return [];
+    if (property.utility_details?.length) return property.utility_details;
+
+    const utilities: NonNullable<Property['utility_details']> = [];
+    if (property.electricity_provider || property.electricity_account_number)
+      utilities.push({
+        type: 'electricity',
+        provider: property.electricity_provider,
+        account_number: property.electricity_account_number,
+      });
+    if (property.cooling_provider || property.cooling_account_number)
+      utilities.push({
+        type: 'cooling',
+        provider: property.cooling_provider,
+        account_number: property.cooling_account_number,
+      });
+    if (property.gas_provider || property.gas_connection_type || property.gas_connection_number)
+      utilities.push({
+        type: 'gas',
+        provider: property.gas_provider,
+        connection_type: property.gas_connection_type,
+        connection_number: property.gas_connection_number,
+      });
+    return utilities;
   }
 
   money(value: number | string | undefined): string {

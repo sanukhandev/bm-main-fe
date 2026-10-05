@@ -22,6 +22,7 @@ import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm
 import { BmLoadingStateComponent } from '../../shared/components/bm-loading-state/bm-loading-state.component';
 import { BmPageHeaderComponent } from '../../shared/components/bm-page-header/bm-page-header.component';
 import { BmStatusBadgeComponent } from '../../shared/components/bm-status-badge/bm-status-badge.component';
+import { formatUaeDate } from '../../shared/utils/uae-formatters';
 
 @Component({
   selector: 'bm-reports',
@@ -277,6 +278,7 @@ import { BmStatusBadgeComponent } from '../../shared/components/bm-status-badge/
   `,
 })
 export class ReportsComponent implements OnInit, OnDestroy {
+  formatDate = formatUaeDate;
   private api = inject(ReportsApiService);
   private route = inject(ActivatedRoute);
   private auth = inject(AuthService);
@@ -441,7 +443,9 @@ export class ReportsComponent implements OnInit, OnDestroy {
   }
   display(row: ReportRow, key: string): string {
     const value = row[key];
-    return key.includes('amount') || key.includes('cash_') || key === 'net' || key.includes('total')
+    return ['date', 'start_date', 'end_date', 'due_date', 'transaction_date'].includes(key)
+      ? this.formatDate(String(value || ''))
+      : key.includes('amount') || key.includes('cash_') || key === 'net' || key.includes('total')
       ? `AED ${this.money(this.scalar(value))}`
       : this.value(row, key);
   }

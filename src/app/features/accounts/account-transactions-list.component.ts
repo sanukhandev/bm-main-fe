@@ -19,6 +19,7 @@ import { BmConfirmDialogComponent } from '../../shared/components/bm-confirm-dia
 import { BmReceiptChequeModalComponent } from '../../shared/components/bm-receipt-cheque-modal/bm-receipt-cheque-modal.component';
 import { ChequeAction, chequeActions, InFlightGuard } from '../../shared/models/payment.models';
 import { PaginationMeta } from '../../core/api/api.models';
+import { formatUaeDate } from '../../shared/utils/uae-formatters';
 
 @Component({
   selector: 'bm-account-transactions-list',
@@ -132,7 +133,7 @@ import { PaginationMeta } from '../../core/api/api.models';
                   <td class="p-4 font-semibold text-slate-800 tabular-nums">
                     {{ row.document_no }}
                   </td>
-                  <td class="p-4 text-slate-600 tabular-nums">{{ row.transaction_date }}</td>
+                  <td class="p-4 text-slate-600 tabular-nums">{{ formatDate(row.transaction_date) }}</td>
                   <td class="p-4 font-medium text-slate-900">
                     {{ row.party?.display_name || 'Miscellaneous' }}
                   </td>
@@ -144,7 +145,7 @@ import { PaginationMeta } from '../../core/api/api.models';
                         Cheque {{ row.cheque_no }} · {{ chequeLabel(row.cheque_status) }}
                       </div>
                       <div class="text-[10px] text-slate-500">
-                        {{ row.cheque_date }} · {{ row.bank_name || '—' }}
+                        {{ formatDate(row.cheque_date) }} · {{ row.bank_name || '—' }}
                       </div>
                     }
                   </td>
@@ -312,6 +313,7 @@ import { PaginationMeta } from '../../core/api/api.models';
   `,
 })
 export class AccountTransactionsListComponent implements OnInit {
+  formatDate = formatUaeDate;
   private api = inject(AccountsApiService);
   private auth = inject(AuthService);
   private route = inject(ActivatedRoute);

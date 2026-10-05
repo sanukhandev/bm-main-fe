@@ -1,13 +1,13 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { BmPageHeaderComponent } from '../../shared/components/bm-page-header/bm-page-header.component';
 import { BmLoadingStateComponent } from '../../shared/components/bm-loading-state/bm-loading-state.component';
 import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm-error-state.component';
 import { PropertiesApiService } from '../../core/api/properties-api.service';
 import { CustomersApiService } from '../../core/api/customers-api.service';
-import { PropertyType } from '../../shared/models/property.models';
+import { Property, PropertyType, PropertyUtility, PropertyUtilityType } from '../../shared/models/property.models';
 import { Customer } from '../../shared/models/customer.models';
 
 import {
@@ -251,6 +251,7 @@ import {
                   <option value="labor_camp">Labor Camp</option>
                   <option value="warehouse">Warehouse</option>
                   <option value="land">Land</option>
+                  <option value="garage">Garage</option>
                 </select>
               </div>
 
@@ -379,77 +380,69 @@ import {
             </div>
           </div>
 
-          <!-- SECTION 4: Utility Connections -->
+          <!-- SECTION 4: Utility Details -->
           <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
             <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
               <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
                 <span class="text-sm font-extrabold">U</span>
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">Utility Connections</h3>
-                <p class="text-xs text-slate-500 font-normal">Optional UAE electricity, cooling, and gas account details</p>
+                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">Utility Details</h3>
+                <p class="text-xs text-slate-500 font-normal">Add optional utility connections and included furniture</p>
               </div>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-              <div>
-                <label class="block text-[13px] font-semibold text-[#26312C] mb-2">Electricity Provider</label>
-                <select formControlName="electricity_provider" class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10">
-                  <option value="">Not specified</option>
-                  <option value="dewa">DEWA</option>
-                  <option value="addc">ADDC</option>
-                  <option value="aadc">AADC</option>
-                  <option value="sewa">SEWA</option>
-                  <option value="etihadwe">EtihadWE (formerly FEWA)</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-[13px] font-semibold text-[#26312C] mb-2">Electricity Account Number</label>
-                <input type="text" formControlName="electricity_account_number" placeholder="DEWA / utility account number" class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10" />
-              </div>
-              <div>
-                <label class="block text-[13px] font-semibold text-[#26312C] mb-2">Cooling Provider</label>
-                <select formControlName="cooling_provider" class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10">
-                  <option value="">Not specified</option>
-                  <option value="empower">Empower</option>
-                  <option value="emicool">Emicool</option>
-                  <option value="tabreed">Tabreed</option>
-                  <option value="nakheel">Nakheel / Palm Utilities</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-[13px] font-semibold text-[#26312C] mb-2">Cooling Account Number</label>
-                <input type="text" formControlName="cooling_account_number" placeholder="District cooling account number" class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10" />
-              </div>
-              <div>
-                <label class="block text-[13px] font-semibold text-[#26312C] mb-2">Gas Provider</label>
-                <select formControlName="gas_provider" class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10">
-                  <option value="">Not specified</option>
-                  <option value="emirates_gas">Emirates Gas</option>
-                  <option value="enoc">ENOC</option>
-                  <option value="adnoc">ADNOC Distribution</option>
-                  <option value="lootah_gas">Lootah Gas</option>
-                  <option value="dubai_gas">Dubai Gas</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-[13px] font-semibold text-[#26312C] mb-2">Gas Connection Type</label>
-                <select formControlName="gas_connection_type" class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10">
-                  <option value="">Not specified</option>
-                  <option value="piped_gas">Piped gas</option>
-                  <option value="lpg_cylinder">LPG cylinder</option>
-                  <option value="bulk_lpg">Bulk LPG</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-              <div class="md:col-span-2">
-                <label class="block text-[13px] font-semibold text-[#26312C] mb-2">Gas Connection Number</label>
-                <input type="text" formControlName="gas_connection_number" placeholder="Gas account or connection number" class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10" />
-              </div>
+            <div formArrayName="utility_details" class="space-y-4">
+              @for (utility of utilityRows().controls; track $index) {
+                <div [formGroupName]="$index" class="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 space-y-4">
+                  <div class="flex items-center justify-between gap-3">
+                    <label class="text-[13px] font-semibold text-[#26312C]">Utility Type</label>
+                    <button type="button" (click)="removeUtilityRow($index)" class="text-xs font-semibold text-rose-600 hover:text-rose-800">Remove</button>
+                  </div>
+                  <select formControlName="type" (change)="onUtilityTypeChange($index)" class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10">
+                    <option value="electricity">Electricity</option>
+                    <option value="cooling">Cooling</option>
+                    <option value="gas">Gas connection</option>
+                    <option value="furniture">Furniture</option>
+                  </select>
+                  @if (utility.get('type')?.value === 'furniture') {
+                    <div>
+                      <label class="block text-[13px] font-semibold text-[#26312C] mb-2">Included furniture</label>
+                      <textarea formControlName="details" rows="3" placeholder="e.g. Sofa, dining table, beds, curtains..." class="w-full p-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10"></textarea>
+                    </div>
+                  } @else {
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label class="block text-[13px] font-semibold text-[#26312C] mb-2">Provider</label>
+                        <select formControlName="provider" class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10">
+                          <option value="">Not specified</option>
+                          @for (provider of providerOptions(utility.get('type')?.value); track provider.value) {
+                            <option [value]="provider.value">{{ provider.label }}</option>
+                          }
+                        </select>
+                      </div>
+                      @if (utility.get('type')?.value === 'gas') {
+                        <div>
+                          <label class="block text-[13px] font-semibold text-[#26312C] mb-2">Connection type</label>
+                          <select formControlName="connection_type" class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10">
+                            <option value="">Not specified</option><option value="piped_gas">Piped gas</option><option value="lpg_cylinder">LPG cylinder</option><option value="bulk_lpg">Bulk LPG</option><option value="other">Other</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label class="block text-[13px] font-semibold text-[#26312C] mb-2">Connection number</label>
+                          <input type="text" formControlName="connection_number" placeholder="Gas account or connection number" class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10" />
+                        </div>
+                      } @else {
+                        <div>
+                          <label class="block text-[13px] font-semibold text-[#26312C] mb-2">Account number</label>
+                          <input type="text" formControlName="account_number" placeholder="Utility account number" class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10" />
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              }
             </div>
+            <button type="button" (click)="addUtilityRow()" class="mt-4 px-4 py-2.5 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-800 text-sm font-semibold hover:bg-emerald-100">+ Add utility</button>
           </div>
 
           <!-- SECTION 5: Notes & Specifications -->
@@ -584,13 +577,7 @@ export class PropertyFormComponent implements OnInit {
     state_or_emirate: ['Dubai'],
     country_code: ['AE'],
     area: [''],
-    electricity_provider: [''],
-    electricity_account_number: [''],
-    cooling_provider: [''],
-    cooling_account_number: [''],
-    gas_provider: [''],
-    gas_connection_type: [''],
-    gas_connection_number: [''],
+    utility_details: this.fb.array([]),
     notes: [''],
   });
 
@@ -669,15 +656,9 @@ export class PropertyFormComponent implements OnInit {
           state_or_emirate: p.state_or_emirate || 'Dubai',
           country_code: p.country_code || 'AE',
           area: p.area !== null && p.area !== undefined ? String(p.area) : '',
-          electricity_provider: p.electricity_provider || '',
-          electricity_account_number: p.electricity_account_number || '',
-          cooling_provider: p.cooling_provider || '',
-          cooling_account_number: p.cooling_account_number || '',
-          gas_provider: p.gas_provider || '',
-          gas_connection_type: p.gas_connection_type || '',
-          gas_connection_number: p.gas_connection_number || '',
           notes: p.notes || '',
         });
+        this.setUtilityRows(p);
         this.isLoading.set(false);
       },
       error: (err) => {
@@ -713,13 +694,7 @@ export class PropertyFormComponent implements OnInit {
       state_or_emirate: val.state_or_emirate || null,
       country_code: val.country_code || 'AE',
       area: val.area || null,
-      electricity_provider: val.electricity_provider || null,
-      electricity_account_number: val.electricity_account_number || null,
-      cooling_provider: val.cooling_provider || null,
-      cooling_account_number: val.cooling_account_number || null,
-      gas_provider: val.gas_provider || null,
-      gas_connection_type: val.gas_connection_type || null,
-      gas_connection_number: val.gas_connection_number || null,
+      utility_details: ((val.utility_details || []) as PropertyUtility[]).filter((utility) => this.hasUtilityValue(utility)),
       notes: val.notes || null,
     };
 
@@ -756,5 +731,56 @@ export class PropertyFormComponent implements OnInit {
         },
       });
     }
+  }
+
+  utilityRows(): FormArray {
+    return this.propertyForm.get('utility_details') as FormArray;
+  }
+
+  addUtilityRow(type?: PropertyUtilityType, utility: Partial<PropertyUtility> = {}): void {
+    const selectedType = type || (['electricity', 'cooling', 'gas', 'furniture'] as PropertyUtilityType[]).find((candidate) =>
+      !this.utilityRows().value.some((row: PropertyUtility) => row.type === candidate),
+    );
+    if (!selectedType) return;
+
+    this.utilityRows().push(this.fb.group({
+      type: [selectedType, Validators.required],
+      provider: [utility.provider || ''],
+      account_number: [utility.account_number || ''],
+      connection_type: [utility.connection_type || ''],
+      connection_number: [utility.connection_number || ''],
+      details: [utility.details || ''],
+    }));
+  }
+
+  removeUtilityRow(index: number): void { this.utilityRows().removeAt(index); }
+
+  onUtilityTypeChange(index: number): void {
+    const row = this.utilityRows().at(index);
+    row.patchValue({ provider: '', account_number: '', connection_type: '', connection_number: '', details: '' }, { emitEvent: false });
+  }
+
+  providerOptions(type: string | null | undefined): { value: string; label: string }[] {
+    if (type === 'electricity') return [{ value: 'dewa', label: 'DEWA' }, { value: 'addc', label: 'ADDC' }, { value: 'aadc', label: 'AADC' }, { value: 'sewa', label: 'SEWA' }, { value: 'etihadwe', label: 'EtihadWE (formerly FEWA)' }, { value: 'other', label: 'Other' }];
+    if (type === 'cooling') return [{ value: 'empower', label: 'Empower' }, { value: 'emicool', label: 'Emicool' }, { value: 'tabreed', label: 'Tabreed' }, { value: 'nakheel', label: 'Nakheel / Palm Utilities' }, { value: 'other', label: 'Other' }];
+    return [{ value: 'emirates_gas', label: 'Emirates Gas' }, { value: 'enoc', label: 'ENOC' }, { value: 'adnoc', label: 'ADNOC Distribution' }, { value: 'lootah_gas', label: 'Lootah Gas' }, { value: 'dubai_gas', label: 'Dubai Gas' }, { value: 'other', label: 'Other' }];
+  }
+
+  private setUtilityRows(property: Property): void {
+    this.utilityRows().clear();
+    const utilities = property.utility_details?.length ? property.utility_details : this.legacyUtilities(property);
+    utilities.forEach((utility) => this.addUtilityRow(utility.type, utility));
+  }
+
+  private legacyUtilities(property: Property): PropertyUtility[] {
+    const utilities: PropertyUtility[] = [];
+    if (property.electricity_provider || property.electricity_account_number) utilities.push({ type: 'electricity', provider: property.electricity_provider, account_number: property.electricity_account_number });
+    if (property.cooling_provider || property.cooling_account_number) utilities.push({ type: 'cooling', provider: property.cooling_provider, account_number: property.cooling_account_number });
+    if (property.gas_provider || property.gas_connection_type || property.gas_connection_number) utilities.push({ type: 'gas', provider: property.gas_provider, connection_type: property.gas_connection_type, connection_number: property.gas_connection_number });
+    return utilities;
+  }
+
+  private hasUtilityValue(utility: any): boolean {
+    return Object.entries(utility || {}).some(([key, value]) => key !== 'type' && String(value || '').trim() !== '');
   }
 }

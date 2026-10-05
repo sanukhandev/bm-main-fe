@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { BillingApiService } from '../../core/api/billing-api.service';
 import { BillingPayment, Invoice, Quotation } from '../../shared/models/billing.models';
 import { BmStatusBadgeComponent } from '../../shared/components/bm-status-badge/bm-status-badge.component';
+import { formatUaeDate } from '../../shared/utils/uae-formatters';
 
 @Component({
   selector: 'bm-billing-detail',
@@ -115,7 +116,7 @@ import { BmStatusBadgeComponent } from '../../shared/components/bm-status-badge/
                 {{ type() === 'quotations' ? 'Quotation Date' : 'Invoice Date' }}
               </span>
               <span class="text-sm font-bold text-slate-900 mt-1 block tabular-nums">
-                {{ date(record()!) }}
+                {{ formatDate(date(record()!)) }}
               </span>
             </div>
 
@@ -124,7 +125,7 @@ import { BmStatusBadgeComponent } from '../../shared/components/bm-status-badge/
                 {{ type() === 'quotations' ? 'Valid Until' : 'Due Date' }}
               </span>
               <span class="text-sm font-bold text-slate-900 mt-1 block tabular-nums">
-                {{ secondaryDate(record()!) || '—' }}
+                {{ formatDate(secondaryDate(record()!)) }}
               </span>
             </div>
 
@@ -620,6 +621,7 @@ import { BmStatusBadgeComponent } from '../../shared/components/bm-status-badge/
   `,
 })
 export class BillingDetailComponent {
+  formatDate = formatUaeDate;
   private api = inject(BillingApiService);
   private route = inject(ActivatedRoute);
 

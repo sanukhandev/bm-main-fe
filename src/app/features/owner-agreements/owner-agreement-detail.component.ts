@@ -335,30 +335,32 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                   <div>
                     <span
                       class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 block mb-0.5"
-                      >Managed Property</span
-                    >
-                    @if (propertiesList().length > 0) {
-                      <div class="font-bold text-white text-sm truncate">
-                        {{ propertiesList()[0].name }}
-                      </div>
-                      <a
-                        [routerLink]="['/app/properties', propertiesList()[0].id]"
-                        class="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-400 hover:text-emerald-300 mt-1"
+                      >Managed Properties</span
                       >
-                        <span
-                          >Unit {{ propertiesList()[0].unit_number }} ({{
-                            propertiesList()[0].property_code
-                          }})</span
-                        >
-                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M9 5l7 7-7 7"
-                          />
-                        </svg>
-                      </a>
+                    @if (propertiesList().length > 0) {
+                      <div class="space-y-2 max-h-32 overflow-y-auto pr-1">
+                        @for (property of propertiesList(); track property.id) {
+                          <div>
+                            <div class="font-bold text-white text-sm truncate">
+                              {{ property.name || 'Unnamed property' }}
+                            </div>
+                            <a
+                              [routerLink]="['/app/properties', property.id]"
+                              class="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-400 hover:text-emerald-300 mt-1"
+                            >
+                              <span>Unit {{ property.unit_number || '—' }} ({{ property.property_code || '—' }})</span>
+                              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M9 5l7 7-7 7"
+                                />
+                              </svg>
+                            </a>
+                          </div>
+                        }
+                      </div>
                     } @else {
                       <div class="text-slate-400 italic">No asset linked</div>
                     }

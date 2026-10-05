@@ -335,35 +335,26 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                   <div>
                     <span
                       class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 block mb-0.5"
-                      >Managed Properties</span
-                      >
-                    @if (propertiesList().length > 0) {
-                      <div class="space-y-2 max-h-32 overflow-y-auto pr-1">
-                        @for (property of propertiesList(); track property.id) {
-                          <div>
-                            <div class="font-bold text-white text-sm truncate">
-                              {{ property.name || 'Unnamed property' }}
-                            </div>
-                            <a
-                              [routerLink]="['/app/properties', property.id]"
-                              class="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-400 hover:text-emerald-300 mt-1"
-                            >
-                              <span>Unit {{ property.unit_number || '—' }} ({{ property.property_code || '—' }})</span>
-                              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="M9 5l7 7-7 7"
-                                />
-                              </svg>
-                            </a>
-                          </div>
-                        }
-                      </div>
-                    } @else {
-                      <div class="text-slate-400 italic">No asset linked</div>
-                    }
+                      >Managed Portfolio</span
+                    >
+                    <div class="font-bold text-white text-sm">
+                      {{ propertiesList().length }}
+                      {{ propertiesList().length === 1 ? 'Property' : 'Properties' }} Linked
+                    </div>
+                    <a
+                      href="#linked-properties-section"
+                      class="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-400 hover:text-emerald-300 mt-1"
+                    >
+                      <span>View property list below</span>
+                      <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </a>
                   </div>
                 </div>
               </div>
@@ -523,6 +514,210 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
           </div>
         </div>
 
+        <!-- SECOND ROW: INTERACTIVE MANAGED PROPERTIES SECTION -->
+        <div
+          id="linked-properties-section"
+          class="bg-white rounded-[22px] p-6 lg:p-8 border border-slate-200/90 shadow-xs mb-8"
+        >
+          <div
+            class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-6 border-b border-slate-100"
+          >
+            <div class="flex items-center gap-2.5">
+              <div
+                class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                  />
+                </svg>
+              </div>
+              <div>
+                <div class="flex items-center gap-2.5">
+                  <h3 class="text-lg font-semibold text-slate-900 tracking-tight">
+                    Managed Assets & Linked Properties
+                  </h3>
+                  <span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60"
+                  >
+                    {{ propertiesList().length }}
+                    {{ propertiesList().length === 1 ? 'Property' : 'Properties' }}
+                  </span>
+                </div>
+                <p class="text-xs text-slate-500 font-normal mt-0.5">
+                  Real estate assets under management contract #{{ agreement()!.agreement_no }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Property Filter Search Bar -->
+            @if (propertiesList().length > 1) {
+              <div class="relative max-w-xs w-full sm:w-auto">
+                <input
+                  type="text"
+                  [ngModel]="propertySearchQuery()"
+                  (ngModelChange)="propertySearchQuery.set($event)"
+                  placeholder="Search properties by name, code, or unit..."
+                  class="bm-input text-xs pl-8 py-1.5 rounded-xl border-slate-200"
+                />
+                <svg
+                  class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+            }
+          </div>
+
+          @if (filteredProperties().length > 0) {
+            <!-- Interactive Properties Cards Row -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              @for (property of filteredProperties(); track property.id) {
+                <div
+                  class="group bg-gradient-to-br from-white via-slate-50/50 to-slate-50 rounded-2xl border border-slate-200/90 p-4 shadow-2xs hover:shadow-md hover:border-emerald-300 transition-all duration-200 flex flex-col justify-between"
+                >
+                  <div>
+                    <div class="flex items-start justify-between gap-2 mb-2">
+                      <div class="flex items-center gap-2.5 min-w-0">
+                        <span
+                          class="w-8 h-8 rounded-xl bg-emerald-100/80 text-emerald-800 flex items-center justify-center text-xs font-bold shrink-0 shadow-2xs"
+                        >
+                          <svg
+                            class="w-4 h-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                            />
+                          </svg>
+                        </span>
+                        <div class="min-w-0">
+                          <h4
+                            class="font-bold text-slate-900 text-sm group-hover:text-emerald-700 transition-colors truncate"
+                          >
+                            {{ property.name || 'Unnamed Property' }}
+                          </h4>
+                          <span class="text-[11px] font-mono text-slate-500 block truncate">
+                            Code: {{ property.property_code || '—' }}
+                          </span>
+                        </div>
+                      </div>
+                      <span
+                        class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold border shrink-0 capitalize"
+                        [ngClass]="propertyStatusBadge(property.status)"
+                      >
+                        {{ formatPropertyStatus(property.status) }}
+                      </span>
+                    </div>
+
+                    <!-- Property Info Strip -->
+                    <div
+                      class="mt-3 py-2.5 px-3 rounded-xl bg-slate-100/80 grid grid-cols-2 gap-2 text-xs border border-slate-200/50"
+                    >
+                      <div>
+                        <span
+                          class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block"
+                          >Unit Number</span
+                        >
+                        <span class="font-bold text-slate-800">{{
+                          property.unit_number || '—'
+                        }}</span>
+                      </div>
+                      <div>
+                        <span
+                          class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block"
+                          >Type</span
+                        >
+                        <span class="font-medium text-slate-700 capitalize">{{
+                          property.property_type || property.category || 'Residential'
+                        }}</span>
+                      </div>
+                      @if (property.address || property.location) {
+                        <div
+                          class="col-span-2 pt-1 border-t border-slate-200/60 text-[11px] text-slate-600 truncate"
+                        >
+                          <span class="text-slate-400">Location:</span>
+                          {{ property.address || property.location }}
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <div
+                    class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs"
+                  >
+                    <span class="text-slate-400 text-[11px] font-medium">Managed Asset</span>
+                    <a
+                      [routerLink]="['/app/properties', property.id]"
+                      class="inline-flex items-center gap-1 font-semibold text-emerald-700 hover:text-emerald-800 transition group-hover:translate-x-0.5 transform"
+                    >
+                      <span>View Property Details</span>
+                      <svg
+                        class="w-3.5 h-3.5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              }
+            </div>
+          } @else {
+            <div
+              class="p-8 text-center bg-slate-50/60 rounded-2xl border border-dashed border-slate-200 text-slate-500 text-xs"
+            >
+              <svg
+                class="w-8 h-8 text-slate-400 mx-auto mb-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.5"
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                />
+              </svg>
+              @if (propertiesList().length === 0) {
+                <span>No properties linked to this owner management agreement.</span>
+              } @else {
+                <span>No properties match your search filter "{{ propertySearchQuery() }}".</span>
+              }
+            </div>
+          }
+        </div>
+
         <!-- PAYMENT SCHEDULE SECTION -->
         <div class="bg-white rounded-[22px] p-6 lg:p-8 border border-slate-200/90 shadow-xs mb-8">
           <div class="flex items-center justify-between pb-4 mb-6 border-b border-slate-100">
@@ -635,8 +830,6 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                   <th class="py-3.5 px-4">Transaction Reference</th>
                   <th class="py-3.5 px-4 w-28">Method</th>
                   <th class="py-3.5 px-4 w-32 text-right">Scheduled</th>
-                  <th class="py-3.5 px-4 w-32 text-right">Paid</th>
-                  <th class="py-3.5 px-4 w-32 text-right">Balance</th>
                   <th class="py-3.5 px-4 w-28 text-center">Status</th>
                   @if (canPostPayments()) {
                     <th class="py-3.5 px-4 w-28 text-right">Actions</th>
@@ -679,18 +872,6 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                     >
                       <span class="text-[11px] text-slate-400 mr-1">AED</span
                       >{{ formatAmount(item.amount) }}
-                    </td>
-                    <td
-                      class="py-3.5 px-4 text-right whitespace-nowrap tabular-nums font-medium text-emerald-700"
-                    >
-                      <span class="text-[11px] text-slate-400 mr-1">AED</span
-                      >{{ formatAmount(item.paid_amount) }}
-                    </td>
-                    <td
-                      class="py-3.5 px-4 text-right whitespace-nowrap tabular-nums font-semibold text-slate-900"
-                    >
-                      <span class="text-[11px] text-slate-400 mr-1">AED</span
-                      >{{ formatAmount(item.balance) }}
                     </td>
                     <td class="py-3.5 px-4 text-center">
                       <span
@@ -853,18 +1034,6 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                       Scheduled:
                       <span class="font-semibold text-slate-900 tabular-nums"
                         >AED {{ formatAmount(item.amount) }}</span
-                      >
-                    </div>
-                    <div>
-                      Balance:
-                      <span class="font-semibold text-slate-900 tabular-nums"
-                        >AED {{ formatAmount(item.balance) }}</span
-                      >
-                    </div>
-                    <div>
-                      Paid:
-                      <span class="font-semibold text-emerald-700 tabular-nums"
-                        >AED {{ formatAmount(item.paid_amount) }}</span
                       >
                     </div>
                   </div>
@@ -1749,6 +1918,41 @@ export class OwnerAgreementDetailComponent implements OnInit {
     if (Array.isArray(a.properties)) return a.properties;
     if ('data' in a.properties && Array.isArray(a.properties.data)) return a.properties.data;
     return [];
+  }
+
+  propertySearchQuery = signal('');
+
+  filteredProperties(): any[] {
+    const query = this.propertySearchQuery().toLowerCase().trim();
+    const list = this.propertiesList();
+    if (!query) return list;
+    return list.filter(
+      (p) =>
+        (p.name && p.name.toLowerCase().includes(query)) ||
+        (p.property_code && p.property_code.toLowerCase().includes(query)) ||
+        (p.unit_number && String(p.unit_number).toLowerCase().includes(query)) ||
+        (p.property_type && p.property_type.toLowerCase().includes(query)),
+    );
+  }
+
+  propertyStatusBadge(status?: string): string {
+    switch (status?.toLowerCase()) {
+      case 'occupied':
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200/80';
+      case 'vacant':
+      case 'available':
+        return 'bg-blue-50 text-blue-700 border-blue-200/80';
+      case 'under_maintenance':
+      case 'maintenance':
+        return 'bg-amber-50 text-amber-700 border-amber-200/80';
+      default:
+        return 'bg-slate-100 text-slate-700 border-slate-200/80';
+    }
+  }
+
+  formatPropertyStatus(status?: string): string {
+    if (!status) return 'Active';
+    return status.replace('_', ' ');
   }
 
   executeTerminate(): void {

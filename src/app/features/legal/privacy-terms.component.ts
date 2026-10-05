@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BmPageHeaderComponent } from '../../shared/components/bm-page-header/bm-page-header.component';
-import { uaeDateInput } from '../../shared/utils/uae-formatters';
+import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
 
 type LegalTab = 'all' | 'privacy' | 'terms';
 
@@ -347,7 +347,7 @@ type LegalTab = 'all' | 'privacy' | 'terms';
           <div class="text-left sm:text-right">
             <div>Document Ref: ERP-LEG-2026-V2.4</div>
             <div class="text-slate-400">
-              Printed: {{ currentDate | date: 'dd MMMM yyyy, HH:mm' }}
+              Printed: {{ formatDate(currentDate) }}
             </div>
           </div>
         </footer>
@@ -370,6 +370,7 @@ type LegalTab = 'all' | 'privacy' | 'terms';
   ],
 })
 export class PrivacyTermsComponent {
+  formatDate = formatUaeDate;
   activeTab = signal<LegalTab>('all');
   currentDate = new Date(`${uaeDateInput()}T12:00:00Z`);
 

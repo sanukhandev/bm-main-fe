@@ -12,7 +12,7 @@ import { PropertiesApiService } from '../../core/api/properties-api.service';
 import { Customer } from '../../shared/models/customer.models';
 import { Property } from '../../shared/models/property.models';
 import { InstallmentItem, OwnerAgreement, PaymentMode } from '../../shared/models/agreement.models';
-import { uaeDateInput } from '../../shared/utils/uae-formatters';
+import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
 
 import {
   BmComboboxComponent,
@@ -33,9 +33,11 @@ import {
     BmComboboxComponent,
   ],
   template: `
-    <div class="max-w-[1240px] w-full mx-auto pb-12 font-sans text-slate-900">
+    <div
+      class="max-w-[1400px] w-full mx-auto space-y-4 font-sans text-slate-900 pb-12 px-4 sm:px-6"
+    >
       <bm-page-header
-        [title]="isEditMode() ? 'Edit Tenant Agreement' : 'Create Tenant Agreement'"
+        [title]="isEditMode() ? 'Edit Tenant Lease' : 'Create Tenant Lease'"
         [subtitle]="
           isEditMode()
             ? 'Update agreement lease details and commercial schedule'
@@ -44,7 +46,7 @@ import {
       >
         <a
           routerLink="/app/tenant-agreements"
-          class="bm-btn bm-btn-secondary text-xs font-semibold px-4 py-2 rounded-xl border border-slate-200 shadow-xs hover:bg-slate-100 transition"
+          class="bm-btn bm-btn-secondary text-xs font-semibold px-3 py-1.5 rounded-xl border border-slate-200 shadow-xs"
         >
           Cancel
         </a>
@@ -55,7 +57,7 @@ import {
       } @else if (error()) {
         <bm-error-state [message]="error()!" (retry)="loadAgreement()"></bm-error-state>
       } @else {
-        <form [formGroup]="agreementForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        <form [formGroup]="agreementForm" (ngSubmit)="onSubmit()" class="space-y-4">
           <!-- Top Server Error Alert -->
           @if (serverError()) {
             <div
@@ -136,6 +138,16 @@ import {
                     Tenant customer selection is required.
                   </span>
                 }
+              </div>
+              <div>
+                <label class="block text-[13px] font-semibold text-[#26312C] mb-2">File No.</label>
+                <input
+                  type="text"
+                  formControlName="file_no"
+                  maxlength="100"
+                  placeholder="Manual file number (optional)"
+                  class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium placeholder:text-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10"
+                />
               </div>
             </div>
           </div>
@@ -258,8 +270,8 @@ import {
                     <strong class="text-slate-900">{{
                       ownerName(selectedOwnerAgreement())
                     }}</strong>
-                    · Valid: {{ selectedOwnerAgreement()?.start_date }} to
-                    {{ selectedOwnerAgreement()?.end_date }}
+                    · Valid: {{ formatDate(selectedOwnerAgreement()?.start_date) }} to
+                    {{ formatDate(selectedOwnerAgreement()?.end_date) }}
                   </div>
                 </div>
               </div>
@@ -500,7 +512,9 @@ import {
                     >
                       <th class="py-3 px-4">Payment No</th>
                       <th class="py-3 px-4">Due Date</th>
-                      <th class="py-3 px-4">Reference / Particulars <span class="text-rose-600">*</span></th>
+                      <th class="py-3 px-4">
+                        Reference / Particulars <span class="text-rose-600">*</span>
+                      </th>
                       <th class="py-3 px-4 text-right">Rent Installment Amount</th>
                     </tr>
                   </thead>
@@ -575,7 +589,7 @@ import {
                   [class.text-emerald-700]="scheduleMatchesTotal()"
                 >
                   AED {{ scheduleTotal() | number: '1.2-2' }} /
-                  {{ (agreementForm.value.total_amount || 0) | number: '1.2-2' }}
+                  {{ agreementForm.value.total_amount || 0 | number: '1.2-2' }}
                 </span>
               </div>
             } @else {
@@ -642,6 +656,7 @@ import {
   `,
 })
 export class TenantAgreementFormComponent implements OnInit {
+  formatDate = formatUaeDate;
   private fb = inject(FormBuilder);
   private api = inject(TenantAgreementsApiService);
   private ownerAgreementsApi = inject(OwnerAgreementsApiService);
@@ -699,9 +714,9 @@ export class TenantAgreementFormComponent implements OnInit {
   sourceOwnerAgreementOptions = computed<ComboboxOption[]>(() => {
     return this.ownerAgreements().map((oa) => ({
       id: oa.id,
-      label: `${oa.agreement_no} (${this.ownerName(oa)} · ${oa.start_date} – ${oa.end_date})`,
+      label: `${oa.agreement_no} (${this.ownerName(oa)} · ${this.formatDate(oa.start_date)} – ${this.formatDate(oa.end_date)})`,
       code: oa.agreement_no,
-      subtitle: `Valid ${oa.start_date} to ${oa.end_date}`,
+      subtitle: `Valid ${this.formatDate(oa.start_date)} to ${this.formatDate(oa.end_date)}`,
     }));
   });
 
@@ -710,12 +725,23 @@ export class TenantAgreementFormComponent implements OnInit {
   error = signal<string | null>(null);
   serverError = signal<string | null>(null);
   private availabilityRequest = 0;
-  scheduleDetails = signal<Record<number, { category: InstallmentItem['category']; particulars: string; due_date?: string; amount?: number }>>({});
+  scheduleDetails = signal<
+    Record<
+      number,
+      {
+        category: InstallmentItem['category'];
+        particulars: string;
+        due_date?: string;
+        amount?: number;
+      }
+    >
+  >({});
   private formVersion = signal(0);
   private scheduleInputSignature = '';
 
   agreementForm = this.fb.group({
     agreement_no: [''],
+    file_no: [''],
     tenant_customer_id: ['', Validators.required],
     source_owner_agreement_id: ['', Validators.required],
     selected_property_ids: this.fb.nonNullable.control<number[]>([], Validators.required),
@@ -756,7 +782,8 @@ export class TenantAgreementFormComponent implements OnInit {
       items.push({
         installment_number: i,
         due_date: this.scheduleDetails()[i]?.due_date || dueDate.toISOString().split('T')[0],
-        amount: this.scheduleDetails()[i]?.amount ?? (baseCents + (i === 1 ? remainderCents : 0)) / 100,
+        amount:
+          this.scheduleDetails()[i]?.amount ?? (baseCents + (i === 1 ? remainderCents : 0)) / 100,
         category: this.scheduleDetails()[i]?.category || 'rent',
         particulars: this.scheduleDetails()[i]?.particulars || '',
         status: 'pending',
@@ -766,42 +793,85 @@ export class TenantAgreementFormComponent implements OnInit {
     return items;
   });
 
-  scheduleTotal = computed(() => this.installmentPreview().reduce((total, item) => total + Number(item.amount || 0), 0));
+  scheduleTotal = computed(() =>
+    this.installmentPreview().reduce((total, item) => total + Number(item.amount || 0), 0),
+  );
 
-  scheduleMatchesTotal = computed(() => Math.round(this.scheduleTotal() * 100) === Math.round(Number(this.agreementForm.value.total_amount || 0) * 100));
+  scheduleMatchesTotal = computed(
+    () =>
+      Math.round(this.scheduleTotal() * 100) ===
+      Math.round(Number(this.agreementForm.value.total_amount || 0) * 100),
+  );
 
   scheduleReference(item: InstallmentItem): string {
-    const customerCode = this.tenants().find((tenant) => String(tenant.id) === String(this.agreementForm.value.tenant_customer_id))?.customer_code || 'CUSTOMER';
+    const customerCode =
+      this.tenants().find(
+        (tenant) => String(tenant.id) === String(this.agreementForm.value.tenant_customer_id),
+      )?.customer_code || 'CUSTOMER';
     return `${customerCode}/${this.agreementForm.value.agreement_no || 'AGREEMENT_PENDING'}/INWARD/${item.category.toUpperCase()}/${item.particulars || '[particulars required]'}`;
   }
 
   updateScheduleCategory(number: number, event: Event): void {
     const category = (event.target as HTMLSelectElement).value as InstallmentItem['category'];
-    this.scheduleDetails.update((details) => ({ ...details, [number]: { ...details[number], category, particulars: details[number]?.particulars || '' } }));
+    this.scheduleDetails.update((details) => ({
+      ...details,
+      [number]: { ...details[number], category, particulars: details[number]?.particulars || '' },
+    }));
   }
 
   updateScheduleParticulars(number: number, event: Event): void {
     const particulars = (event.target as HTMLInputElement).value;
-    this.scheduleDetails.update((details) => ({ ...details, [number]: { ...details[number], category: details[number]?.category || 'rent', particulars } }));
+    this.scheduleDetails.update((details) => ({
+      ...details,
+      [number]: { ...details[number], category: details[number]?.category || 'rent', particulars },
+    }));
   }
 
   updateScheduleDate(number: number, event: Event): void {
     const dueDate = (event.target as HTMLInputElement).value;
-    this.scheduleDetails.update((details) => ({ ...details, [number]: { ...details[number], due_date: dueDate, category: details[number]?.category || 'rent', particulars: details[number]?.particulars || '' } }));
+    this.scheduleDetails.update((details) => ({
+      ...details,
+      [number]: {
+        ...details[number],
+        due_date: dueDate,
+        category: details[number]?.category || 'rent',
+        particulars: details[number]?.particulars || '',
+      },
+    }));
   }
 
   updateScheduleAmount(number: number, event: Event): void {
     const amount = Number((event.target as HTMLInputElement).value);
-    this.scheduleDetails.update((details) => ({ ...details, [number]: { ...details[number], amount: Number.isFinite(amount) ? amount : 0, category: details[number]?.category || 'rent', particulars: details[number]?.particulars || '' } }));
+    this.scheduleDetails.update((details) => ({
+      ...details,
+      [number]: {
+        ...details[number],
+        amount: Number.isFinite(amount) ? amount : 0,
+        category: details[number]?.category || 'rent',
+        particulars: details[number]?.particulars || '',
+      },
+    }));
   }
 
   private resetScheduleOverrides(): void {
-    this.scheduleDetails.update((details) => Object.fromEntries(Object.entries(details).map(([number, value]) => [number, { category: value.category, particulars: value.particulars }])));
+    this.scheduleDetails.update((details) =>
+      Object.fromEntries(
+        Object.entries(details).map(([number, value]) => [
+          number,
+          { category: value.category, particulars: value.particulars },
+        ]),
+      ),
+    );
   }
 
   private scheduleSignature(): string {
     const value = this.agreementForm.getRawValue();
-    return [value.total_amount, value.payment_count, value.start_date, value.payment_frequency].join('|');
+    return [
+      value.total_amount,
+      value.payment_count,
+      value.start_date,
+      value.payment_frequency,
+    ].join('|');
   }
 
   ngOnInit(): void {
@@ -977,6 +1047,7 @@ export class TenantAgreementFormComponent implements OnInit {
         const agr = res.data;
         this.agreementForm.patchValue({
           agreement_no: agr.agreement_no,
+          file_no: agr.file_no || '',
           tenant_customer_id: String(agr.tenant_customer_id),
           source_owner_agreement_id: agr.properties?.[0]?.source_owner_agreement_id
             ? String(agr.properties[0].source_owner_agreement_id)
@@ -990,7 +1061,21 @@ export class TenantAgreementFormComponent implements OnInit {
           payment_mode: agr.payment_mode || 'cheque',
           notes: agr.notes || '',
         });
-        this.scheduleDetails.set(Object.fromEntries((agr.installments || []).filter((line) => !line.is_extra).map((line) => [Number(line.installment_no), { category: line.category, particulars: line.particulars, due_date: line.due_date, amount: Number(line.amount) }])));
+        this.scheduleDetails.set(
+          Object.fromEntries(
+            (agr.installments || [])
+              .filter((line) => !line.is_extra)
+              .map((line) => [
+                Number(line.installment_no),
+                {
+                  category: line.category,
+                  particulars: line.particulars,
+                  due_date: line.due_date,
+                  amount: Number(line.amount),
+                },
+              ]),
+          ),
+        );
         this.loadAvailableProperties();
         this.isLoading.set(false);
       },
@@ -1056,7 +1141,9 @@ export class TenantAgreementFormComponent implements OnInit {
       return;
     }
     if (this.installmentPreview().some((item) => !item.particulars.trim())) {
-      this.serverError.set('Particulars are required for every installment in the schedule preview.');
+      this.serverError.set(
+        'Particulars are required for every installment in the schedule preview.',
+      );
       return;
     }
     if (!this.scheduleMatchesTotal()) {
@@ -1072,13 +1159,20 @@ export class TenantAgreementFormComponent implements OnInit {
 
     const dto = {
       tenant_customer_id: Number(val.tenant_customer_id),
+      file_no: val.file_no?.trim() || null,
       start_date: val.start_date!,
       end_date: val.end_date!,
       total_amount: Number(val.total_amount),
       payment_count: Number(val.payment_count),
       payment_frequency: val.payment_frequency || 'monthly',
       payment_mode: val.payment_mode as PaymentMode,
-      installments: this.installmentPreview().map((item) => ({ installment_no: item.installment_number, due_date: item.due_date, amount: Number(item.amount.toFixed(2)), category: item.category, particulars: item.particulars.trim() })),
+      installments: this.installmentPreview().map((item) => ({
+        installment_no: item.installment_number,
+        due_date: item.due_date,
+        amount: Number(item.amount.toFixed(2)),
+        category: item.category,
+        particulars: item.particulars.trim(),
+      })),
       properties: selectedPropertyIds.map((propertyId) => ({
         property_id: propertyId,
         source_owner_agreement_id: Number(val.source_owner_agreement_id),

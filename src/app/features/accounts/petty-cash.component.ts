@@ -15,7 +15,7 @@ import { BmReceiptChequeModalComponent } from '../../shared/components/bm-receip
 import { BmSearchInputComponent } from '../../shared/components/bm-search-input/bm-search-input.component';
 import { BmPaginationComponent } from '../../shared/components/bm-pagination/bm-pagination.component';
 import { PaginationMeta } from '../../core/api/api.models';
-import { uaeDateInput } from '../../shared/utils/uae-formatters';
+import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
 
 @Component({
   selector: 'bm-petty-cash',
@@ -154,7 +154,7 @@ import { uaeDateInput } from '../../shared/utils/uae-formatters';
               @for (row of paginatedRows(); track row.id) {
                 <tr class="hover:bg-slate-50/60 transition-colors">
                   <td class="p-4 font-medium text-slate-600 tabular-nums">
-                    {{ row.transaction_date }}
+                    {{ formatDate(row.transaction_date) }}
                   </td>
                   <td class="p-4 font-bold text-slate-900 tabular-nums">{{ row.document_no }}</td>
                   <td class="p-4 text-slate-700">{{ row.remarks || '—' }}</td>
@@ -223,6 +223,7 @@ import { uaeDateInput } from '../../shared/utils/uae-formatters';
   `,
 })
 export class PettyCashComponent implements OnInit {
+  formatDate = formatUaeDate;
   private api = inject(AccountsApiService);
   private fb = inject(FormBuilder);
 

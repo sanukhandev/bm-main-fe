@@ -40,7 +40,7 @@ import {
     <div class="max-w-[1240px] w-full mx-auto pb-12">
       <!-- Page Header -->
       <bm-page-header [title]="pageTitle()" [subtitle]="pageSubtitle()">
-        @if (!isEditMode() && workflowRole() && customerType() === 'individual') {
+        @if (!isEditMode() && workflowRole()) {
           <input
             #identityDocument
             type="file"
@@ -55,7 +55,7 @@ import {
             [disabled]="isExtractingIdentity()"
             (click)="openIdentityCamera(identityDocument)"
           >
-            {{ isExtractingIdentity() ? 'Reading ID…' : 'Scan with Camera' }}
+            {{ isExtractingIdentity() ? 'Reading document…' : (customerType() === 'organization' ? 'Scan Trade Licence' : 'Scan Emirates ID') }}
           </button>
           <button
             type="button"
@@ -63,7 +63,7 @@ import {
             [disabled]="isExtractingIdentity()"
             (click)="identityDocument.click()"
           >
-            Upload ID
+            {{ customerType() === 'organization' ? 'Upload Trade Licence' : 'Upload ID' }}
           </button>
         }
         <a
@@ -110,8 +110,7 @@ import {
             <div
               class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs font-medium text-amber-900"
             >
-              {{ identityExtractionNotice() }} Review the populated fields, enter and confirm the
-              phone number, then submit manually.
+              {{ identityExtractionNotice() }} Review the populated fields and submit manually.
             </div>
           }
 
@@ -266,6 +265,17 @@ import {
           </div>
 
           @if (selectedRoles().includes('owner')) {
+            <div class="bg-white rounded-[20px] p-5 border border-slate-200/90 shadow-xs">
+              <label class="inline-flex items-center gap-3 text-sm font-semibold text-slate-800 cursor-pointer select-none">
+                <input type="checkbox" [checked]="representativeEnabled()" (change)="toggleRepresentative($event)" class="rounded-md text-emerald-700 focus:ring-emerald-600 h-4.5 w-4.5 border-slate-300" />
+                <span>Add owner representative</span>
+              </label>
+              <p class="text-xs text-slate-500 mt-1 ml-7">Use this when an owner is represented by a son, family member, or authorised representative.</p>
+            </div>
+          }
+
+          @if (selectedRoles().includes('owner') && representativeEnabled()) {
+            <input #representativeIdentityDocument type="file" accept="image/jpeg,image/png,application/pdf" capture="environment" class="hidden" (change)="onRepresentativeDocumentSelected($event)" />
             <!-- OPTIONAL OWNER REPRESENTATIVE -->
             <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
               <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
@@ -305,6 +315,10 @@ import {
                     <span class="text-xs font-medium text-rose-600 mt-1.5 flex items-center gap-1">Enter a valid Emirates ID: 784-YYYY-XXXXXXX-X.</span>
                   }
                 </div>
+              </div>
+              <div class="flex flex-wrap items-center gap-2 mt-5">
+                <button type="button" class="bm-btn bm-btn-secondary text-xs" [disabled]="isExtractingIdentity()" (click)="openIdentityCamera(representativeIdentityDocument, 'representative')">{{ isExtractingIdentity() ? 'Reading ID…' : 'Scan Representative ID' }}</button>
+                <button type="button" class="bm-btn bm-btn-secondary text-xs" [disabled]="isExtractingIdentity()" (click)="representativeIdentityDocument.click()">Upload Representative ID</button>
               </div>
               <p class="text-[11px] text-slate-400 mt-4">If any representative detail is entered, the representative Emirates ID is required.</p>
             </div>
@@ -689,7 +703,7 @@ import {
           >
             <div class="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
               <div>
-                <h2 class="font-semibold text-slate-900">Scan Emirates ID</h2>
+                <h2 class="font-semibold text-slate-900">Scan {{ identityScanTarget() === 'representative' ? 'Representative Emirates ID' : (customerType() === 'organization' ? 'Trade Licence' : 'Emirates ID') }}</h2>
                 <p class="text-xs text-slate-500 mt-1">
                   Position the document clearly inside the camera view.
                 </p>
@@ -720,7 +734,7 @@ import {
                 [disabled]="isExtractingIdentity()"
                 (click)="captureIdentityCamera()"
               >
-                {{ isExtractingIdentity() ? 'Reading ID…' : 'Capture & Read' }}
+                {{ isExtractingIdentity() ? 'Reading document…' : 'Capture & Read' }}
               </button>
             </div>
           </div>
@@ -750,6 +764,8 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
   identityVerified = signal(false);
   identityVerificationToken = signal<string | null>(null);
   cameraOpen = signal(false);
+  representativeEnabled = signal(false);
+  identityScanTarget = signal<'customer' | 'representative'>('customer');
   @ViewChild('cameraPreview') cameraPreview?: ElementRef<HTMLVideoElement>;
   private cameraStream?: MediaStream;
 
@@ -896,10 +912,19 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
     const document = input.files?.[0];
     input.value = '';
     if (!document) return;
-    this.extractIdentityDocument(document);
+    this.extractIdentityDocument(document, 'customer');
   }
 
-  async openIdentityCamera(fileInput: HTMLInputElement): Promise<void> {
+  onRepresentativeDocumentSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const document = input.files?.[0];
+    input.value = '';
+    if (!document) return;
+    this.extractIdentityDocument(document, 'representative');
+  }
+
+  async openIdentityCamera(fileInput: HTMLInputElement, target: 'customer' | 'representative' = 'customer'): Promise<void> {
+    this.identityScanTarget.set(target);
     if (!navigator.mediaDevices?.getUserMedia) {
       fileInput.click();
       return;
@@ -940,7 +965,8 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
         if (!blob) return;
         this.closeIdentityCamera();
         this.extractIdentityDocument(
-          new File([blob], 'emirates-id-camera.jpg', { type: 'image/jpeg' }),
+          new File([blob], this.identityScanTarget() === 'representative' ? 'representative-emirates-id-camera.jpg' : 'identity-document-camera.jpg', { type: 'image/jpeg' }),
+          this.identityScanTarget(),
         );
       },
       'image/jpeg',
@@ -948,28 +974,37 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
     );
   }
 
-  private extractIdentityDocument(document: File): void {
+  private extractIdentityDocument(document: File, target: 'customer' | 'representative'): void {
     const role = this.workflowRole();
     if (!role) return;
     this.isExtractingIdentity.set(true);
     this.serverError.set(null);
-    this.api.extractIdentity(document, role).subscribe({
+    const customerType = target === 'representative' ? 'individual' : this.customerType();
+    this.api.extractIdentity(document, role, customerType).subscribe({
       next: (response) => {
         const fields = response.data.fields;
-        this.customerForm.patchValue({
-          display_name: fields.display_name || '',
-          legal_name: fields.legal_name || '',
-          identity_no: fields.identity_no ? formatEmiratesId(fields.identity_no) : '',
-          country_code: fields.country_code || 'AE',
-          state_or_emirate: fields.state_or_emirate || 'Dubai',
-          city: fields.city || 'Dubai',
-          address_line_1: fields.address_line_1 || '',
-          phone: '',
-        });
-        this.identityAssisted.set(true);
-        this.identityVerificationToken.set(response.data.verification_token);
+        if (target === 'representative') {
+          this.customerForm.patchValue({
+            representative_name: fields.display_name || '',
+            representative_identity_no: fields.identity_no ? formatEmiratesId(fields.identity_no) : '',
+          });
+          this.representativeEnabled.set(true);
+        } else {
+          this.customerForm.patchValue({
+            display_name: fields.display_name || '',
+            legal_name: fields.legal_name || '',
+            identity_no: fields.identity_no ? (this.customerType() === 'organization' ? formatTradeLicense(fields.identity_no) : formatEmiratesId(fields.identity_no)) : '',
+            country_code: fields.country_code || 'AE',
+            state_or_emirate: fields.state_or_emirate || 'Dubai',
+            city: fields.city || 'Dubai',
+            address_line_1: fields.address_line_1 || '',
+            phone: '',
+          });
+          this.identityAssisted.set(true);
+          this.identityVerificationToken.set(response.data.verification_token);
+        }
         this.identityExtractionNotice.set(
-          'Identity details were extracted as draft form values only.',
+          target === 'representative' ? 'Representative Emirates ID details were extracted as draft form values only.' : `${this.customerType() === 'organization' ? 'Trade licence' : 'Identity'} details were extracted as draft form values only.`,
         );
         this.isExtractingIdentity.set(false);
       },
@@ -1055,6 +1090,7 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
         ) {
           this.customerRole.set('vendor');
         }
+        this.representativeEnabled.set(Boolean(cust.representative));
 
         this.customerForm.patchValue({
           customer_type: cust.customer_type,
@@ -1105,6 +1141,20 @@ export class CustomerFormComponent implements OnInit, OnDestroy {
       }
     } else {
       this.selectedRoles.update((roles) => roles.filter((r) => r !== role));
+      if (role === 'owner') this.representativeEnabled.set(false);
+    }
+  }
+
+  toggleRepresentative(event: Event): void {
+    const enabled = (event.target as HTMLInputElement).checked;
+    this.representativeEnabled.set(enabled);
+    if (!enabled) {
+      this.customerForm.patchValue({
+        representative_name: '',
+        representative_relationship: '',
+        representative_phone: '',
+        representative_identity_no: '',
+      });
     }
   }
 

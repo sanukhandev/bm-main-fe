@@ -42,10 +42,12 @@ export class CustomersApiService {
   extractIdentity(
     document: File,
     role: 'owner' | 'tenant' | 'vendor',
+    customerType: 'individual' | 'organization' = 'individual',
   ): Observable<ApiResponse<IdentityExtraction>> {
     const form = new FormData();
     form.append('document', document);
     form.append('role', role);
+    form.append('customer_type', customerType);
     return this.http.post<ApiResponse<IdentityExtraction>>(
       `${this.baseUrl}/identity-extract`,
       form,

@@ -47,62 +47,45 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
       <bm-error-state [message]="error()!" (retry)="loadAgreement()"></bm-error-state>
     } @else if (agreement()) {
       <div class="agreement-screen max-w-[1360px] w-full mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <!-- Back Breadcrumb & Header -->
-        <div class="mb-6">
-          <a
-            routerLink="/app/tenant-agreements"
-            class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 hover:text-emerald-800 transition mb-3"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+        <!-- Bento 3-Grid Hero Header -->
+        <div class="space-y-4 mb-6">
+          <!-- Top Navigation & Action Toolbar -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <a
+              routerLink="/app/tenant-agreements"
+              class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 hover:text-emerald-800 transition"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            <span>Back to Tenant Agreements</span>
-          </a>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+              <span>Back to Tenant Agreements</span>
+            </a>
 
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <div class="flex items-center gap-3">
-                <h1 class="text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight">
-                  {{ agreement()!.agreement_no }}
-                </h1>
-                <span
-                  class="px-3 py-1 rounded-full text-xs font-semibold border"
-                  [ngClass]="statusBadgeClasses(agreement()!.status)"
-                >
-                  ● {{ formatStatus(agreement()!.status) }}
-                </span>
-              </div>
-              <p class="text-xs lg:text-sm text-slate-500 font-normal mt-1">
-                {{ tenantName() }} · {{ primaryPropertyName() }} ·
-                {{ formatDate(agreement()!.start_date) }} – {{ formatDate(agreement()!.end_date) }}
-              </p>
-            </div>
-
-            <!-- Action Hierarchy Buttons -->
-            <div class="flex items-center gap-2.5 flex-wrap">
+            <!-- Primary Action Controls -->
+            <div class="flex items-center gap-2 flex-wrap">
               @if (agreement()!.status === 'draft') {
                 <button
                   type="button"
                   (click)="transition('pending_approval')"
                   [disabled]="isActioning()"
-                  class="bm-btn bm-btn-primary text-xs font-semibold px-4 py-2 rounded-xl shadow-xs"
+                  class="bm-btn bm-btn-primary text-xs font-semibold py-1.5 px-3"
                 >
                   Submit for Approval
                 </button>
                 <a
                   [routerLink]="['/app/tenant-agreements', agreement()!.id, 'edit']"
-                  class="bm-btn bm-btn-secondary text-xs font-semibold px-4 py-2 rounded-xl border border-slate-200"
+                  class="bm-btn bm-btn-secondary text-xs py-1.5 px-3"
                 >
                   Edit
                 </a>
@@ -112,13 +95,13 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                   type="button"
                   (click)="transition('approved')"
                   [disabled]="isActioning()"
-                  class="bm-btn bm-btn-primary text-xs font-semibold px-4 py-2 rounded-xl shadow-xs"
+                  class="bm-btn bm-btn-primary text-xs font-semibold py-1.5 px-3"
                 >
                   Approve Lease
                 </button>
                 <a
                   [routerLink]="['/app/tenant-agreements', agreement()!.id, 'edit']"
-                  class="bm-btn bm-btn-secondary text-xs font-semibold px-4 py-2 rounded-xl border border-slate-200"
+                  class="bm-btn bm-btn-secondary text-xs py-1.5 px-3"
                   >Edit</a
                 >
               }
@@ -127,7 +110,7 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                   type="button"
                   (click)="transition('commenced')"
                   [disabled]="isActioning()"
-                  class="bm-btn bm-btn-primary text-xs font-semibold px-4 py-2 rounded-xl shadow-xs"
+                  class="bm-btn bm-btn-primary text-xs font-semibold py-1.5 px-3"
                 >
                   Commence Lease
                 </button>
@@ -137,7 +120,7 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                   type="button"
                   (click)="openHoldModal()"
                   [disabled]="isActioning()"
-                  class="bm-btn bm-btn-secondary text-xs font-semibold px-4 py-2 rounded-xl border border-slate-200"
+                  class="bm-btn bm-btn-secondary text-xs py-1.5 px-3"
                 >
                   Put On Hold
                 </button>
@@ -147,26 +130,25 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                   type="button"
                   (click)="transition('commenced')"
                   [disabled]="isActioning()"
-                  class="bm-btn bm-btn-primary text-xs font-semibold px-4 py-2 rounded-xl shadow-xs"
+                  class="bm-btn bm-btn-primary text-xs font-semibold py-1.5 px-3"
                 >
                   Resume Agreement
                 </button>
               }
-
               <button
                 type="button"
                 (click)="printAgreement()"
-                class="bm-btn bm-btn-secondary text-xs font-semibold px-4 py-2 rounded-xl border border-slate-200"
+                class="bm-btn bm-btn-secondary text-xs py-1.5 px-3"
               >
-                Print Agreement
+                Print
               </button>
 
-              <!-- More Dropdown Menu -->
+              <!-- More Options -->
               <div class="relative">
                 <button
                   type="button"
                   (click)="showMoreMenu.set(!showMoreMenu())"
-                  class="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition flex items-center gap-1.5 shadow-2xs"
+                  class="bm-btn bm-btn-secondary text-xs py-1.5 px-3 flex items-center gap-1"
                 >
                   <span>More</span>
                   <svg
@@ -184,10 +166,9 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                     />
                   </svg>
                 </button>
-
                 @if (showMoreMenu()) {
                   <div
-                    class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-200/90 py-1.5 z-30 text-xs"
+                    class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-200 py-1.5 z-30 text-xs"
                   >
                     <button
                       type="button"
@@ -210,31 +191,29 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                       </svg>
                       <span>Raise Dispute</span>
                     </button>
-
                     @if (canPostPayments()) {
                       <button
-                      type="button"
-                      (click)="addExtraPayment(); showMoreMenu.set(false)"
-                      class="w-full text-left px-4 py-2 hover:bg-slate-50 text-slate-700 flex items-center gap-2 font-medium"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-4 w-4 text-emerald-600"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
+                        type="button"
+                        (click)="addExtraPayment(); showMoreMenu.set(false)"
+                        class="w-full text-left px-4 py-2 hover:bg-slate-50 text-slate-700 flex items-center gap-2 font-medium"
                       >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                        />
-                      </svg>
-                      <span>Add Payment Line</span>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4 text-emerald-600"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                          />
+                        </svg>
+                        <span>Add Payment Line</span>
                       </button>
                     }
-
                     @if (agreement()!.available_actions?.includes('extend')) {
                       <button
                         type="button"
@@ -253,7 +232,6 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                         Renew Agreement
                       </button>
                     }
-
                     @if (
                       agreement()!.available_actions?.includes('terminate') ||
                       agreement()!.available_actions?.includes('cancel')
@@ -290,325 +268,247 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- MAIN AGREEMENT SUMMARY CARD -->
-        <div class="bg-white rounded-[22px] p-6 lg:p-8 border border-slate-200/90 shadow-xs mb-8">
-          <!-- Card Header -->
-          <div class="flex items-center justify-between pb-5 mb-6 border-b border-slate-100">
-            <div class="flex items-center gap-3">
-              <div
-                class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
+          <!-- BENTO HERO 3-GRID ASYMMETRIC LAYOUT -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-4">
+            <!-- Grid 1: Leased Asset & Tenant Profile Hero Card (lg:col-span-5) -->
+            <div
+              class="lg:col-span-5 bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-950 text-white rounded-2xl p-5 shadow-sm relative overflow-hidden flex flex-col justify-between"
+            >
+              <div class="absolute -right-8 -bottom-8 opacity-10 pointer-events-none">
+                <svg class="w-48 h-48 text-white" fill="currentColor" viewBox="0 0 24 24">
                   <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <div class="text-[11px] font-semibold text-emerald-800 uppercase tracking-wider">
-                  TENANT LEASE CONTRACT
-                </div>
-                <h2 class="text-2xl font-bold text-slate-900 tracking-tight">
-                  {{ agreement()!.agreement_no }}
-                </h2>
-              </div>
-            </div>
-            <div class="text-right text-xs text-slate-400">
-              <div>Record Created</div>
-              <div class="font-medium text-slate-700 mt-0.5">
-                {{ formatDate(agreement()!.created_at) }}
-              </div>
-            </div>
-          </div>
-
-          <!-- 3-Column Information (NO NESTED CARDS - Clean text blocks with icons) -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 pb-8 border-b border-slate-100">
-            <!-- Col 1: Leasing Tenant -->
-            <div class="space-y-3">
-              <div
-                class="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-4 w-4 text-emerald-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-                <span>Leasing Tenant</span>
-              </div>
-              <div>
-                <div class="text-lg font-bold text-slate-900">{{ tenantName() }}</div>
-                @if (tenantCustomer()) {
-                  <div class="text-xs text-slate-500 mt-1 tabular-nums flex items-center gap-1.5">
-                    <span class="text-slate-400">Code:</span>
-                    <span class="font-semibold text-slate-700">{{
-                      tenantCustomer()?.customer_code
-                    }}</span>
-                  </div>
-                  @if (tenantCustomer()?.phone) {
-                    <div
-                      class="text-xs text-slate-600 tabular-nums flex items-center gap-1.5 mt-0.5"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-3.5 w-3.5 text-slate-400"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                        />
-                      </svg>
-                      <span>{{ tenantCustomer()?.phone }}</span>
-                    </div>
-                  }
-                }
-              </div>
-              @if (tenantCustomer()) {
-                <div class="pt-2">
-                  <a
-                    [routerLink]="['/app/customers', tenantCustomer()?.id]"
-                    class="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 hover:text-emerald-800 transition"
-                  >
-                    <span>View Tenant Master File</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-3.5 w-3.5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </a>
-                </div>
-              }
-            </div>
-
-            <!-- Col 2: Leased Property Asset -->
-            <div class="space-y-3">
-              <div
-                class="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-4 w-4 text-emerald-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
                     d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
                   />
                 </svg>
-                <span>Leased Property Asset</span>
               </div>
+
               <div>
-                @if (primaryProperty()) {
-                  <div class="text-lg font-bold text-slate-900 truncate">
-                    {{ primaryProperty()!.name }}
-                  </div>
-                  <div class="text-xs text-slate-500 mt-1 tabular-nums">
-                    <span class="text-slate-400">Code:</span>
-                    {{ primaryProperty()!.property_code }} · Unit
-                    {{ primaryProperty()!.unit_number }}
-                  </div>
-                  <div class="text-xs text-slate-600 capitalize mt-0.5">
-                    Type: {{ primaryProperty()!.property_type }}
-                  </div>
-                } @else {
-                  <div class="text-sm font-medium text-slate-400 italic">
-                    No property asset assigned
-                  </div>
-                }
-              </div>
-              @if (primaryProperty()) {
-                <div class="pt-2 flex items-center justify-between">
-                  <a
-                    [routerLink]="['/app/properties', primaryProperty()!.id]"
-                    class="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 hover:text-emerald-800 transition"
+                <div class="flex items-center justify-between gap-2 mb-2">
+                  <span
+                    class="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
                   >
-                    <span>View Property Details</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-3.5 w-3.5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </a>
-                  @if (propertiesList().length > 1) {
-                    <span class="text-[11px] font-semibold text-slate-500">
-                      +{{ propertiesList().length - 1 }} more assets
-                    </span>
-                  }
+                    TENANT LEASE CONTRACT
+                  </span>
+                  <span
+                    class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold border"
+                    [ngClass]="statusBadgeClasses(agreement()!.status)"
+                  >
+                    ● {{ formatStatus(agreement()!.status) }}
+                  </span>
                 </div>
-              }
+
+                <h1 class="text-2xl font-black tracking-tight text-white flex items-baseline gap-2">
+                  <span>{{ agreement()!.agreement_no }}</span>
+                  @if (agreement()!.file_no) {
+                    <span class="text-xs font-normal text-slate-400"
+                      >File: {{ agreement()!.file_no }}</span
+                    >
+                  }
+                </h1>
+
+                <!-- Tenant & Property Compact Summary -->
+                <div class="mt-4 pt-3 border-t border-slate-700/60 grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <span
+                      class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 block mb-0.5"
+                      >Leasing Tenant</span
+                    >
+                    <div class="font-bold text-white text-sm truncate">{{ tenantName() }}</div>
+                    @if (tenantCustomer()) {
+                      <a
+                        [routerLink]="['/app/customers', tenantCustomer()?.id]"
+                        class="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-400 hover:text-emerald-300 mt-1"
+                      >
+                        <span>Code: {{ tenantCustomer()?.customer_code }}</span>
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </a>
+                    }
+                  </div>
+
+                  <div>
+                    <span
+                      class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 block mb-0.5"
+                      >Leased Property</span
+                    >
+                    @if (primaryProperty()) {
+                      <div class="font-bold text-white text-sm truncate">
+                        {{ primaryProperty()!.name }}
+                      </div>
+                      <a
+                        [routerLink]="['/app/properties', primaryProperty()!.id]"
+                        class="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-400 hover:text-emerald-300 mt-1"
+                      >
+                        <span
+                          >Unit {{ primaryProperty()!.unit_number }} ({{
+                            primaryProperty()!.property_code
+                          }})</span
+                        >
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </a>
+                    } @else {
+                      <div class="text-slate-400 italic">No asset linked</div>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="mt-4 pt-3 border-t border-slate-700/60 flex items-center justify-between text-xs text-slate-300"
+              >
+                <span class="font-medium">Lease Term:</span>
+                <span class="font-bold text-white tabular-nums"
+                  >{{ formatDate(agreement()!.start_date) }} →
+                  {{ formatDate(agreement()!.end_date) }}</span
+                >
+              </div>
             </div>
 
-            <!-- Col 3: Lease Period -->
-            <div class="space-y-3">
+            <!-- Grid 2: Financial KPI Bento Cards (lg:col-span-4) -->
+            <div class="lg:col-span-4 grid grid-cols-2 gap-3">
+              <!-- Stat 1: Total Value -->
               <div
-                class="flex items-center gap-2 text-xs font-semibold text-slate-500 uppercase tracking-wider"
+                class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs flex flex-col justify-between"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-4 w-4 text-emerald-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+                <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider"
+                  >Total Rent</span
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-                <span>Lease Validity Period</span>
+                <div class="my-1">
+                  <div class="text-xs text-slate-400 font-semibold">AED</div>
+                  <div class="text-xl font-extrabold text-slate-900 tracking-tight tabular-nums">
+                    {{ formatAmount(agreement()!.total_amount) }}
+                  </div>
+                </div>
+                <span class="text-[11px] text-slate-500 font-medium">Contract Value</span>
               </div>
-              <div>
-                <div
-                  class="text-base font-semibold text-slate-900 tabular-nums flex items-baseline gap-2"
+
+              <!-- Stat 2: Total Paid -->
+              <div
+                class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs flex flex-col justify-between"
+              >
+                <span class="text-[11px] font-semibold text-emerald-700 uppercase tracking-wider"
+                  >Total Collected</span
                 >
-                  <span>{{ formatDate(agreement()!.start_date) }}</span>
-                  <span class="text-emerald-600 font-bold">→</span>
-                  <span>{{ formatDate(agreement()!.end_date) }}</span>
+                <div class="my-1">
+                  <div class="text-xs text-emerald-600 font-semibold">AED</div>
+                  <div class="text-xl font-extrabold text-emerald-600 tracking-tight tabular-nums">
+                    {{ formatAmount(getPaidTotal(agreement()!.installments)) }}
+                  </div>
                 </div>
-                <div class="text-xs text-slate-500 mt-1 flex items-center gap-2">
-                  <span>Workflow Status:</span>
-                  <span class="font-bold text-slate-900 capitalize">{{
-                    formatStatus(agreement()!.status)
-                  }}</span>
-                </div>
+                <span class="text-[11px] text-emerald-700 font-medium">Paid Installments</span>
               </div>
-              <div class="pt-2 text-xs text-slate-500">
-                Duration:
-                <span class="font-semibold text-slate-800"
+
+              <!-- Stat 3: Balance -->
+              <div
+                class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs flex flex-col justify-between"
+              >
+                <span class="text-[11px] font-semibold text-amber-700 uppercase tracking-wider"
+                  >Balance Due</span
+                >
+                <div class="my-1">
+                  <div class="text-xs text-amber-600 font-semibold">AED</div>
+                  <div class="text-xl font-extrabold text-amber-600 tracking-tight tabular-nums">
+                    {{ formatAmount(getOutstandingTotal(agreement()!.installments)) }}
+                  </div>
+                </div>
+                <span class="text-[11px] text-amber-700 font-medium">Outstanding Balance</span>
+              </div>
+
+              <!-- Stat 4: Terms -->
+              <div
+                class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs flex flex-col justify-between"
+              >
+                <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider"
+                  >Frequency & Mode</span
+                >
+                <div class="my-1">
+                  <div class="text-base font-bold text-slate-900 capitalize">
+                    {{ agreement()!.payment_frequency || 'Monthly' }}
+                  </div>
+                  <div class="text-xs font-semibold text-slate-600 capitalize mt-0.5">
+                    {{ (agreement()!.payment_mode || '').replace('_', ' ') }}
+                  </div>
+                </div>
+                <span class="text-[11px] text-slate-500 font-medium"
                   >{{ agreement()!.payment_count || 0 }} cycles</span
                 >
               </div>
             </div>
-          </div>
 
-          <!-- FINANCIAL SUMMARY PANEL (Clean text strip with no colored card box) -->
-          <div>
+            <!-- Grid 3: Quick Overview & Details Panel (lg:col-span-3) -->
             <div
-              class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4 flex items-center justify-between"
+              class="lg:col-span-3 bg-white rounded-2xl p-4 border border-slate-200/90 shadow-xs flex flex-col justify-between space-y-3"
             >
-              <div class="flex items-center gap-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-4 w-4 text-emerald-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+              <div>
+                <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
+                  <span class="text-xs font-bold text-slate-800 uppercase tracking-wider"
+                    >Overview Highlights</span
+                  >
+                  <span class="text-[10px] text-slate-400 font-mono">{{
+                    formatDate(agreement()!.created_at)
+                  }}</span>
+                </div>
+
+                <div class="space-y-2 text-xs text-slate-600">
+                  <div class="flex items-center justify-between">
+                    <span class="text-slate-500">Installment Count:</span>
+                    <span class="font-bold text-slate-900 tabular-nums"
+                      >{{ agreement()!.payment_count }} cycles</span
+                    >
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-slate-500">Paid Count:</span>
+                    <span class="font-bold text-emerald-700 tabular-nums"
+                      >{{ getPaidCount(agreement()!.installments) }} /
+                      {{ agreement()!.installments?.length || 0 }}</span
+                    >
+                  </div>
+                  @if (tenantCustomer()?.phone) {
+                    <div class="flex items-center justify-between">
+                      <span class="text-slate-500">Tenant Contact:</span>
+                      <a
+                        [href]="'tel:' + tenantCustomer()?.phone"
+                        class="font-semibold text-emerald-700 hover:underline"
+                        >{{ tenantCustomer()?.phone }}</a
+                      >
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+                <span class="text-[11px] font-semibold text-slate-500"
+                  >Currency: {{ agreement()!.currency_code || 'AED' }}</span
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                <span>Lease Terms & Financial Position</span>
-              </div>
-              <span class="text-slate-500 font-normal"
-                >Currency:
-                <strong class="text-slate-800">{{
-                  agreement()!.currency_code || 'AED'
-                }}</strong></span
-              >
-            </div>
-
-            <div class="grid grid-cols-2 md:grid-cols-6 gap-6 text-xs">
-              <div>
-                <div class="text-slate-500 font-medium mb-1">Total Rent Amount</div>
-                <div
-                  class="whitespace-nowrap tabular-nums font-semibold tracking-tight text-xl text-slate-900"
+                <button
+                  type="button"
+                  (click)="printAgreement()"
+                  class="text-xs font-semibold text-emerald-700 hover:text-emerald-800 transition flex items-center gap-1"
                 >
-                  <span class="text-xs text-slate-400 uppercase font-medium mr-1">AED</span>
-                  <span>{{ formatAmount(agreement()!.total_amount) }}</span>
-                </div>
-              </div>
-
-              <div>
-                <div class="text-slate-500 font-medium mb-1">Total Paid</div>
-                <div
-                  class="whitespace-nowrap tabular-nums font-semibold tracking-tight text-xl text-emerald-700"
-                >
-                  <span class="text-xs text-emerald-600 uppercase font-medium mr-1">AED</span>
-                  <span>{{ formatAmount(getPaidTotal(agreement()!.installments)) }}</span>
-                </div>
-              </div>
-
-              <div>
-                <div class="text-slate-500 font-medium mb-1">Outstanding Balance</div>
-                <div
-                  class="whitespace-nowrap tabular-nums font-semibold tracking-tight text-xl text-amber-700"
-                >
-                  <span class="text-xs text-amber-600 uppercase font-medium mr-1">AED</span>
-                  <span>{{ formatAmount(getOutstandingTotal(agreement()!.installments)) }}</span>
-                </div>
-              </div>
-
-              <div>
-                <div class="text-slate-500 font-medium mb-1">Installment Count</div>
-                <div class="text-base font-semibold text-slate-900 tabular-nums mt-1">
-                  {{ agreement()!.payment_count }} cycles
-                </div>
-              </div>
-
-              <div>
-                <div class="text-slate-500 font-medium mb-1">Payment Frequency</div>
-                <div class="text-base font-semibold text-slate-900 capitalize mt-1">
-                  {{ agreement()!.payment_frequency || 'Monthly' }}
-                </div>
-              </div>
-
-              <div>
-                <div class="text-slate-500 font-medium mb-1">Payment Mode</div>
-                <div class="text-base font-semibold text-slate-900 capitalize mt-1">
-                  {{ (agreement()!.payment_mode || '').replace('_', ' ') }}
-                </div>
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+                    />
+                  </svg>
+                  <span>Print Sheet</span>
+                </button>
               </div>
             </div>
           </div>
@@ -729,7 +629,12 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                       {{ formatDate(item.due_date) }}
                     </td>
                     <td class="py-3.5 px-4 text-slate-700">
-                      {{ item.transaction_reference || item.particulars || item.notes || 'Rent installment' }}
+                      {{
+                        item.transaction_reference ||
+                          item.particulars ||
+                          item.notes ||
+                          'Rent installment'
+                      }}
                     </td>
                     <td class="py-3.5 px-4">
                       <span
@@ -765,81 +670,56 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                     </td>
                     @if (canPostPayments()) {
                       <td class="py-3.5 px-4 text-right whitespace-nowrap">
-                      <div class="flex items-center justify-end gap-1.5">
-                        @if (isPaidOrVoid(item)) {
-                          <button
-                            type="button"
-                            (click)="openVoucherModal(item)"
-                            title="View Receipt Voucher"
-                            aria-label="View Receipt Voucher"
-                            class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200/60 inline-flex items-center gap-1 font-semibold text-xs transition shadow-2xs cursor-pointer"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              class="h-3.5 w-3.5 text-emerald-700"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
+                        <div class="flex items-center justify-end gap-1.5">
+                          @if (isPaidOrVoid(item)) {
+                            <button
+                              type="button"
+                              (click)="openVoucherModal(item)"
+                              title="View Receipt Voucher"
+                              aria-label="View Receipt Voucher"
+                              class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200/60 inline-flex items-center gap-1 font-semibold text-xs transition shadow-2xs cursor-pointer"
                             >
-                              <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                              />
-                              <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                              />
-                            </svg>
-                            <span>View Voucher</span>
-                            @if (item.receipt?.document_no) {
-                              <span
-                                class="text-[10px] bg-emerald-100/80 px-1.5 py-0.5 rounded text-emerald-800 font-mono"
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="h-3.5 w-3.5 text-emerald-700"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
                               >
-                                ({{ item.receipt!.document_no }})
-                              </span>
-                            }
-                          </button>
-                        } @else if (canPostPayments()) {
-                          <button
-                            type="button"
-                            [disabled]="installmentProcessingId() === item.id"
-                            (click)="
-                              item.is_extra
-                                ? setInstallmentStatus(item.id, 'paid')
-                                : openPaymentModal(item.id)
-                            "
-                            title="Mark as Paid"
-                            aria-label="Mark as Paid"
-                            class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200/60 inline-flex items-center justify-center transition shadow-2xs disabled:opacity-40"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              class="h-4 w-4"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M5 13l4 4L19 7"
-                              />
-                            </svg>
-                          </button>
-
-                          @if (item.status !== 'defaulted') {
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                                />
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                                />
+                              </svg>
+                              <span>View Voucher</span>
+                              @if (item.receipt?.document_no) {
+                                <span
+                                  class="text-[10px] bg-emerald-100/80 px-1.5 py-0.5 rounded text-emerald-800 font-mono"
+                                >
+                                  ({{ item.receipt!.document_no }})
+                                </span>
+                              }
+                            </button>
+                          } @else if (canPostPayments()) {
                             <button
                               type="button"
                               [disabled]="installmentProcessingId() === item.id"
-                              (click)="setInstallmentStatus(item.id, 'defaulted')"
-                              title="Mark as Defaulted"
-                              aria-label="Mark as Defaulted"
-                              class="w-8 h-8 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200/60 inline-flex items-center justify-center transition shadow-2xs disabled:opacity-40"
+                              (click)="
+                                item.is_extra
+                                  ? setInstallmentStatus(item.id, 'paid')
+                                  : openPaymentModal(item.id)
+                              "
+                              title="Mark as Paid"
+                              aria-label="Mark as Paid"
+                              class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200/60 inline-flex items-center justify-center transition shadow-2xs disabled:opacity-40"
                             >
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -852,19 +732,47 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                                   stroke-linecap="round"
                                   stroke-linejoin="round"
                                   stroke-width="2"
-                                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                                  d="M5 13l4 4L19 7"
                                 />
                               </svg>
                             </button>
+
+                            @if (item.status !== 'defaulted') {
+                              <button
+                                type="button"
+                                [disabled]="installmentProcessingId() === item.id"
+                                (click)="setInstallmentStatus(item.id, 'defaulted')"
+                                title="Mark as Defaulted"
+                                aria-label="Mark as Defaulted"
+                                class="w-8 h-8 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200/60 inline-flex items-center justify-center transition shadow-2xs disabled:opacity-40"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  class="h-4 w-4"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                                  />
+                                </svg>
+                              </button>
+                            }
                           }
-                        }
-                      </div>
+                        </div>
                       </td>
                     }
                   </tr>
                 } @empty {
                   <tr>
-                    <td [attr.colspan]="canPostPayments() ? 9 : 8" class="p-6 text-center text-slate-500">
+                    <td
+                      [attr.colspan]="canPostPayments() ? 9 : 8"
+                      class="p-6 text-center text-slate-500"
+                    >
                       No payment schedule installments found.
                     </td>
                   </tr>
@@ -890,7 +798,12 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                 </div>
                 <div class="text-slate-600">
                   <div class="font-medium text-slate-900 mb-2">
-                    {{ item.transaction_reference || item.particulars || item.notes || 'Rent installment' }}
+                    {{
+                      item.transaction_reference ||
+                        item.particulars ||
+                        item.notes ||
+                        'Rent installment'
+                    }}
                   </div>
                   <div class="grid grid-cols-2 gap-2">
                     <div>
@@ -927,64 +840,64 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                 </div>
                 @if (canPostPayments()) {
                   <div class="pt-2 border-t border-slate-100 flex items-center justify-end gap-2">
-                  @if (isPaidOrVoid(item)) {
-                    <button
-                      type="button"
-                      (click)="openVoucherModal(item)"
-                      class="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200/60 text-xs inline-flex items-center gap-1 cursor-pointer"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-3.5 w-3.5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
+                    @if (isPaidOrVoid(item)) {
+                      <button
+                        type="button"
+                        (click)="openVoucherModal(item)"
+                        class="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200/60 text-xs inline-flex items-center gap-1 cursor-pointer"
                       >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                        />
-                      </svg>
-                      <span>View Voucher</span>
-                      @if (item.receipt?.document_no) {
-                        <span class="text-[10px] opacity-80 font-mono">
-                          ({{ item.receipt!.document_no }})
-                        </span>
-                      }
-                    </button>
-                  } @else if (canPostPayments()) {
-                    <button
-                      type="button"
-                      [disabled]="installmentProcessingId() === item.id"
-                      (click)="
-                        item.is_extra
-                          ? setInstallmentStatus(item.id, 'paid')
-                          : openPaymentModal(item.id)
-                      "
-                      class="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200/60 text-xs disabled:opacity-40"
-                    >
-                      Mark Paid
-                    </button>
-                    @if (item.status !== 'defaulted') {
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-3.5 w-3.5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                          />
+                        </svg>
+                        <span>View Voucher</span>
+                        @if (item.receipt?.document_no) {
+                          <span class="text-[10px] opacity-80 font-mono">
+                            ({{ item.receipt!.document_no }})
+                          </span>
+                        }
+                      </button>
+                    } @else if (canPostPayments()) {
                       <button
                         type="button"
                         [disabled]="installmentProcessingId() === item.id"
-                        (click)="setInstallmentStatus(item.id, 'defaulted')"
-                        class="px-3 py-1.5 rounded-lg bg-rose-50 text-rose-700 font-semibold border border-rose-200/60 text-xs disabled:opacity-40"
+                        (click)="
+                          item.is_extra
+                            ? setInstallmentStatus(item.id, 'paid')
+                            : openPaymentModal(item.id)
+                        "
+                        class="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200/60 text-xs disabled:opacity-40"
                       >
-                        Mark Defaulted
+                        Mark Paid
                       </button>
+                      @if (item.status !== 'defaulted') {
+                        <button
+                          type="button"
+                          [disabled]="installmentProcessingId() === item.id"
+                          (click)="setInstallmentStatus(item.id, 'defaulted')"
+                          class="px-3 py-1.5 rounded-lg bg-rose-50 text-rose-700 font-semibold border border-rose-200/60 text-xs disabled:opacity-40"
+                        >
+                          Mark Defaulted
+                        </button>
+                      }
                     }
-                  }
-                </div>
+                  </div>
                 }
               </div>
             }
@@ -1173,7 +1086,31 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                   "
                   class="bm-btn bm-btn-primary text-xs rounded-xl shadow-2xs"
                 >
-                  {{ paymentPosting ? 'Posting…' : 'Post Payment' }}
+                  <span class="inline-flex items-center gap-1.5">
+                    @if (paymentPosting) {
+                      <svg
+                        class="animate-spin h-3.5 w-3.5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          class="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          stroke-width="4"
+                        ></circle>
+                        <path
+                          class="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                    }
+                    <span>{{ paymentPosting ? 'Posting…' : 'Post Payment' }}</span></span
+                  >
                 </button>
               </div>
             </form>
@@ -1364,7 +1301,31 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
                   [disabled]="!holdReason.trim() || isActioning()"
                   class="bm-btn bm-btn-primary text-xs rounded-xl shadow-2xs"
                 >
-                  {{ isActioning() ? 'Saving…' : 'Put On Hold' }}
+                  <span class="inline-flex items-center gap-1.5">
+                    @if (isActioning()) {
+                      <svg
+                        class="animate-spin h-3.5 w-3.5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          class="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          stroke-width="4"
+                        ></circle>
+                        <path
+                          class="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                    }
+                    <span>{{ isActioning() ? 'Saving…' : 'Put On Hold' }}</span></span
+                  >
                 </button>
               </div>
             </form>

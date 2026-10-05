@@ -1,9 +1,19 @@
 import { Customer } from './customer.models';
 
 export type PropertyType =
-  'apartment' | 'villa' | 'shop' | 'office' | 'space' | 'labor_camp' | 'warehouse' | 'land';
+  'apartment' | 'villa' | 'shop' | 'office' | 'space' | 'labor_camp' | 'warehouse' | 'land' | 'garage';
 
 export type PropertyStatus = 'active' | 'inactive' | 'archived';
+export type PropertyUtilityType = 'electricity' | 'cooling' | 'gas' | 'furniture';
+
+export interface PropertyUtility {
+  type: PropertyUtilityType;
+  provider?: string | null;
+  account_number?: string | null;
+  connection_type?: string | null;
+  connection_number?: string | null;
+  details?: string | null;
+}
 
 export interface Property {
   id: number;
@@ -28,6 +38,7 @@ export interface Property {
   gas_provider?: string | null;
   gas_connection_type?: string | null;
   gas_connection_number?: string | null;
+  utility_details?: PropertyUtility[] | null;
   status: PropertyStatus;
   notes?: string | null;
   created_at?: string;
@@ -54,6 +65,7 @@ export interface CreatePropertyDto {
   gas_provider?: string | null;
   gas_connection_type?: string | null;
   gas_connection_number?: string | null;
+  utility_details?: PropertyUtility[] | null;
   notes?: string | null;
 }
 

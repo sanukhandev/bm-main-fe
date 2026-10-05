@@ -8,6 +8,7 @@ import { BmPageHeaderComponent } from '../../../shared/components/bm-page-header
 import { BmPaginationComponent } from '../../../shared/components/bm-pagination/bm-pagination.component';
 import { PaginationMeta } from '../../../core/api/api.models';
 import { AuthService } from '../../../core/auth/auth.service';
+import { formatUaeDate } from '../../../shared/utils/uae-formatters';
 
 @Component({
   selector: 'bm-audit-list',
@@ -188,7 +189,7 @@ import { AuthService } from '../../../core/auth/auth.service';
                 @for (log of logs(); track log.id) {
                   <tr class="hover:bg-slate-50/60 transition-colors">
                     <td class="p-4 whitespace-nowrap text-slate-600 font-medium tabular-nums">
-                      {{ log.created_at | date: 'medium' }}
+                      {{ formatDate(log.created_at) }}
                     </td>
                     <td class="p-4 font-semibold text-slate-900">
                       {{ log.actor?.name || 'System' }}
@@ -267,6 +268,7 @@ import { AuthService } from '../../../core/auth/auth.service';
   `,
 })
 export class AuditListComponent implements OnInit {
+  formatDate = formatUaeDate;
   private api = inject(AuditApiService);
   readonly auth = inject(AuthService);
 

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { OwnerAgreement, TenantAgreement } from '../../models/agreement.models';
+import { formatUaeDate } from '../../utils/uae-formatters';
 
 type PrintableAgreement = OwnerAgreement | TenantAgreement;
 type PrintableProperty = {
@@ -55,7 +56,7 @@ type PrintableProperty = {
           <tbody>
             <tr>
               <th>Agreement Period<br /><span>مدة الاتفاقية</span></th>
-              <td>{{ agreement.start_date }} — {{ agreement.end_date }}</td>
+              <td>{{ formatDate(agreement.start_date) }} — {{ formatDate(agreement.end_date) }}</td>
             </tr>
             <tr>
               <th>Payment Terms<br /><span>شروط الدفع</span></th>
@@ -118,7 +119,7 @@ type PrintableProperty = {
           <tbody>
             <tr *ngFor="let item of agreement.installments">
               <td>{{ item.installment_no }}</td>
-              <td>{{ item.due_date }}</td>
+              <td>{{ formatDate(item.due_date) }}</td>
               <td>{{ agreement.currency_code || 'AED' }} {{ item.amount }}</td>
               <td>{{ item.status | titlecase }}</td>
             </tr>
@@ -312,6 +313,8 @@ export class BmAgreementPrintSheetComponent {
   @Input({ required: true }) secondPartyRole = '';
   @Input() isOwnerAgreement = false;
   @Input() properties: PrintableProperty[] = [];
+
+  formatDate = formatUaeDate;
 
   readonly business = {
     trn: '100000000000003',

@@ -31,7 +31,9 @@ import {
     BmComboboxComponent,
   ],
   template: `
-    <div class="max-w-[1240px] w-full mx-auto pb-12">
+    <div
+      class="max-w-[1400px] w-full mx-auto space-y-4 font-sans text-slate-900 pb-12 px-4 sm:px-6"
+    >
       <bm-page-header
         [title]="isEditMode() ? 'Edit Owner Agreement' : 'Draft Owner Agreement'"
         [subtitle]="
@@ -42,7 +44,7 @@ import {
       >
         <a
           routerLink="/app/owner-agreements"
-          class="bm-btn bm-btn-secondary text-xs font-semibold px-4 py-2 rounded-xl border border-slate-200 shadow-xs hover:bg-slate-100 transition"
+          class="bm-btn bm-btn-secondary text-xs font-semibold px-3 py-1.5 rounded-xl border border-slate-200 shadow-xs"
         >
           Cancel
         </a>
@@ -53,15 +55,15 @@ import {
       } @else if (error()) {
         <bm-error-state [message]="error()!" (retry)="loadAgreement()"></bm-error-state>
       } @else {
-        <form [formGroup]="agreementForm" (ngSubmit)="onSubmit()" class="space-y-6">
-          <!-- Top Server Error Alert -->
+        <form [formGroup]="agreementForm" (ngSubmit)="onSubmit()" class="space-y-4">
+          <!-- Server Error Alert -->
           @if (serverError()) {
             <div
-              class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs font-medium text-rose-800 flex items-start gap-3 shadow-xs"
+              class="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs font-medium text-rose-800 flex items-start gap-2.5 shadow-2xs"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="h-5 w-5 text-rose-600 shrink-0 mt-0.5"
+                class="h-4 w-4 text-rose-600 shrink-0 mt-0.5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -74,410 +76,380 @@ import {
                 />
               </svg>
               <div>
-                <div class="font-semibold text-rose-900 mb-0.5">Submission Error</div>
+                <div class="font-bold text-rose-900">Submission Error</div>
                 <div>{{ serverError() }}</div>
               </div>
             </div>
           }
 
-          <!-- SECTION 1: Agreement Identity & Owner Selection -->
-          <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
-            <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
-              <div
-                class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+          <!-- GRID ROW 1: IDENTITY & VALIDITY PERIOD (2 COLUMNS) -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4">
+            <!-- CARD 1: IDENTITY & OWNER (6 COLS) -->
+            <div
+              class="lg:col-span-6 rounded-2xl bg-white p-4 border border-slate-200/90 shadow-2xs space-y-3"
+            >
+              <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
+                <div
+                  class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs shrink-0"
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
+                  01
+                </div>
+                <h3 class="text-sm font-extrabold text-slate-900">Contract Identity & Owner</h3>
               </div>
-              <div>
-                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">
-                  Agreement Identity & Owner
-                </h3>
-                <p class="text-xs text-slate-500 font-normal">
-                  Contract reference code and master property owner assignment
-                </p>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label
+                    class="block text-[11px] font-bold uppercase text-slate-500 mb-1 flex items-center justify-between"
+                  >
+                    <span>Agreement #</span>
+                    <span class="text-[10px] text-slate-400 font-normal">Auto</span>
+                  </label>
+                  <input
+                    type="text"
+                    formControlName="agreement_no"
+                    placeholder="Auto-generated on save"
+                    readonly
+                    class="w-full h-9 px-3 rounded-lg border border-slate-200 bg-slate-50 text-slate-600 text-xs font-semibold tabular-nums cursor-not-allowed select-none"
+                  />
+                </div>
+
+                <div>
+                  <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">
+                    File No.
+                  </label>
+                  <input
+                    type="text"
+                    formControlName="file_no"
+                    maxlength="100"
+                    placeholder="Optional manual file #"
+                    class="w-full h-9 px-3 rounded-lg border border-slate-300/90 bg-white text-slate-900 text-xs font-medium focus:outline-none focus:border-emerald-600"
+                  />
+                </div>
+
+                <div class="sm:col-span-2">
+                  <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">
+                    Property Owner <span class="text-rose-600 ml-0.5">*</span>
+                  </label>
+                  <bm-combobox
+                    formControlName="owner_customer_id"
+                    [options]="ownerOptions()"
+                    [locked]="ownerPrefilled()"
+                    placeholder="Search or select property owner..."
+                    searchPlaceholder="Search owner by name, code, phone..."
+                    (change)="onOwnerChange()"
+                    [invalid]="isFieldInvalid('owner_customer_id')"
+                  ></bm-combobox>
+                  @if (isFieldInvalid('owner_customer_id')) {
+                    <span class="text-[11px] font-semibold text-rose-600 mt-1 block">
+                      Property owner selection is required.
+                    </span>
+                  }
+                </div>
               </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-              <div>
-                <label
-                  class="block text-[13px] font-semibold text-[#26312C] mb-2 flex items-center justify-between"
+            <!-- CARD 2: CONTRACT VALIDITY & TERM (6 COLS) -->
+            <div
+              class="lg:col-span-6 rounded-2xl bg-white p-4 border border-slate-200/90 shadow-2xs space-y-3"
+            >
+              <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
+                <div
+                  class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs shrink-0"
                 >
-                  <span>Agreement Number</span>
-                  <span class="text-[11px] text-slate-400 font-normal">System generated</span>
-                </label>
-                <input
-                  type="text"
-                  formControlName="agreement_no"
-                  placeholder="Assigned automatically on save"
-                  readonly
-                  class="w-full h-11 px-3.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 text-sm font-semibold tabular-nums cursor-not-allowed select-none placeholder:text-slate-400 placeholder:font-normal"
-                />
+                  02
+                </div>
+                <h3 class="text-sm font-extrabold text-slate-900">Contract Term & Validity</h3>
               </div>
 
-              <div>
-                <label class="block text-[13px] font-semibold text-[#26312C] mb-2">
-                  Property Owner <span class="text-rose-600 font-bold ml-0.5">*</span>
-                </label>
-                <bm-combobox
-                  formControlName="owner_customer_id"
-                  [options]="ownerOptions()"
-                  [locked]="ownerPrefilled()"
-                  placeholder="Search or select property owner..."
-                  searchPlaceholder="Search owner by name, code, phone..."
-                  (change)="onOwnerChange()"
-                  [invalid]="isFieldInvalid('owner_customer_id')"
-                ></bm-combobox>
-                @if (isFieldInvalid('owner_customer_id')) {
-                  <span class="text-xs font-medium text-rose-600 mt-1.5 flex items-center gap-1">
-                    Property owner selection is required.
-                  </span>
-                }
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">
+                    Commencement Date <span class="text-rose-600 ml-0.5">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    formControlName="start_date"
+                    class="w-full h-9 px-3 rounded-lg border border-slate-300/90 bg-white text-slate-900 text-xs font-medium focus:outline-none focus:border-emerald-600"
+                  />
+                  @if (isFieldInvalid('start_date')) {
+                    <span class="text-[11px] font-semibold text-rose-600 mt-1 block">
+                      Start date is required.
+                    </span>
+                  }
+                </div>
+
+                <div>
+                  <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">
+                    Expiration Date <span class="text-rose-600 ml-0.5">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    formControlName="end_date"
+                    class="w-full h-9 px-3 rounded-lg border border-slate-300/90 bg-white text-slate-900 text-xs font-medium focus:outline-none focus:border-emerald-600"
+                  />
+                  @if (isFieldInvalid('end_date')) {
+                    <span class="text-[11px] font-semibold text-rose-600 mt-1 block">
+                      End date is required.
+                    </span>
+                  }
+                </div>
+
+                <div class="sm:col-span-2 pt-1">
+                  <div
+                    class="p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs"
+                  >
+                    <span class="text-slate-500 font-medium">Contract Scope Status:</span>
+                    <span
+                      class="font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 text-[11px]"
+                    >
+                      {{
+                        isEditMode()
+                          ? 'Editing Existing Agreement'
+                          : 'New Management Agreement Draft'
+                      }}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- SECTION 2: Property Selection -->
-          <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
-            <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
-              <div
-                class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+          <!-- GRID ROW 2: COVERED PROPERTIES & COMMERCIAL TERMS -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 items-start">
+            <!-- CARD 3: MANAGED PROPERTY ASSETS (5 COLS) -->
+            <div
+              class="lg:col-span-5 rounded-2xl bg-white p-4 border border-slate-200/90 shadow-2xs space-y-3"
+            >
+              <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                <div class="flex items-center gap-2">
+                  <div
+                    class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs shrink-0"
+                  >
+                    03
+                  </div>
+                  <h3 class="text-sm font-extrabold text-slate-900">Covered Assets</h3>
+                </div>
+                <span
+                  class="text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200"
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                  />
-                </svg>
+                  {{ selectedPropertyIds().length }} Selected
+                </span>
               </div>
-              <div>
-                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">
-                  Covered Property Assets
-                </h3>
-                <p class="text-xs text-slate-500 font-normal">
-                  Select property assets managed under this owner contract
-                </p>
-              </div>
-            </div>
 
-            @if (!agreementForm.value.owner_customer_id) {
-              <div class="py-6 text-center text-xs text-slate-500 italic border-t border-slate-100">
-                Please select a property owner above to view available assets.
-              </div>
-            } @else if (availableProperties().length === 0) {
-              <div
-                class="py-6 text-center text-xs text-amber-700 font-medium border-t border-slate-100"
-              >
-                No active property assets registered under this owner in current branch.
-              </div>
-            } @else {
-              <div>
-                <label class="block text-[13px] font-semibold text-[#26312C] mb-3">
-                  Select Properties Managed <span class="text-rose-600 font-bold ml-0.5">*</span>
-                </label>
+              @if (!agreementForm.value.owner_customer_id) {
                 <div
-                  class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-72 overflow-y-auto p-1"
+                  class="py-5 text-center text-xs text-slate-400 italic bg-slate-50 rounded-xl border border-slate-100"
                 >
+                  Select a property owner above to view available assets.
+                </div>
+              } @else if (availableProperties().length === 0) {
+                <div
+                  class="py-5 text-center text-xs text-amber-700 font-medium bg-amber-50/50 rounded-xl border border-amber-200/60"
+                >
+                  No property assets registered under this owner in current branch.
+                </div>
+              } @else {
+                <div class="space-y-1.5 max-h-56 overflow-y-auto pr-1">
                   @for (prop of availableProperties(); track prop.id) {
                     <label
-                      class="flex items-center gap-3 p-3.5 rounded-xl border border-slate-200 bg-white hover:border-emerald-600 hover:shadow-2xs cursor-pointer transition-all duration-150"
+                      class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 bg-white hover:border-emerald-600 cursor-pointer transition text-xs"
                       [class.border-emerald-600]="isPropertySelected(prop.id)"
-                      [class.bg-emerald-50/20]="isPropertySelected(prop.id)"
+                      [class.bg-emerald-50/30]="isPropertySelected(prop.id)"
                     >
                       <input
                         type="checkbox"
                         [checked]="isPropertySelected(prop.id)"
                         (change)="toggleProperty(prop.id, $event)"
-                        class="rounded-md text-emerald-700 focus:ring-emerald-600 h-4.5 w-4.5 border-slate-300"
+                        class="rounded text-emerald-700 focus:ring-emerald-600 h-4 w-4 border-slate-300"
                       />
-                      <div class="text-xs overflow-hidden">
-                        <div class="font-semibold text-slate-900 truncate">
+                      <div class="overflow-hidden">
+                        <div class="font-bold text-slate-900 truncate">
                           [{{ prop.property_code }}] {{ prop.name }}
                         </div>
-                        <div class="text-slate-500 text-[11px] truncate">
-                          Property / Unit No.: {{ prop.unit_number }} | {{ prop.property_type }}
+                        <div class="text-slate-500 text-[10px] truncate">
+                          Unit {{ prop.unit_number }} · {{ prop.property_type }}
                         </div>
                       </div>
                     </label>
                   }
                 </div>
                 @if (selectedPropertyIds().length === 0 && agreementForm.touched) {
-                  <span class="text-xs font-medium text-rose-600 mt-2 block">
+                  <span class="text-[11px] font-semibold text-rose-600 block">
                     Please select at least one property asset.
                   </span>
                 }
-              </div>
-            }
-          </div>
+              }
+            </div>
 
-          <!-- SECTION 3: Agreement Period -->
-          <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
-            <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
-              <div
-                class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+            <!-- CARD 4: COMMERCIAL & FINANCIAL TERMS (7 COLS) -->
+            <div
+              class="lg:col-span-7 rounded-2xl bg-white p-4 border border-slate-200/90 shadow-2xs space-y-3"
+            >
+              <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
+                <div
+                  class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs shrink-0"
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  04
+                </div>
+                <h3 class="text-sm font-extrabold text-slate-900">Commercial & Financial Terms</h3>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                <div>
+                  <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">
+                    Total Amount (AED) <span class="text-rose-600 ml-0.5">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    formControlName="total_amount"
+                    placeholder="0.00"
+                    class="w-full h-9 px-3 rounded-lg border border-slate-300/90 bg-white text-slate-900 text-xs font-bold tabular-nums focus:outline-none focus:border-emerald-600"
                   />
-                </svg>
-              </div>
-              <div>
-                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">
-                  Contract Term & Validity
-                </h3>
-                <p class="text-xs text-slate-500 font-normal">
-                  Agreement commencement and expiration dates
-                </p>
-              </div>
-            </div>
+                  @if (isFieldInvalid('total_amount')) {
+                    <span class="text-[11px] font-semibold text-rose-600 mt-1 block">
+                      Valid amount required.
+                    </span>
+                  }
+                </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-              <div>
-                <label class="block text-[13px] font-semibold text-[#26312C] mb-2">
-                  Start Date <span class="text-rose-600 font-bold ml-0.5">*</span>
-                </label>
-                <input
-                  type="date"
-                  formControlName="start_date"
-                  class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium shadow-2xs focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
-                />
-                @if (isFieldInvalid('start_date')) {
-                  <span class="text-xs font-medium text-rose-600 mt-1.5 flex items-center gap-1">
-                    Commencement start date is required.
-                  </span>
-                }
-              </div>
-
-              <div>
-                <label class="block text-[13px] font-semibold text-[#26312C] mb-2">
-                  End Date <span class="text-rose-600 font-bold ml-0.5">*</span>
-                </label>
-                <input
-                  type="date"
-                  formControlName="end_date"
-                  class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium shadow-2xs focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
-                />
-                @if (isFieldInvalid('end_date')) {
-                  <span class="text-xs font-medium text-rose-600 mt-1.5 flex items-center gap-1">
-                    Expiration end date is required.
-                  </span>
-                }
-              </div>
-            </div>
-          </div>
-
-          <!-- SECTION 4: Commercial Terms -->
-          <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
-            <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
-              <div
-                class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 12v-2m0 0c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                <div>
+                  <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">
+                    Installment Count <span class="text-rose-600 ml-0.5">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="36"
+                    formControlName="payment_count"
+                    class="w-full h-9 px-3 rounded-lg border border-slate-300/90 bg-white text-slate-900 text-xs font-medium tabular-nums focus:outline-none focus:border-emerald-600"
                   />
-                </svg>
-              </div>
-              <div>
-                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">
-                  Commercial & Financial Terms
-                </h3>
-                <p class="text-xs text-slate-500 font-normal">
-                  Contract value, installment frequency, and payment mode
-                </p>
-              </div>
-            </div>
+                  @if (isFieldInvalid('payment_count')) {
+                    <span class="text-[11px] font-semibold text-rose-600 mt-1 block">
+                      Count required.
+                    </span>
+                  }
+                </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-5">
-              <div>
-                <label class="block text-[13px] font-semibold text-[#26312C] mb-2">
-                  Total Amount (AED) <span class="text-rose-600 font-bold ml-0.5">*</span>
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  formControlName="total_amount"
-                  placeholder="0.00"
-                  class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-semibold tabular-nums shadow-2xs placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
-                />
-                @if (isFieldInvalid('total_amount')) {
-                  <span class="text-xs font-medium text-rose-600 mt-1.5 flex items-center gap-1">
-                    Valid contract amount is required.
-                  </span>
-                }
-              </div>
+                <div>
+                  <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">
+                    Payment Frequency
+                  </label>
+                  <select
+                    formControlName="payment_frequency"
+                    class="w-full h-9 px-3 rounded-lg border border-slate-300/90 bg-white text-slate-900 text-xs font-medium focus:outline-none focus:border-emerald-600"
+                  >
+                    <option value="monthly">Monthly</option>
+                    <option value="quarterly">Quarterly</option>
+                    <option value="semi-annually">Semi-Annually</option>
+                    <option value="annually">Annually</option>
+                  </select>
+                </div>
 
-              <div>
-                <label class="block text-[13px] font-semibold text-[#26312C] mb-2">
-                  Number of Installments <span class="text-rose-600 font-bold ml-0.5">*</span>
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  max="36"
-                  formControlName="payment_count"
-                  class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium tabular-nums shadow-2xs focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
-                />
-                @if (isFieldInvalid('payment_count')) {
-                  <span class="text-xs font-medium text-rose-600 mt-1.5 flex items-center gap-1">
-                    Number of payments is required.
-                  </span>
-                }
-              </div>
+                <div>
+                  <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">
+                    Payment Mode <span class="text-rose-600 ml-0.5">*</span>
+                  </label>
+                  <select
+                    formControlName="payment_mode"
+                    class="w-full h-9 px-3 rounded-lg border border-slate-300/90 bg-white text-slate-900 text-xs font-medium focus:outline-none focus:border-emerald-600"
+                  >
+                    <option value="bank_transfer">Bank Transfer</option>
+                    <option value="cheque">Cheque</option>
+                    <option value="cash">Cash</option>
+                  </select>
+                </div>
 
-              <div>
-                <label class="block text-[13px] font-semibold text-[#26312C] mb-2">
-                  Payment Frequency
-                </label>
-                <select
-                  formControlName="payment_frequency"
-                  class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium shadow-2xs focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
-                >
-                  <option value="monthly">Monthly</option>
-                  <option value="quarterly">Quarterly</option>
-                  <option value="semi-annually">Semi-Annually</option>
-                  <option value="annually">Annually</option>
-                </select>
-              </div>
-
-              <div>
-                <label class="block text-[13px] font-semibold text-[#26312C] mb-2">
-                  Payment Mode <span class="text-rose-600 font-bold ml-0.5">*</span>
-                </label>
-                <select
-                  formControlName="payment_mode"
-                  class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium shadow-2xs focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
-                >
-                  <option value="bank_transfer">Bank Transfer</option>
-                  <option value="cheque">Cheque</option>
-                  <option value="cash">Cash</option>
-                </select>
-              </div>
-
-              <div class="md:col-span-2">
-                <label class="block text-[13px] font-semibold text-[#26312C] mb-2">
-                  Notes & Special Conditions
-                </label>
-                <input
-                  type="text"
-                  formControlName="notes"
-                  placeholder="Special clauses or agreement terms..."
-                  class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium shadow-2xs placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
-                />
+                <div class="sm:col-span-2">
+                  <label class="block text-[11px] font-bold uppercase text-slate-500 mb-1">
+                    Notes & Special Conditions
+                  </label>
+                  <input
+                    type="text"
+                    formControlName="notes"
+                    placeholder="Special clauses or agreement terms..."
+                    class="w-full h-9 px-3 rounded-lg border border-slate-300/90 bg-white text-slate-900 text-xs font-medium focus:outline-none focus:border-emerald-600"
+                  />
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- SECTION 5: Client Installment Schedule Preview -->
-          <div class="bg-white rounded-[20px] p-6 lg:p-7 border border-slate-200/90 shadow-xs">
-            <div class="flex items-center gap-3 pb-4 mb-6 border-b border-slate-100">
-              <div
-                class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+          <!-- CARD 5: INSTALLMENT SCHEDULE PREVIEW (FULL WIDTH) -->
+          <div class="rounded-2xl bg-white p-4 border border-slate-200/90 shadow-2xs space-y-3">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+              <div class="flex items-center gap-2">
+                <div
+                  class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs shrink-0"
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                  />
-                </svg>
+                  05
+                </div>
+                <div>
+                  <h3 class="text-sm font-extrabold text-slate-900">
+                    Installment Schedule Breakdown
+                  </h3>
+                </div>
               </div>
-              <div>
-                <h3 class="text-lg font-semibold text-slate-900 tracking-tight">
-                  Installment Schedule Preview
-                </h3>
-                <p class="text-xs text-slate-500 font-normal">
-                  Informative schedule breakdown generated based on commercial terms
-                </p>
-              </div>
+
+              @if (installmentPreview().length > 0) {
+                <div class="text-xs flex items-center gap-2">
+                  <span class="text-slate-500">Schedule Total:</span>
+                  <span
+                    class="font-extrabold tabular-nums px-2.5 py-0.5 rounded text-[11px] border"
+                    [class.bg-emerald-50]="scheduleMatchesTotal()"
+                    [class.text-emerald-800]="scheduleMatchesTotal()"
+                    [class.border-emerald-200]="scheduleMatchesTotal()"
+                    [class.bg-rose-50]="!scheduleMatchesTotal()"
+                    [class.text-rose-800]="!scheduleMatchesTotal()"
+                    [class.border-rose-200]="!scheduleMatchesTotal()"
+                  >
+                    AED {{ scheduleTotal() | number: '1.2-2' }} /
+                    {{ agreementForm.value.total_amount || 0 | number: '1.2-2' }}
+                  </span>
+                </div>
+              }
             </div>
 
             @if (installmentPreview().length > 0) {
-              <div class="border border-slate-200/80 rounded-xl overflow-hidden">
+              <div class="border border-slate-200/80 rounded-xl overflow-x-auto bg-white">
                 <table class="w-full text-left border-collapse text-xs">
                   <thead>
                     <tr
-                      class="bg-slate-50/80 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]"
+                      class="bg-slate-50 border-b border-slate-200/80 text-slate-500 font-bold uppercase text-[10px]"
                     >
-                      <th class="py-3 px-4">Installment</th>
-                      <th class="py-3 px-4">Due Date</th>
-                      <th class="py-3 px-4">Reference / Particulars <span class="text-rose-600">*</span></th>
-                      <th class="py-3 px-4 text-right">Amount (AED)</th>
+                      <th class="py-2 px-3">#</th>
+                      <th class="py-2 px-3">Due Date</th>
+                      <th class="py-2 px-3">Particulars & Category</th>
+                      <th class="py-2 px-3 text-right">Amount (AED)</th>
                     </tr>
                   </thead>
-                  <tbody class="divide-y divide-slate-100">
+                  <tbody class="divide-y divide-slate-100 font-medium">
                     @for (item of installmentPreview(); track item.installment_number) {
-                      <tr class="hover:bg-slate-50/50 transition-colors">
-                        <td class="py-3 px-4 font-semibold text-slate-800">
-                          Installment {{ item.installment_number }}
+                      <tr class="hover:bg-slate-50/60 transition">
+                        <td class="py-2 px-3 font-bold text-slate-800">
+                          Inst. {{ item.installment_number }}
                         </td>
-                        <td class="py-3 px-4">
+                        <td class="py-2 px-3">
                           <input
                             [value]="item.due_date"
                             (input)="updateScheduleDate(item.installment_number, $event)"
                             type="date"
                             [min]="agreementForm.value.start_date || null"
                             [max]="agreementForm.value.end_date || null"
-                            class="h-9 rounded-lg border border-slate-200 bg-white px-2 text-xs tabular-nums"
+                            class="h-8 rounded-md border border-slate-200 bg-white px-2 text-xs tabular-nums"
                             required
                           />
                         </td>
-                        <td class="py-3 px-4 min-w-[360px]">
-                          <div class="text-[10px] text-slate-400 font-mono truncate mb-1">
+                        <td class="py-2 px-3 min-w-[320px]">
+                          <div class="text-[10px] text-slate-400 font-mono truncate mb-0.5">
                             {{ scheduleReference(item) }}
                           </div>
-                          <div class="flex gap-2">
+                          <div class="flex gap-1.5">
                             <select
                               [value]="item.category"
                               (change)="updateScheduleCategory(item.installment_number, $event)"
-                              class="h-9 rounded-lg border border-slate-200 bg-white px-2 text-xs"
+                              class="h-8 rounded-md border border-slate-200 bg-white px-2 text-xs"
                             >
                               <option value="rent">Rent</option>
                               <option value="security">Security</option>
@@ -486,22 +458,22 @@ import {
                             <input
                               [value]="item.particulars"
                               (input)="updateScheduleParticulars(item.installment_number, $event)"
-                              placeholder="Enter particulars"
+                              placeholder="Enter particulars..."
                               required
-                              class="h-9 min-w-0 flex-1 rounded-lg border border-slate-200 px-2 text-xs"
+                              class="h-8 min-w-0 flex-1 rounded-md border border-slate-200 px-2 text-xs"
                             />
                           </div>
                         </td>
-                        <td class="py-3 px-4 text-right font-semibold text-slate-900 tabular-nums">
+                        <td class="py-2 px-3 text-right font-bold text-slate-900 tabular-nums">
                           <div class="flex items-center justify-end gap-1">
-                            <span class="text-slate-400">AED</span>
+                            <span class="text-slate-400 text-[10px]">AED</span>
                             <input
                               [value]="item.amount"
                               (input)="updateScheduleAmount(item.installment_number, $event)"
                               type="number"
                               min="0.01"
                               step="0.01"
-                              class="h-9 w-28 rounded-lg border border-slate-200 bg-white px-2 text-right text-xs tabular-nums"
+                              class="h-8 w-28 rounded-md border border-slate-200 bg-white px-2 text-right text-xs tabular-nums font-bold"
                               required
                             />
                           </div>
@@ -511,28 +483,19 @@ import {
                   </tbody>
                 </table>
               </div>
-              <div class="mt-3 flex items-center justify-end gap-2 text-xs">
-                <span class="text-slate-500">Schedule total:</span>
-                <span
-                  class="font-bold tabular-nums"
-                  [class.text-rose-700]="!scheduleMatchesTotal()"
-                  [class.text-emerald-700]="scheduleMatchesTotal()"
-                >
-                  AED {{ scheduleTotal() | number: '1.2-2' }} /
-                  {{ (agreementForm.value.total_amount || 0) | number: '1.2-2' }}
-                </span>
-              </div>
             } @else {
-              <div class="py-6 text-center text-xs text-slate-400 italic">
-                Enter total contract amount, dates, and installment count above to calculate
-                schedule preview.
+              <div
+                class="py-6 text-center text-xs text-slate-400 italic bg-slate-50/50 rounded-xl border border-slate-100"
+              >
+                Enter total contract amount, validity dates, and installment count to generate
+                schedule breakdown.
               </div>
             }
           </div>
 
           <!-- STICKY ACTION BAR -->
           <div
-            class="sticky bottom-4 z-10 bg-white/95 backdrop-blur-md p-4 rounded-2xl border border-slate-200/90 shadow-lg flex items-center justify-between mt-8"
+            class="sticky bottom-3 z-10 bg-white/95 backdrop-blur-md p-3 rounded-2xl border border-slate-200/90 shadow-md flex items-center justify-between mt-6"
           >
             <div class="text-xs text-slate-500 font-medium hidden sm:block">
               <span class="text-slate-400">Status:</span>
@@ -542,21 +505,21 @@ import {
                   : 'Creating new owner agreement in draft state'
               }}
             </div>
-            <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+            <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end">
               <a
                 routerLink="/app/owner-agreements"
-                class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold border border-slate-200/80 transition"
+                class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold border border-slate-200/80 transition"
               >
                 Cancel
               </a>
               <button
                 type="submit"
                 [disabled]="isSubmitting()"
-                class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#132a13] to-[#31572c] hover:brightness-110 text-white text-sm font-semibold shadow-sm transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+                class="px-5 py-2 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold shadow-xs transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-1.5"
               >
                 @if (isSubmitting()) {
                   <svg
-                    class="animate-spin -ml-1 h-4 w-4 text-white"
+                    class="animate-spin -ml-1 h-3.5 w-3.5 text-white"
                     fill="none"
                     viewBox="0 0 24 24"
                   >
@@ -574,11 +537,9 @@ import {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  <span>Saving Agreement...</span>
+                  <span>Saving...</span>
                 } @else {
-                  <span>{{
-                    isEditMode() ? 'Update Draft Agreement' : 'Save Draft Agreement'
-                  }}</span>
+                  <span>{{ isEditMode() ? 'Update Agreement' : 'Save Agreement' }}</span>
                 }
               </button>
             </div>
@@ -603,7 +564,17 @@ export class OwnerAgreementFormComponent implements OnInit {
   owners = signal<Customer[]>([]);
   allOwnerProperties = signal<Property[]>([]);
   selectedPropertyIds = signal<number[]>([]);
-  scheduleDetails = signal<Record<number, { category: InstallmentItem['category']; particulars: string; due_date?: string; amount?: number }>>({});
+  scheduleDetails = signal<
+    Record<
+      number,
+      {
+        category: InstallmentItem['category'];
+        particulars: string;
+        due_date?: string;
+        amount?: number;
+      }
+    >
+  >({});
   private formVersion = signal(0);
   private scheduleInputSignature = '';
 
@@ -623,6 +594,7 @@ export class OwnerAgreementFormComponent implements OnInit {
 
   agreementForm = this.fb.group({
     agreement_no: [''],
+    file_no: [''],
     owner_customer_id: ['', Validators.required],
     start_date: ['', Validators.required],
     end_date: ['', Validators.required],
@@ -667,7 +639,8 @@ export class OwnerAgreementFormComponent implements OnInit {
       items.push({
         installment_number: i,
         due_date: this.scheduleDetails()[i]?.due_date || dueDate.toISOString().split('T')[0],
-        amount: this.scheduleDetails()[i]?.amount ?? (baseCents + (i === 1 ? remainderCents : 0)) / 100,
+        amount:
+          this.scheduleDetails()[i]?.amount ?? (baseCents + (i === 1 ? remainderCents : 0)) / 100,
         category: this.scheduleDetails()[i]?.category || 'rent',
         particulars: this.scheduleDetails()[i]?.particulars || '',
         status: 'pending',
@@ -677,42 +650,85 @@ export class OwnerAgreementFormComponent implements OnInit {
     return items;
   });
 
-  scheduleTotal = computed(() => this.installmentPreview().reduce((total, item) => total + Number(item.amount || 0), 0));
+  scheduleTotal = computed(() =>
+    this.installmentPreview().reduce((total, item) => total + Number(item.amount || 0), 0),
+  );
 
-  scheduleMatchesTotal = computed(() => Math.round(this.scheduleTotal() * 100) === Math.round(Number(this.agreementForm.value.total_amount || 0) * 100));
+  scheduleMatchesTotal = computed(
+    () =>
+      Math.round(this.scheduleTotal() * 100) ===
+      Math.round(Number(this.agreementForm.value.total_amount || 0) * 100),
+  );
 
   scheduleReference(item: InstallmentItem): string {
-    const customerCode = this.owners().find((owner) => String(owner.id) === String(this.agreementForm.value.owner_customer_id))?.customer_code || 'CUSTOMER';
+    const customerCode =
+      this.owners().find(
+        (owner) => String(owner.id) === String(this.agreementForm.value.owner_customer_id),
+      )?.customer_code || 'CUSTOMER';
     return `${customerCode}/${this.agreementForm.value.agreement_no || 'AGREEMENT_PENDING'}/OUTWARD/${item.category.toUpperCase()}/${item.particulars || '[particulars required]'}`;
   }
 
   updateScheduleCategory(number: number, event: Event): void {
     const category = (event.target as HTMLSelectElement).value as InstallmentItem['category'];
-    this.scheduleDetails.update((details) => ({ ...details, [number]: { ...details[number], category, particulars: details[number]?.particulars || '' } }));
+    this.scheduleDetails.update((details) => ({
+      ...details,
+      [number]: { ...details[number], category, particulars: details[number]?.particulars || '' },
+    }));
   }
 
   updateScheduleParticulars(number: number, event: Event): void {
     const particulars = (event.target as HTMLInputElement).value;
-    this.scheduleDetails.update((details) => ({ ...details, [number]: { ...details[number], category: details[number]?.category || 'rent', particulars } }));
+    this.scheduleDetails.update((details) => ({
+      ...details,
+      [number]: { ...details[number], category: details[number]?.category || 'rent', particulars },
+    }));
   }
 
   updateScheduleDate(number: number, event: Event): void {
     const dueDate = (event.target as HTMLInputElement).value;
-    this.scheduleDetails.update((details) => ({ ...details, [number]: { ...details[number], due_date: dueDate, category: details[number]?.category || 'rent', particulars: details[number]?.particulars || '' } }));
+    this.scheduleDetails.update((details) => ({
+      ...details,
+      [number]: {
+        ...details[number],
+        due_date: dueDate,
+        category: details[number]?.category || 'rent',
+        particulars: details[number]?.particulars || '',
+      },
+    }));
   }
 
   updateScheduleAmount(number: number, event: Event): void {
     const amount = Number((event.target as HTMLInputElement).value);
-    this.scheduleDetails.update((details) => ({ ...details, [number]: { ...details[number], amount: Number.isFinite(amount) ? amount : 0, category: details[number]?.category || 'rent', particulars: details[number]?.particulars || '' } }));
+    this.scheduleDetails.update((details) => ({
+      ...details,
+      [number]: {
+        ...details[number],
+        amount: Number.isFinite(amount) ? amount : 0,
+        category: details[number]?.category || 'rent',
+        particulars: details[number]?.particulars || '',
+      },
+    }));
   }
 
   private resetScheduleOverrides(): void {
-    this.scheduleDetails.update((details) => Object.fromEntries(Object.entries(details).map(([number, value]) => [number, { category: value.category, particulars: value.particulars }])));
+    this.scheduleDetails.update((details) =>
+      Object.fromEntries(
+        Object.entries(details).map(([number, value]) => [
+          number,
+          { category: value.category, particulars: value.particulars },
+        ]),
+      ),
+    );
   }
 
   private scheduleSignature(): string {
     const value = this.agreementForm.getRawValue();
-    return [value.total_amount, value.payment_count, value.start_date, value.payment_frequency].join('|');
+    return [
+      value.total_amount,
+      value.payment_count,
+      value.start_date,
+      value.payment_frequency,
+    ].join('|');
   }
 
   ngOnInit(): void {
@@ -811,6 +827,7 @@ export class OwnerAgreementFormComponent implements OnInit {
 
         this.agreementForm.patchValue({
           agreement_no: agr.agreement_no,
+          file_no: agr.file_no || '',
           owner_customer_id: String(agr.owner_customer_id),
           start_date: agr.start_date,
           end_date: agr.end_date,
@@ -820,7 +837,21 @@ export class OwnerAgreementFormComponent implements OnInit {
           payment_mode: agr.payment_mode || 'bank_transfer',
           notes: agr.notes || '',
         });
-        this.scheduleDetails.set(Object.fromEntries((agr.installments || []).filter((line) => !line.is_extra).map((line) => [Number(line.installment_no), { category: line.category, particulars: line.particulars, due_date: line.due_date, amount: Number(line.amount) }])));
+        this.scheduleDetails.set(
+          Object.fromEntries(
+            (agr.installments || [])
+              .filter((line) => !line.is_extra)
+              .map((line) => [
+                Number(line.installment_no),
+                {
+                  category: line.category,
+                  particulars: line.particulars,
+                  due_date: line.due_date,
+                  amount: Number(line.amount),
+                },
+              ]),
+          ),
+        );
         this.isLoading.set(false);
       },
       error: (err) => {
@@ -865,7 +896,9 @@ export class OwnerAgreementFormComponent implements OnInit {
       return;
     }
     if (this.installmentPreview().some((item) => !item.particulars.trim())) {
-      this.serverError.set('Particulars are required for every installment in the schedule preview.');
+      this.serverError.set(
+        'Particulars are required for every installment in the schedule preview.',
+      );
       return;
     }
     if (!this.scheduleMatchesTotal()) {
@@ -879,6 +912,7 @@ export class OwnerAgreementFormComponent implements OnInit {
     const val = this.agreementForm.value;
     const dto = {
       owner_customer_id: Number(val.owner_customer_id),
+      file_no: val.file_no?.trim() || null,
       property_ids: this.selectedPropertyIds(),
       start_date: val.start_date!,
       end_date: val.end_date!,
@@ -886,7 +920,13 @@ export class OwnerAgreementFormComponent implements OnInit {
       payment_count: Number(val.payment_count),
       payment_frequency: val.payment_frequency || 'monthly',
       payment_mode: val.payment_mode as PaymentMode,
-      installments: this.installmentPreview().map((item) => ({ installment_no: item.installment_number, due_date: item.due_date, amount: Number(item.amount.toFixed(2)), category: item.category, particulars: item.particulars.trim() })),
+      installments: this.installmentPreview().map((item) => ({
+        installment_no: item.installment_number,
+        due_date: item.due_date,
+        amount: Number(item.amount.toFixed(2)),
+        category: item.category,
+        particulars: item.particulars.trim(),
+      })),
       notes: val.notes || null,
     };
 

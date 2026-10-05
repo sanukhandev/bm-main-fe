@@ -15,17 +15,22 @@ export function uaeDateInput(date = new Date()): string {
 
 export function formatUaeDate(value: string | Date | null | undefined): string {
   if (!value) return '—';
-  const date =
-    typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)
-      ? new Date(`${value}T12:00:00Z`)
-      : new Date(value);
+  if (typeof value === 'string') {
+    const dateOnly = value.slice(0, 10);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateOnly)) {
+      return `${dateOnly.slice(8, 10)}/${dateOnly.slice(5, 7)}/${dateOnly.slice(0, 4)}`;
+    }
+  }
+  const date = new Date(value);
   if (Number.isNaN(date.getTime())) return String(value);
-  return new Intl.DateTimeFormat('en-GB', {
+  const parts = new Intl.DateTimeFormat('en-GB', {
     timeZone: UAE_TIME_ZONE,
     day: '2-digit',
-    month: 'short',
+    month: '2-digit',
     year: 'numeric',
-  }).format(date);
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+  return `${values['day']}/${values['month']}/${values['year']}`;
 }
 
 /**

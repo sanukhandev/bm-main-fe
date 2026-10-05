@@ -1,7 +1,7 @@
 import { Component, input, output, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AccountTransaction } from '../../../core/api/accounts-api.service';
-import { numberToWords } from '../../utils/uae-formatters';
+import { formatUaeDate, numberToWords } from '../../utils/uae-formatters';
 
 @Component({
   selector: 'bm-receipt-cheque-modal',
@@ -198,7 +198,7 @@ import { numberToWords } from '../../utils/uae-formatters';
                   <div class="text-xs text-slate-500 tabular-nums">
                     Date:
                     <span class="font-medium text-slate-800">{{
-                      transaction()!.transaction_date
+                      formatDate(transaction()!.transaction_date)
                     }}</span>
                   </div>
                 </div>
@@ -394,7 +394,7 @@ import { numberToWords } from '../../utils/uae-formatters';
                           <strong class="text-slate-900">{{
                             transaction()!.cheque_no || '—'
                           }}</strong>
-                          · Date: {{ transaction()!.cheque_date || '—' }}
+                          · Date: {{ formatDate(transaction()!.cheque_date) }}
                         </div>
                         @if (transaction()!.bank_name) {
                           <div class="text-slate-500">Bank: {{ transaction()!.bank_name }}</div>
@@ -407,7 +407,7 @@ import { numberToWords } from '../../utils/uae-formatters';
                           <strong class="text-slate-900">{{
                             transaction()!.bank_reference || '—'
                           }}</strong>
-                          · Date: {{ transaction()!.transfer_date || '—' }}
+                          · Date: {{ formatDate(transaction()!.transfer_date) }}
                         </div>
                         @if (transaction()!.bank_name) {
                           <div class="text-slate-500">
@@ -459,6 +459,7 @@ import { numberToWords } from '../../utils/uae-formatters';
   `,
 })
 export class BmReceiptChequeModalComponent {
+  formatDate = formatUaeDate;
   isOpen = input<boolean>(false);
   transaction = input<AccountTransaction | null>(null);
   close = output<void>();

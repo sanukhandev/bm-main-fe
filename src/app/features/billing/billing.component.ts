@@ -8,6 +8,7 @@ import { BmStatusBadgeComponent } from '../../shared/components/bm-status-badge/
 import { BmSearchInputComponent } from '../../shared/components/bm-search-input/bm-search-input.component';
 import { BmPaginationComponent } from '../../shared/components/bm-pagination/bm-pagination.component';
 import { PaginationMeta } from '../../core/api/api.models';
+import { formatUaeDate } from '../../shared/utils/uae-formatters';
 
 @Component({
   selector: 'bm-billing',
@@ -307,7 +308,7 @@ import { PaginationMeta } from '../../core/api/api.models';
                         <span class="text-slate-400">—</span>
                       }
                     </td>
-                    <td class="py-3.5 px-4 text-slate-600 tabular-nums">{{ date(row) }}</td>
+                    <td class="py-3.5 px-4 text-slate-600 tabular-nums">{{ formatDate(date(row)) }}</td>
                     <td class="py-3.5 px-4 font-extrabold text-slate-900 tabular-nums">
                       <div class="flex items-center">
                         <dirham-symbol
@@ -439,6 +440,7 @@ import { PaginationMeta } from '../../core/api/api.models';
   `,
 })
 export class BillingComponent {
+  formatDate = formatUaeDate;
   private api = inject(BillingApiService);
   private route = inject(ActivatedRoute);
 

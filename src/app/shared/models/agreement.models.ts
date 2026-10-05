@@ -29,6 +29,7 @@ export interface OwnerAgreement {
   id: number;
   branch_id: number;
   agreement_no: string;
+  file_no?: string | null;
   owner_customer_id: number;
   owner?: { data: Customer } | Customer;
   properties?: Property[] | { data: Property[] };
@@ -79,6 +80,7 @@ export interface TenantAgreement {
   id: number;
   branch_id: number;
   agreement_no: string;
+  file_no?: string | null;
   tenant_customer_id: number;
   tenant?: { data: Customer } | Customer;
   properties?: TenantAgreementPropertyItem[];

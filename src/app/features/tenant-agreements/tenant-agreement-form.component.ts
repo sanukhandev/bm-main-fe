@@ -6,7 +6,6 @@ import { BmPageHeaderComponent } from '../../shared/components/bm-page-header/bm
 import { BmLoadingStateComponent } from '../../shared/components/bm-loading-state/bm-loading-state.component';
 import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm-error-state.component';
 import { TenantAgreementsApiService } from '../../core/api/tenant-agreements-api.service';
-import { AuthService } from '../../core/auth/auth.service';
 import { OwnerAgreementsApiService } from '../../core/api/owner-agreements-api.service';
 import { CustomersApiService } from '../../core/api/customers-api.service';
 import { PropertiesApiService } from '../../core/api/properties-api.service';
@@ -708,7 +707,6 @@ export class TenantAgreementFormComponent implements OnInit {
   formatDate = formatUaeDate;
   private fb = inject(FormBuilder);
   private api = inject(TenantAgreementsApiService);
-  private auth = inject(AuthService);
   private ownerAgreementsApi = inject(OwnerAgreementsApiService);
   private customersApi = inject(CustomersApiService);
   private propertiesApi = inject(PropertiesApiService);
@@ -1140,6 +1138,7 @@ export class TenantAgreementFormComponent implements OnInit {
   }
 
   onDateChange(): void {
+    if (!this.isEditMode() && this.ownerCoverageExceeded()) return;
     this.onAvailabilityInputsChange();
   }
 
@@ -1205,10 +1204,6 @@ export class TenantAgreementFormComponent implements OnInit {
     }
 
     if (!this.isEditMode() && this.ownerCoverageExceeded() && !this.coverageOverrideConfirmed) {
-      if (!this.auth.hasPermission('agreements.override_coverage')) {
-        this.serverError.set('You are not authorized to override Owner Agreement coverage.');
-        return;
-      }
       this.agreementForm.get('coverage_override_reason')?.setValue('');
       this.coverageOverrideDialogOpen.set(true);
       return;

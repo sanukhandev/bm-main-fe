@@ -6,6 +6,7 @@ import { BmPageHeaderComponent } from '../../shared/components/bm-page-header/bm
 import { BmLoadingStateComponent } from '../../shared/components/bm-loading-state/bm-loading-state.component';
 import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm-error-state.component';
 import { TenantAgreementsApiService } from '../../core/api/tenant-agreements-api.service';
+import { AuthService } from '../../core/auth/auth.service';
 import { OwnerAgreementsApiService } from '../../core/api/owner-agreements-api.service';
 import { CustomersApiService } from '../../core/api/customers-api.service';
 import { PropertiesApiService } from '../../core/api/properties-api.service';
@@ -650,6 +651,54 @@ import {
               </button>
             </div>
           </div>
+
+          @if (coverageOverrideDialogOpen()) {
+            <div
+              class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 bm-modal-backdrop"
+              role="presentation"
+            >
+              <div
+                class="bg-white rounded-2xl shadow-2xl border border-amber-200 w-full max-w-lg overflow-hidden bm-modal-content"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="coverage-override-title"
+              >
+                <div class="p-6 space-y-4">
+                  <div>
+                    <h2 id="coverage-override-title" class="text-lg font-extrabold text-amber-900">
+                      Owner coverage warning
+                    </h2>
+                    <p class="mt-2 text-sm text-slate-600">
+                      The tenant dates exceed the selected Owner Agreement. Continue only with
+                      approved authorization and record the reason.
+                    </p>
+                  </div>
+                  <label class="block text-sm font-semibold text-slate-700">
+                    Override reason <span class="text-rose-600">*</span>
+                    <textarea
+                      formControlName="coverage_override_reason"
+                      rows="4"
+                      class="bm-input mt-2 !h-auto p-3"
+                      placeholder="Explain why the tenant agreement may exceed owner coverage..."
+                    ></textarea>
+                  </label>
+                  <div class="flex justify-end gap-2">
+                    <button type="button" class="bm-btn bm-btn-secondary text-xs" (click)="cancelCoverageOverride()">
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      class="bm-btn bm-btn-primary text-xs"
+                      [disabled]="!((agreementForm.value.coverage_override_reason || '').trim())"
+                      (click)="confirmCoverageOverride()"
+                    >
+                      Confirm and create
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
         </form>
       }
     </div>
@@ -659,6 +708,7 @@ export class TenantAgreementFormComponent implements OnInit {
   formatDate = formatUaeDate;
   private fb = inject(FormBuilder);
   private api = inject(TenantAgreementsApiService);
+  private auth = inject(AuthService);
   private ownerAgreementsApi = inject(OwnerAgreementsApiService);
   private customersApi = inject(CustomersApiService);
   private propertiesApi = inject(PropertiesApiService);
@@ -724,6 +774,8 @@ export class TenantAgreementFormComponent implements OnInit {
   isSubmitting = signal(false);
   error = signal<string | null>(null);
   serverError = signal<string | null>(null);
+  coverageOverrideDialogOpen = signal(false);
+  private coverageOverrideConfirmed = false;
   private availabilityRequest = 0;
   scheduleDetails = signal<
     Record<
@@ -751,6 +803,7 @@ export class TenantAgreementFormComponent implements OnInit {
     payment_count: [1, [Validators.required, Validators.min(1), Validators.max(36)]],
     payment_frequency: ['monthly'],
     payment_mode: ['cheque' as PaymentMode, Validators.required],
+    coverage_override_reason: ['' as string],
     notes: [''],
   });
 
@@ -1151,6 +1204,16 @@ export class TenantAgreementFormComponent implements OnInit {
       return;
     }
 
+    if (!this.isEditMode() && this.ownerCoverageExceeded() && !this.coverageOverrideConfirmed) {
+      if (!this.auth.hasPermission('agreements.override_coverage')) {
+        this.serverError.set('You are not authorized to override Owner Agreement coverage.');
+        return;
+      }
+      this.agreementForm.get('coverage_override_reason')?.setValue('');
+      this.coverageOverrideDialogOpen.set(true);
+      return;
+    }
+
     this.isSubmitting.set(true);
     this.serverError.set(null);
 
@@ -1178,6 +1241,12 @@ export class TenantAgreementFormComponent implements OnInit {
         source_owner_agreement_id: Number(val.source_owner_agreement_id),
       })),
       notes: val.notes || null,
+      ...(this.coverageOverrideConfirmed
+        ? {
+            coverage_override: true,
+            coverage_override_reason: val.coverage_override_reason?.trim(),
+          }
+        : {}),
     };
 
     if (this.isEditMode()) {
@@ -1205,10 +1274,35 @@ export class TenantAgreementFormComponent implements OnInit {
     }
   }
 
+  confirmCoverageOverride(): void {
+    const reason = this.agreementForm.value.coverage_override_reason?.trim() || '';
+    if (!reason) {
+      this.serverError.set('An override reason is required.');
+      return;
+    }
+    this.coverageOverrideConfirmed = true;
+    this.coverageOverrideDialogOpen.set(false);
+    this.onSubmit();
+  }
+
+  cancelCoverageOverride(): void {
+    this.coverageOverrideConfirmed = false;
+    this.coverageOverrideDialogOpen.set(false);
+    this.agreementForm.get('coverage_override_reason')?.setValue('');
+  }
+
+  private ownerCoverageExceeded(): boolean {
+    const owner = this.selectedOwnerAgreement();
+    const start = this.agreementForm.value.start_date;
+    const end = this.agreementForm.value.end_date;
+    return !!owner && !!start && !!end && (start < owner.start_date || end > owner.end_date);
+  }
+
   private handleSubmitError(
     err: { error?: { code?: string; errors?: Record<string, unknown> }; message?: string },
     fallback: string,
   ): void {
+    this.coverageOverrideConfirmed = false;
     if (err.error?.code === 'PROPERTY_NOT_AVAILABLE') {
       this.serverError.set(
         'One or more selected properties are no longer available for this agreement period. Review the property selection and try again.',

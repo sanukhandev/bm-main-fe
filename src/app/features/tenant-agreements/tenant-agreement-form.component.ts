@@ -1038,6 +1038,21 @@ export class TenantAgreementFormComponent implements OnInit {
     const value = this.agreementForm.getRawValue();
     const oaId = Number(value.source_owner_agreement_id);
 
+    if (oaId && !this.isEditMode() && this.ownerCoverageExceeded()) {
+      this.ownerAgreementsApi.getAgreement(oaId).subscribe({
+        next: (res) => {
+          if (request !== this.availabilityRequest) return;
+          const properties = this.normalizeOwnerAgreementProperties(res.data.properties);
+          this.availableProperties.set(properties);
+          const selected = (value.selected_property_ids || [])
+            .map(Number)
+            .filter((id) => properties.some((property) => property.id === id));
+          this.agreementForm.get('selected_property_ids')?.setValue(selected, { emitEvent: false });
+        },
+      });
+      return;
+    }
+
     // If source owner agreement is selected but dates are missing, fetch properties directly from owner agreement
     if (oaId && (!value.start_date || !value.end_date)) {
       this.ownerAgreementsApi.getAgreement(oaId).subscribe({
@@ -1138,7 +1153,10 @@ export class TenantAgreementFormComponent implements OnInit {
   }
 
   onDateChange(): void {
-    if (!this.isEditMode() && this.ownerCoverageExceeded()) return;
+    if (!this.isEditMode() && this.ownerCoverageExceeded()) {
+      this.loadAvailableProperties();
+      return;
+    }
     this.onAvailabilityInputsChange();
   }
 
@@ -1294,7 +1312,7 @@ export class TenantAgreementFormComponent implements OnInit {
   }
 
   private handleSubmitError(
-    err: { error?: { code?: string; errors?: Record<string, unknown> }; message?: string },
+    err: { error?: { code?: string; message?: string; errors?: Record<string, unknown> }; message?: string },
     fallback: string,
   ): void {
     this.coverageOverrideConfirmed = false;
@@ -1306,6 +1324,6 @@ export class TenantAgreementFormComponent implements OnInit {
       return;
     }
     const messages = err.error?.errors ? Object.values(err.error.errors).flat().join(' ') : '';
-    this.serverError.set(messages || err.message || fallback);
+    this.serverError.set(messages || err.error?.message || err.message || fallback);
   }
 }

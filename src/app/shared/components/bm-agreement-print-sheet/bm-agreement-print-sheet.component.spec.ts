@@ -48,7 +48,12 @@ describe('BmAgreementPrintSheetComponent', () => {
     gas_connection_type: null,
     gas_connection_number: null,
     utility_details: [
-      { type: 'electricity', provider: 'Etihad', account_number: '420280000417', connection_type: 'Single' },
+      {
+        type: 'electricity',
+        provider: 'Etihad',
+        account_number: '420280000417',
+        connection_type: 'Single',
+      },
       { type: 'furniture', details: 'Furnished' },
     ],
     status: 'active',
@@ -144,7 +149,11 @@ describe('BmAgreementPrintSheetComponent', () => {
     component.secondPartyRole = 'Tenant / المستأجر';
     component.properties = agreement.properties;
     component.firstParty = { name: component.firstPartyName, role: component.firstPartyRole };
-    component.secondParty = { name: customer.display_name, role: component.secondPartyRole, customer };
+    component.secondParty = {
+      name: customer.display_name,
+      role: component.secondPartyRole,
+      customer,
+    };
 
     fixture.detectChanges();
 
@@ -161,7 +170,12 @@ describe('BmAgreementPrintSheetComponent', () => {
   });
 
   it('renders the owner party and owner-specific terms for an owner agreement', () => {
-    const ownerAgreement = { ...agreement, agreement_no: 'L-3', owner_customer_id: 2, owner: customer } as OwnerAgreement;
+    const ownerAgreement = {
+      ...agreement,
+      agreement_no: 'L-3',
+      owner_customer_id: 2,
+      owner: customer,
+    } as OwnerAgreement;
     const component = fixture.componentInstance as any;
     component.agreement = ownerAgreement;
     component.branch = branch;
@@ -171,7 +185,11 @@ describe('BmAgreementPrintSheetComponent', () => {
     component.secondPartyName = 'BAITHUL MADEENA REAL ESTATE';
     component.secondPartyRole = 'Tenant / المستأجر';
     component.properties = [property];
-    component.firstParty = { name: customer.display_name, role: component.firstPartyRole, customer };
+    component.firstParty = {
+      name: customer.display_name,
+      role: component.firstPartyRole,
+      customer,
+    };
     component.secondParty = { name: component.secondPartyName, role: component.secondPartyRole };
 
     fixture.detectChanges();
@@ -179,13 +197,22 @@ describe('BmAgreementPrintSheetComponent', () => {
     const text = fixture.nativeElement.textContent;
     expect(text).toContain('Gurpreet Singh Surinder Singh');
     expect(text).toContain('BAITHUL MADEENA REAL ESTATE');
-    expect(text).toContain('The tenant has the right to lease the property without referring to the lessor.');
-    expect(text).toContain('The lessor does not have the right to cancel the lease without the consent of the tenant.');
+    expect(text).toContain(
+      'The tenant has the right to lease the property without referring to the lessor.',
+    );
+    expect(text).toContain(
+      'The lessor does not have the right to cancel the lease without the consent of the tenant.',
+    );
   });
 
   it('renders safe placeholders when optional branch, party, and property data is missing', () => {
     const component = fixture.componentInstance as any;
-    component.agreement = { ...agreement, properties: undefined, installments: undefined, additional_payments: undefined };
+    component.agreement = {
+      ...agreement,
+      properties: undefined,
+      installments: undefined,
+      additional_payments: undefined,
+    };
     component.branch = null;
     component.isOwnerAgreement = false;
     component.firstPartyName = 'First fallback party';
@@ -213,14 +240,88 @@ describe('BmAgreementPrintSheetComponent', () => {
     component.firstPartyRole = 'Lessor / المؤجر';
     component.secondPartyName = customer.display_name;
     component.secondPartyRole = 'Tenant / المستأجر';
-    component.properties = [{ ...property, utility_details: null, electricity_provider: null, electricity_account_number: null, notes: null }];
+    component.properties = [
+      {
+        ...property,
+        utility_details: null,
+        electricity_provider: null,
+        electricity_account_number: null,
+        notes: null,
+      },
+    ];
     component.firstParty = { name: component.firstPartyName, role: component.firstPartyRole };
-    component.secondParty = { name: customer.display_name, role: component.secondPartyRole, customer };
+    component.secondParty = {
+      name: customer.display_name,
+      role: component.secondPartyRole,
+      customer,
+    };
 
     fixture.detectChanges();
 
     const text = fixture.nativeElement.textContent;
     expect(text).toContain('Branch #7');
     expect(text).not.toContain('AMENITIES AND SERVICES');
+  });
+
+  it('opens a standalone bilingual A4 document and prints after it loads', () => {
+    const component = fixture.componentInstance as any;
+    component.agreement = agreement;
+    component.branch = branch;
+    component.isOwnerAgreement = false;
+    component.firstPartyName = 'BAITHUL MADEENA REAL ESTATE';
+    component.firstPartyRole = 'Lessor / المؤجر';
+    component.secondPartyName = customer.display_name;
+    component.secondPartyRole = 'Tenant / المستأجر';
+    component.properties = agreement.properties;
+    component.firstParty = { name: component.firstPartyName, role: component.firstPartyRole };
+    component.secondParty = {
+      name: customer.display_name,
+      role: component.secondPartyRole,
+      customer,
+    };
+    fixture.detectChanges();
+
+    let html = '';
+    const print = vi.fn();
+    const printWindow = {
+      document: {
+        open: vi.fn(),
+        write: vi.fn((value: string) => {
+          html = value;
+        }),
+        close: vi.fn(),
+      },
+      addEventListener: vi.fn((_event: string, callback: EventListener) =>
+        callback(new Event('load')),
+      ),
+      focus: vi.fn(),
+      print,
+    } as unknown as Window;
+    const open = vi.spyOn(window, 'open').mockReturnValue(printWindow);
+
+    component.openPrintWindow();
+
+    expect(open).toHaveBeenCalledOnce();
+    expect(html).toContain('@page { size: A4');
+    expect(html).toContain('LEASE AGREEMENT');
+    expect(html).toContain('T-20');
+    expect(html).toContain('PAYMENT TERMS');
+    expect(html).toContain('20M - Ali Juma Villa');
+    expect(html).toContain('Electricity');
+    expect(html).toContain('If the lease contract includes electricity and water');
+    expect(html).toContain('Leaser’s Signature &amp; Stamp');
+    expect(print).toHaveBeenCalledOnce();
+
+    open.mockRestore();
+  });
+
+  it('does nothing when the browser blocks the print window', () => {
+    const component = fixture.componentInstance as any;
+    const open = vi.spyOn(window, 'open').mockReturnValue(null);
+
+    expect(() => component.openPrintWindow()).not.toThrow();
+    expect(open).toHaveBeenCalledOnce();
+
+    open.mockRestore();
   });
 });

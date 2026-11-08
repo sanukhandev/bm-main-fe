@@ -6,7 +6,7 @@ import { TenantAgreementsApiService } from '../../core/api/tenant-agreements-api
 import { TenantAgreementDetailComponent } from './tenant-agreement-detail.component';
 
 describe('TenantAgreementDetailComponent printing', () => {
-  it('opens the browser print dialog after the print sheet has rendered', () => {
+  it('delegates printing to the shared standalone print sheet', () => {
     const injector = Injector.create({
       providers: [
         { provide: TenantAgreementsApiService, useValue: {} },
@@ -15,20 +15,12 @@ describe('TenantAgreementDetailComponent printing', () => {
         { provide: Router, useValue: {} },
       ],
     });
-    const component = runInInjectionContext(
-      injector,
-      () => new TenantAgreementDetailComponent(),
-    );
-    const print = vi.spyOn(window, 'print').mockImplementation(() => undefined);
-    vi.useFakeTimers();
+    const component = runInInjectionContext(injector, () => new TenantAgreementDetailComponent());
+    const openPrintWindow = vi.fn();
+    (component as any).printSheet = { openPrintWindow };
 
     component.printAgreement();
 
-    expect(print).not.toHaveBeenCalled();
-    vi.runAllTimers();
-    expect(print).toHaveBeenCalledOnce();
-
-    vi.useRealTimers();
-    print.mockRestore();
+    expect(openPrintWindow).toHaveBeenCalledOnce();
   });
 });

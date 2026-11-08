@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, ElementRef, Input, inject } from '@angular/core';
 import { Branch } from '../../../core/branch-context/branch.models';
 import { Customer } from '../../models/customer.models';
 import { OwnerAgreement, TenantAgreement } from '../../models/agreement.models';
 import { Property, PropertyUtility } from '../../models/property.models';
-import { formatUaeDate } from '../../utils/uae-formatters';
+import { formatUaeDate, numberToWords } from '../../utils/uae-formatters';
 
 type PrintableAgreement = OwnerAgreement | TenantAgreement;
 
@@ -24,13 +24,65 @@ interface PrintableClause {
   ar: string;
 }
 
+const AGREEMENT_PRINT_STYLES = `
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #fff; color: #000; }
+  body { font-family: Arial, Tahoma, sans-serif; font-size: 9pt; line-height: 1.28; }
+  .agreement-print-sheet { display: none; background: #fff; color: #000; }
+  body.print-window .agreement-print-sheet { display: block; width: 210mm; min-height: 297mm; margin: 0 auto; padding: 10mm 12mm; }
+  .print-letterhead-space { height: 21mm; }
+  .print-header { display: flex; justify-content: space-between; gap: 8mm; align-items: flex-start; margin-bottom: 3mm; font-size: 7.5pt; }
+  .print-header > div { display: flex; flex-direction: column; gap: 1mm; }
+  .print-header strong { font-size: 10pt; }
+  .print-header .print-branch { text-align: right; }
+  .print-title { border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 3mm 0; text-align: center; }
+  .print-title h1 { margin: 0; font-size: 14pt; }
+  .print-title p { margin: 1mm 0 2mm; font-size: 10pt; }
+  .print-meta { display: flex; justify-content: space-between; gap: 4mm; text-align: left; font-size: 7.5pt; }
+  .print-section { margin-top: 4mm; break-inside: avoid; }
+  .print-section h2 { margin: 0 0 1.5mm; font-size: 9pt; }
+  .print-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  .print-table th, .print-table td { border: 1px solid #000; padding: 1.7mm 1.8mm; vertical-align: top; overflow-wrap: anywhere; }
+  .print-table th { font-weight: 700; }
+  .print-table th span { font-weight: 400; }
+  .party-table th, .party-table td { width: 20%; }
+  .party-table th:first-child, .party-table td:first-child { width: 25%; }
+  .party-table th:nth-child(3), .party-table td:nth-child(3) { width: 25%; }
+  .party-table th:nth-child(4), .party-table td:nth-child(4) { width: 15%; }
+  .party-table th:nth-child(5), .party-table td:nth-child(5) { width: 15%; }
+  .property-table th:nth-child(1), .property-table td:nth-child(1) { width: 20%; }
+  .property-table th:nth-child(2), .property-table td:nth-child(2) { width: 15%; }
+  .property-table th:nth-child(3), .property-table td:nth-child(3) { width: 24%; }
+  .property-table th:nth-child(4), .property-table td:nth-child(4) { width: 16%; }
+  .property-table th:nth-child(5), .property-table td:nth-child(5) { width: 13%; }
+  .property-table th:nth-child(6), .property-table td:nth-child(6) { width: 12%; }
+  .property-table .empty-row td { text-align: center; }
+  .terms-table { font-size: 7.5pt; }
+  .terms-table td:first-child { width: 4%; text-align: center; }
+  .terms-table td:nth-child(2), .terms-table td:nth-child(3) { width: 48%; }
+  .terms-table td:nth-child(3) { direction: rtl; text-align: right; }
+  .print-signatures { margin-top: 14mm; break-inside: avoid; }
+  .print-signatures td { width: 33.33%; text-align: center; height: 25mm; vertical-align: bottom; }
+  .signature-line { display: block; border-bottom: 1px solid #000; margin: 0 6mm 2mm; height: 13mm; }
+  .print-footer { margin-top: 5mm; border-top: 1px solid #000; padding-top: 2mm; text-align: center; font-size: 7pt; }
+  @page { size: A4; margin: 0; }
+  @media print {
+    html, body { width: 210mm; min-height: 297mm; }
+    body.print-window .agreement-print-sheet { margin: 0; }
+    .print-section { break-inside: avoid; }
+    .terms-table tr, .print-signatures { break-inside: avoid; }
+  }
+`;
+
 @Component({
   selector: 'bm-agreement-print-sheet',
   standalone: true,
   imports: [CommonModule],
   template: `
     <article class="agreement-print-sheet" aria-label="Printable agreement">
-      <header class="print-letterhead">
+      <div class="print-letterhead-space"></div>
+
+      <header class="print-header">
         <div>
           <strong>BAITHUL MADEENA REAL ESTATE</strong>
           <span>Official Agreement Document / وثيقة اتفاقية رسمية</span>
@@ -43,126 +95,208 @@ interface PrintableClause {
       </header>
 
       <header class="print-title">
-        <h1>{{ isOwnerAgreement ? 'OWNER MANAGEMENT AGREEMENT' : 'LEASE AGREEMENT' }}</h1>
-        <p>{{ isOwnerAgreement ? 'اتفاقية إدارة عقار' : 'عقد الإيجار' }}</p>
+        <h1>
+          {{
+            isOwnerAgreement ? 'OWNER AGREEMENT / اتفاقية المالك' : 'LEASE AGREEMENT / عقد الإيجار'
+          }}
+          #{{ display(agreement.agreement_no) }}
+        </h1>
+        <p>
+          {{
+            isOwnerAgreement
+              ? 'Owner Management Agreement / اتفاقية إدارة عقار'
+              : 'Lease Agreement / عقد الإيجار'
+          }}
+        </p>
         <div class="print-meta">
-          <span><b>Agreement No. / رقم الاتفاقية:</b> {{ agreement.agreement_no || '—' }}</span>
           <span><b>Created On / تاريخ الإنشاء:</b> {{ formatDate(agreement.created_at) }}</span>
+          <span><b>Branch / الفرع:</b> {{ branchName }}</span>
           <span><b>Status / الحالة:</b> {{ formatStatus(agreement.status) }}</span>
         </div>
       </header>
 
-      <section class="print-parties print-grid">
-        <div class="print-party">
-          <h2>{{ isOwnerAgreement ? 'OWNER DETAILS / بيانات المالك' : 'LESSOR DETAILS / تفاصيل المؤجر' }}</h2>
-          <p class="print-party-name">{{ partyName(firstParty, firstPartyName) }}</p>
-          <p>{{ partyRole(firstParty, firstPartyRole) }}</p>
-          <ng-container *ngIf="partyCustomer(firstParty) as customer">
-            <p *ngIf="customer.identity_no || customer.company_registration_no">
-              License / ID No. / رقم الرخصة أو الهوية: {{ customer.identity_no || customer.company_registration_no }}
-            </p>
-            <p *ngIf="customer.phone">Contact / التواصل: {{ customer.phone }}</p>
-            <p *ngIf="customer.email">Email / البريد الإلكتروني: {{ customer.email }}</p>
-            <p *ngIf="customer.address_line_1 || customer.city">
-              Address / العنوان: {{ customerAddress(customer) }}
-            </p>
-          </ng-container>
-          <ng-container *ngIf="!isOwnerAgreement">
-            <p>License / ID No. / رقم الرخصة أو الهوية: {{ business.eid }}</p>
-            <p>Address / العنوان: {{ business.address }}</p>
-            <p>Contact / التواصل: {{ business.phone }}</p>
-          </ng-container>
-        </div>
-
-        <div class="print-party">
-          <h2>{{ isOwnerAgreement ? 'TENANT DETAILS / بيانات المستأجر' : 'TENANT DETAILS / بيانات المستأجر' }}</h2>
-          <p class="print-party-name">{{ partyName(secondParty, secondPartyName) }}</p>
-          <p>{{ partyRole(secondParty, secondPartyRole) }}</p>
-          <ng-container *ngIf="partyCustomer(secondParty) as customer">
-            <p *ngIf="customer.identity_no || customer.company_registration_no">
-              License / ID No. / رقم الرخصة أو الهوية: {{ customer.identity_no || customer.company_registration_no }}
-            </p>
-            <p *ngIf="customer.phone">Contact / التواصل: {{ customer.phone }}</p>
-            <p *ngIf="customer.email">Email / البريد الإلكتروني: {{ customer.email }}</p>
-            <p *ngIf="customer.address_line_1 || customer.city">
-              Address / العنوان: {{ customerAddress(customer) }}
-            </p>
-          </ng-container>
-          <ng-container *ngIf="isOwnerAgreement">
-            <p>License / ID No. / رقم الرخصة أو الهوية: {{ business.eid }}</p>
-            <p>Address / العنوان: {{ business.address }}</p>
-            <p>Contact / التواصل: {{ business.phone }}</p>
-          </ng-container>
-        </div>
-      </section>
-
       <section class="print-section">
-        <h2>LEASE DETAILS / تفاصيل الإيجار</h2>
-        <table class="print-table">
+        <h2>OWNER DETAILS / بيانات المالك</h2>
+        <table class="print-table party-table">
+          <thead>
+            <tr>
+              <th>Owner Name / اسم المالك</th>
+              <th>Leaser Name / اسم المؤجر</th>
+              <th>Address / العنوان</th>
+              <th>License / ID No / رقم الرخصة/الهوية</th>
+              <th>Contact / التواصل</th>
+            </tr>
+          </thead>
           <tbody>
             <tr>
-              <th>Lease Period<br /><span>فترة الإيجار</span></th>
-              <td>{{ formatDate(agreement.start_date) }} — {{ formatDate(agreement.end_date) }}</td>
-              <th>Duration / المدة الزمنية</th>
-              <td>{{ duration }}</td>
-            </tr>
-            <tr>
-              <th>Total Rent / قيمة الإيجار</th>
-              <td>{{ money(agreement.total_amount) }}</td>
-              <th>Payment Mode / طريقة الدفع</th>
-              <td>{{ formatPaymentMode(agreement.payment_mode) }}</td>
-            </tr>
-            <tr>
-              <th>Payment Terms / شروط الدفع</th>
-              <td>{{ paymentTerms }}</td>
-              <th>Terms / الشروط</th>
-              <td>{{ agreementTerms }}</td>
+              <td>
+                <strong>{{ partyName(firstParty, firstPartyName) }}</strong>
+              </td>
+              <td>
+                <strong>{{ partyName(firstParty, firstPartyName) }}</strong>
+              </td>
+              <td>{{ partyAddress(firstParty, !isOwnerAgreement) }}</td>
+              <td>{{ partyIdentity(firstParty, !isOwnerAgreement) }}</td>
+              <td>{{ partyContact(firstParty, !isOwnerAgreement) }}</td>
             </tr>
           </tbody>
         </table>
       </section>
 
       <section class="print-section">
-        <h2>LEASED PREMISE / العقار المؤجر</h2>
-        <table class="print-table print-properties">
+        <h2>TENANT DETAILS / بيانات المستأجر</h2>
+        <table class="print-table party-table">
           <thead>
             <tr>
-              <th>#</th>
-              <th>Property / العقار</th>
-              <th>Unit / الوحدة</th>
-              <th>Category / الفئة</th>
-              <th>Area / المنطقة</th>
-              <th>File / الملف</th>
-              <th>Usage / الاستخدام</th>
+              <th>Tenant Name / اسم المستأجر</th>
+              <th>License / ID No / رقم الرخصة/الهوية</th>
+              <th>Contact / التواصل</th>
+              <th>Role / الصفة</th>
+              <th>Branch / الفرع</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let property of properties; let i = index">
-              <td>{{ i + 1 }}</td>
-              <td>{{ getPropertyField(property, 'name') }}<br />{{ getPropertyField(property, 'property_code') }}</td>
-              <td>{{ getPropertyField(property, 'unit_number') }}</td>
-              <td>{{ getPropertyField(property, 'property_type') }}</td>
-              <td>{{ getPropertyField(property, 'area') }}</td>
-              <td>{{ agreement.file_no || '—' }}</td>
-              <td>{{ getPropertyField(property, 'notes') }}</td>
+            <tr>
+              <td>
+                <strong>{{ partyName(secondParty, secondPartyName) }}</strong>
+              </td>
+              <td>{{ partyIdentity(secondParty, isOwnerAgreement) }}</td>
+              <td>{{ partyContact(secondParty, isOwnerAgreement) }}</td>
+              <td>{{ partyRole(secondParty, secondPartyRole) }}</td>
+              <td>{{ branchName }}</td>
             </tr>
-            <tr *ngIf="properties.length === 0">
-              <td colspan="7">No property details recorded / لا توجد تفاصيل عقار مسجلة</td>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="print-section">
+        <h2>LEASED PREMISE / المبنى أو المكان المؤجر</h2>
+        <table class="print-table property-table">
+          <thead>
+            <tr>
+              <th>Category / الفئة</th>
+              <th>No. of rooms / عدد الغرف</th>
+              <th>Unit No / رقم الوحدة</th>
+              <th>Area / المنطقة</th>
+              <th>Plot No / القطعة رقم</th>
+              <th>File No / رقم الملف</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let property of properties">
+              <td>
+                <strong>{{ getPropertyField(property, 'property_type') }}</strong>
+              </td>
+              <td>{{ getPropertyField(property, 'unit_number') }}</td>
+              <td>
+                {{ getPropertyField(property, 'name') }} /
+                {{ getPropertyField(property, 'property_code') }}
+              </td>
+              <td>{{ getPropertyField(property, 'area') }}</td>
+              <td>{{ getPropertyField(property, 'property_code') }}</td>
+              <td>{{ display(agreement.file_no) }}</td>
+            </tr>
+            <tr *ngIf="properties.length === 0" class="empty-row">
+              <td colspan="6">No property details recorded / لا توجد تفاصيل عقار مسجلة</td>
+            </tr>
+          </tbody>
+        </table>
+        <table class="print-table property-table">
+          <thead>
+            <tr>
+              <th>Landmark / معلم معروف</th>
+              <th colspan="2">Usage / الاستخدام</th>
+              <th colspan="3">Property Address / عنوان العقار</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let property of properties">
+              <td>{{ getPropertyField(property, 'building_name') }}</td>
+              <td colspan="2">{{ getPropertyField(property, 'notes') }}</td>
+              <td colspan="3">{{ propertyAddress(property) }}</td>
+            </tr>
+            <tr *ngIf="properties.length === 0" class="empty-row">
+              <td colspan="6">—</td>
             </tr>
           </tbody>
         </table>
       </section>
 
       <section class="print-section" *ngIf="propertyServiceRows.length">
-        <h2>AMENITIES AND SERVICES / المرافق والخدمات</h2>
+        <h2>ELECTRICITY, WATER, SEWAGE AND SERVICES / الكهرباء والمياه والصرف الصحي والخدمات</h2>
         <table class="print-table">
           <thead>
-            <tr><th>Property / العقار</th><th>Provided service or amenity / الخدمة أو المرفق</th></tr>
+            <tr>
+              <th>Property / العقار</th>
+              <th>Payee / المستفيد</th>
+              <th>Mode / النظام</th>
+              <th>Provided service or amenity / الخدمة أو المرفق</th>
+            </tr>
           </thead>
           <tbody>
             <tr *ngFor="let row of propertyServiceRows">
               <td>{{ row.property }}</td>
+              <td>{{ isOwnerAgreement ? 'Owner' : 'Tenant' }}</td>
+              <td>As recorded / حسب السجل</td>
               <td>{{ row.services }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="print-section">
+        <h2>LEASE PERIOD / فترة الإيجار</h2>
+        <table class="print-table">
+          <thead>
+            <tr>
+              <th>Lease Start / بداية الإيجار</th>
+              <th>Lease End / نهاية الإيجار</th>
+              <th>Duration / المدة الزمنية</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <strong>{{ formatDate(agreement.start_date) }}</strong>
+              </td>
+              <td>
+                <strong>{{ formatDate(agreement.end_date) }}</strong>
+              </td>
+              <td>
+                <strong>{{ duration }}</strong>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="print-section">
+        <h2>PAYMENT TERMS / شروط الدفع</h2>
+        <table class="print-table">
+          <tbody>
+            <tr>
+              <td><b>Total Rent / قيمة الإيجار:</b> {{ money(agreement.total_amount) }}</td>
+              <td>
+                <b>Mode of payment / طريقة الدفع:</b>
+                {{ formatPaymentMode(agreement.payment_mode) }}
+              </td>
+              <td>
+                <b>No. of payments / عدد الدفعات:</b> {{ display(agreement.payment_count) }}
+                {{ display(agreement.payment_frequency) }}
+              </td>
+            </tr>
+            <tr>
+              <td><b>Total Rent in Words / قيمة الإيجار كتابة:</b></td>
+              <td colspan="2">
+                <strong>{{ amountInWords(agreement.total_amount) }}</strong>
+              </td>
+            </tr>
+            <tr>
+              <td><b>Deposit / التأمين:</b> {{ depositAmount }}</td>
+              <td colspan="2"><b>Mode of pay / طريقة الدفع:</b> {{ depositMode }}</td>
+            </tr>
+            <tr>
+              <td colspan="3"><b>Remarks / ملاحظات:</b> {{ agreementTerms }}</td>
             </tr>
           </tbody>
         </table>
@@ -198,7 +332,13 @@ interface PrintableClause {
         <h2>OTHER PAYMENT TERMS / شروط دفع أخرى</h2>
         <table class="print-table">
           <thead>
-            <tr><th>Particulars / التفاصيل</th><th>Due Date / الاستحقاق</th><th>Amount / المبلغ</th><th>Mode / الطريقة</th><th>Terms / الشروط</th></tr>
+            <tr>
+              <th>Particulars / التفاصيل</th>
+              <th>Due Date / الاستحقاق</th>
+              <th>Amount / المبلغ</th>
+              <th>Mode / الطريقة</th>
+              <th>Terms / الشروط</th>
+            </tr>
           </thead>
           <tbody>
             <tr *ngFor="let item of agreement.additional_payments">
@@ -212,92 +352,46 @@ interface PrintableClause {
         </table>
       </section>
 
-      <section class="print-section print-clauses">
+      <section class="print-section">
         <h2>TERMS AND CONDITIONS / الشروط والأحكام</h2>
-        <div class="print-clause print-grid" *ngFor="let clause of clauses; let i = index">
-          <div><b>{{ i + 1 }}. {{ clause.en }}</b></div>
-          <div dir="rtl"><b>{{ i + 1 }}. {{ clause.ar }}</b></div>
-        </div>
+        <table class="print-table terms-table">
+          <tbody>
+            <tr *ngFor="let clause of clauses; let i = index">
+              <td>{{ i + 1 }}.</td>
+              <td>{{ clause.en }}</td>
+              <td dir="rtl">{{ clause.ar }}</td>
+            </tr>
+          </tbody>
+        </table>
       </section>
 
-      <section class="print-signatures print-grid">
-        <div>
-          <h2>FIRST PARTY SIGNATURE / توقيع الطرف الأول</h2>
-          <div class="signature-line"></div>
-          <p>Name / الاسم: {{ partyName(firstParty, firstPartyName) }}</p>
-          <p>Date / التاريخ: _________________________</p>
-        </div>
-        <div>
-          <h2>SECOND PARTY SIGNATURE / توقيع الطرف الثاني</h2>
-          <div class="signature-line"></div>
-          <p>Name / الاسم: {{ partyName(secondParty, secondPartyName) }}</p>
-          <p>Date / التاريخ: _________________________</p>
-        </div>
-      </section>
+      <table class="print-table print-signatures">
+        <tbody>
+          <tr>
+            <td>
+              <span class="signature-line"></span><strong>Leaser’s Signature & Stamp</strong> /
+              توقيع وختم المؤجر
+            </td>
+            <td><span class="signature-line"></span><strong>Witness</strong> / الشاهد</td>
+            <td>
+              <span class="signature-line"></span><strong>Tenant Signature & Stamp</strong> / توقيع
+              وختم المستأجر
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
       <footer class="print-footer">
-        <p>Baithul Madeena Real Estate · {{ branchName }} · Official Agreement Copy</p>
-        <p>هذه الوثيقة نسخة رسمية من الاتفاقية</p>
+        <div>Baithul Madeena Real Estate · {{ branchName }} · Official Agreement Copy</div>
+        <div>هذه الوثيقة نسخة رسمية من الاتفاقية</div>
       </footer>
     </article>
   `,
-  styles: [
-    `
-      .agreement-print-sheet {
-        display: none;
-        color: #000;
-        background: #fff;
-        font-family: Arial, Tahoma, sans-serif;
-        font-size: 9pt;
-        line-height: 1.35;
-      }
-      .print-letterhead {
-        display: flex;
-        justify-content: space-between;
-        gap: 8mm;
-        border-bottom: 1px solid #000;
-        padding-bottom: 3mm;
-        margin-bottom: 5mm;
-        font-size: 8pt;
-      }
-      .print-letterhead > div { display: flex; flex-direction: column; gap: 1mm; }
-      .print-letterhead strong { font-size: 11pt; }
-      .print-branch { text-align: right; }
-      .print-title { text-align: center; border-bottom: 1px solid #000; padding-bottom: 4mm; margin-bottom: 5mm; }
-      .print-title h1 { font-size: 15pt; margin: 0; letter-spacing: 0.03em; }
-      .print-title p { margin: 1mm 0 3mm; font-size: 11pt; }
-      .print-meta { display: flex; justify-content: space-between; gap: 5mm; text-align: left; font-size: 8pt; }
-      .print-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
-      .print-party { border: 1px solid #000; padding: 3mm; min-height: 29mm; }
-      .print-party h2, .print-section h2, .print-signatures h2 { font-size: 9pt; margin: 0 0 2mm; font-weight: 700; }
-      .print-party p { margin: 1mm 0; }
-      .print-party-name { font-size: 10pt; font-weight: 700; }
-      .print-section { margin-top: 5mm; break-inside: avoid; }
-      .print-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-      .print-table th, .print-table td { border: 1px solid #000; padding: 2mm; vertical-align: top; text-align: left; overflow-wrap: anywhere; }
-      .print-table th { font-weight: 700; }
-      .print-table th span { font-weight: 400; }
-      .print-properties th:nth-child(1), .print-properties td:nth-child(1) { width: 4%; text-align: center; }
-      .print-properties th:nth-child(2), .print-properties td:nth-child(2) { width: 22%; }
-      .print-properties th:nth-child(3), .print-properties td:nth-child(3) { width: 15%; }
-      .print-clauses { break-inside: auto; }
-      .print-clause { border: 1px solid #000; border-bottom: 0; padding: 2.5mm; gap: 0; break-inside: avoid; }
-      .print-clause:last-child { border-bottom: 1px solid #000; }
-      .print-clause > div { padding: 0 2.5mm; }
-      .print-clause > div + div { border-left: 1px solid #000; }
-      .print-signatures { margin-top: 14mm; break-inside: avoid; }
-      .print-signatures > div { min-height: 29mm; }
-      .signature-line { border-bottom: 1px solid #000; height: 13mm; margin-bottom: 2mm; }
-      .print-signatures p { margin: 1mm 0; }
-      .print-footer { border-top: 1px solid #000; margin-top: 9mm; padding-top: 2mm; text-align: center; font-size: 7pt; }
-      @media print {
-        .agreement-print-sheet { display: block !important; }
-        @page { size: A4; margin: 10mm 12mm; }
-      }
-    `,
-  ],
+  styles: [AGREEMENT_PRINT_STYLES],
 })
 export class BmAgreementPrintSheetComponent {
+  private readonly host = inject(ElementRef<HTMLElement>);
+
   @Input({ required: true }) agreement!: PrintableAgreement;
   @Input({ required: true }) firstPartyName = '';
   @Input({ required: true }) secondPartyName = '';
@@ -360,19 +454,52 @@ export class BmAgreementPrintSheetComponent {
 
   formatDate = formatUaeDate;
 
+  openPrintWindow(): void {
+    if (typeof window === 'undefined') return;
+
+    const source = this.host.nativeElement.querySelector(
+      '.agreement-print-sheet',
+    ) as HTMLElement | null;
+    if (!source) return;
+
+    const printWindow = window.open('', '_blank', 'popup');
+    if (!printWindow) return;
+
+    const print = () => {
+      printWindow.focus();
+      printWindow.print();
+    };
+
+    printWindow.addEventListener('load', print, { once: true });
+    printWindow.document.open();
+    printWindow.document.write(
+      `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Agreement ${this.display(this.agreement?.agreement_no)}</title><style>${AGREEMENT_PRINT_STYLES}</style></head><body class="print-window">${source.outerHTML}</body></html>`,
+    );
+    printWindow.document.close();
+  }
+
   get clauses(): PrintableClause[] {
     return this.isOwnerAgreement ? this.ownerClauses : this.tenantClauses;
   }
 
   get branchAddress(): string {
     if (!this.branch) return '—';
-    return [this.branch.address_line_1, this.branch.address_line_2, this.branch.city, this.branch.state_or_emirate]
-      .filter(Boolean)
-      .join(', ') || '—';
+    return (
+      [
+        this.branch.address_line_1,
+        this.branch.address_line_2,
+        this.branch.city,
+        this.branch.state_or_emirate,
+      ]
+        .filter(Boolean)
+        .join(', ') || '—'
+    );
   }
 
   get branchName(): string {
-    return this.branch?.name || (this.agreement?.branch_id ? `Branch #${this.agreement.branch_id}` : '—');
+    return (
+      this.branch?.name || (this.agreement?.branch_id ? `Branch #${this.agreement.branch_id}` : '—')
+    );
   }
 
   get duration(): string {
@@ -395,10 +522,26 @@ export class BmAgreementPrintSheetComponent {
     return this.display(terms);
   }
 
+  get depositAmount(): string {
+    const payment = this.agreement?.additional_payments?.find(
+      (item) => item.category === 'security',
+    );
+    return payment ? this.money(payment.amount) : 'NIL';
+  }
+
+  get depositMode(): string {
+    const payment = this.agreement?.additional_payments?.find(
+      (item) => item.category === 'security',
+    );
+    return payment ? this.formatPaymentMode(payment.payment_mode) : '—';
+  }
+
   get propertyServiceRows(): Array<{ property: string; services: string }> {
     return this.properties
       .map((property) => ({
-        property: this.getPropertyField(property, 'name') || this.getPropertyField(property, 'property_code'),
+        property:
+          this.getPropertyField(property, 'name') ||
+          this.getPropertyField(property, 'property_code'),
         services: this.propertyUtilities(property).join('; '),
       }))
       .filter((row) => row.services.length > 0);
@@ -416,10 +559,43 @@ export class BmAgreementPrintSheetComponent {
     return party?.customer || null;
   }
 
+  partyIdentity(party: PrintableParty | null, useBusiness: boolean): string {
+    const customer = this.partyCustomer(party);
+    return this.display(
+      customer?.identity_no ||
+        customer?.company_registration_no ||
+        (useBusiness ? this.business.eid : ''),
+    );
+  }
+
+  partyContact(party: PrintableParty | null, useBusiness: boolean): string {
+    return this.display(
+      this.partyCustomer(party)?.phone || (useBusiness ? this.business.phone : ''),
+    );
+  }
+
+  partyAddress(party: PrintableParty | null, useBusiness: boolean): string {
+    const customer = this.partyCustomer(party);
+    return customer
+      ? this.customerAddress(customer)
+      : this.display(useBusiness ? this.business.address : '');
+  }
+
   customerAddress(customer: Customer): string {
-    return [customer.address_line_1, customer.address_line_2, customer.city, customer.state_or_emirate]
-      .filter(Boolean)
-      .join(', ') || '—';
+    return (
+      [customer.address_line_1, customer.address_line_2, customer.city, customer.state_or_emirate]
+        .filter(Boolean)
+        .join(', ') || '—'
+    );
+  }
+
+  propertyAddress(property: PrintableProperty): string {
+    const value = this.propertyValue(property);
+    return (
+      [value.address_line_1, value.address_line_2, value.city, value.state_or_emirate]
+        .filter(Boolean)
+        .join(', ') || '—'
+    );
   }
 
   propertyValue(property: PrintableProperty): Partial<Property> {
@@ -435,24 +611,39 @@ export class BmAgreementPrintSheetComponent {
     const value = this.propertyValue(property);
     const services = new Set<string>();
     const add = (label: string, details: Array<unknown>) => {
-      const text = details.filter(Boolean).map((item) => String(item)).join(' / ');
+      const text = details
+        .filter(Boolean)
+        .map((item) => String(item))
+        .join(' / ');
       if (text) services.add(`${label}: ${text}`);
     };
 
     const utilityTypes = new Set<PropertyUtility['type']>();
     for (const utility of value.utility_details || []) {
       utilityTypes.add(utility.type);
-      add(this.utilityLabel(utility.type), [utility.provider, utility.connection_type, utility.account_number || utility.connection_number, utility.details]);
+      add(this.utilityLabel(utility.type), [
+        utility.provider,
+        utility.connection_type,
+        utility.account_number || utility.connection_number,
+        utility.details,
+      ]);
     }
-    if (!utilityTypes.has('electricity')) add('Electricity', [value.electricity_provider, value.electricity_account_number]);
-    if (!utilityTypes.has('cooling')) add('Cooling', [value.cooling_provider, value.cooling_account_number]);
-    if (!utilityTypes.has('gas')) add('Gas', [value.gas_provider, value.gas_connection_type, value.gas_connection_number]);
+    if (!utilityTypes.has('electricity'))
+      add('Electricity', [value.electricity_provider, value.electricity_account_number]);
+    if (!utilityTypes.has('cooling'))
+      add('Cooling', [value.cooling_provider, value.cooling_account_number]);
+    if (!utilityTypes.has('gas'))
+      add('Gas', [value.gas_provider, value.gas_connection_type, value.gas_connection_number]);
     add('Amenities / Notes', [value.notes]);
     return [...services];
   }
 
   utilityLabel(type: PropertyUtility['type']): string {
     return type.charAt(0).toUpperCase() + type.slice(1);
+  }
+
+  amountInWords(value: unknown): string {
+    return numberToWords(value as string | number | null | undefined);
   }
 
   display(value: unknown): string {
@@ -468,6 +659,8 @@ export class BmAgreementPrintSheetComponent {
   }
 
   formatStatus(status?: string | null): string {
-    return this.display(status).replaceAll('_', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
+    return this.display(status)
+      .replaceAll('_', ' ')
+      .replace(/\b\w/g, (letter) => letter.toUpperCase());
   }
 }

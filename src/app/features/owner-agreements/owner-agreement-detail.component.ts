@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -1803,6 +1803,7 @@ export class OwnerAgreementDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   readonly branchContext = inject(BranchContextService);
+  @ViewChild(BmAgreementPrintSheetComponent) private printSheet?: BmAgreementPrintSheetComponent;
 
   agreement = signal<OwnerAgreement | null>(null);
   selectedVoucherTransaction = signal<AccountTransaction | null>(null);
@@ -1866,7 +1867,7 @@ export class OwnerAgreementDetailComponent implements OnInit {
   }
 
   printAgreement(): void {
-    window.setTimeout(() => window.print(), 0);
+    this.printSheet?.openPrintWindow();
   }
 
   loadAgreement(silent = false): void {

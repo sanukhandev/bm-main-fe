@@ -6,7 +6,7 @@ import { OwnerAgreementsApiService } from '../../core/api/owner-agreements-api.s
 import { OwnerAgreementDetailComponent } from './owner-agreement-detail.component';
 
 describe('OwnerAgreementDetailComponent printing', () => {
-  it('opens the browser print dialog after the print sheet has rendered', () => {
+  it('delegates printing to the shared standalone print sheet', () => {
     const injector = Injector.create({
       providers: [
         { provide: OwnerAgreementsApiService, useValue: {} },
@@ -15,20 +15,12 @@ describe('OwnerAgreementDetailComponent printing', () => {
         { provide: Router, useValue: {} },
       ],
     });
-    const component = runInInjectionContext(
-      injector,
-      () => new OwnerAgreementDetailComponent(),
-    );
-    const print = vi.spyOn(window, 'print').mockImplementation(() => undefined);
-    vi.useFakeTimers();
+    const component = runInInjectionContext(injector, () => new OwnerAgreementDetailComponent());
+    const openPrintWindow = vi.fn();
+    (component as any).printSheet = { openPrintWindow };
 
     component.printAgreement();
 
-    expect(print).not.toHaveBeenCalled();
-    vi.runAllTimers();
-    expect(print).toHaveBeenCalledOnce();
-
-    vi.useRealTimers();
-    print.mockRestore();
+    expect(openPrintWindow).toHaveBeenCalledOnce();
   });
 });

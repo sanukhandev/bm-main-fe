@@ -158,15 +158,53 @@ describe('BmAgreementPrintSheetComponent', () => {
     fixture.detectChanges();
 
     const text = fixture.nativeElement.textContent;
+    expect(text).toContain('TENANT AGREEMENT / اتفاقية المستأجر');
+    expect(text).toContain('Agreement No. / رقم الاتفاقية: T-20');
+    expect(fixture.nativeElement.querySelector('.print-header')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.print-logo')?.getAttribute('src')).toBe(
+      '/bm-logo-black.png',
+    );
+    expect(text).not.toContain('Status / الحالة:');
+    expect(text).toContain('1014157');
+    expect(text).toContain('092236364, 055 4191214');
+    expect(text).not.toContain('Tenant Agreement / اتفاقية المستأجر');
+    expect(text).toContain('LESSOR DETAILS / بيانات المؤجر');
+    expect(text).not.toContain('OWNER DETAILS / بيانات المالك');
+    expect(text).toContain('Leaser Name / اسم المؤجر');
+    expect(text).not.toContain('Owner Name / اسم المالك');
     expect(text).toContain('Dubai Branch');
     expect(text).toContain('BAITHUL MADEENA REAL ESTATE');
     expect(text).toContain('Gurpreet Singh Surinder Singh');
     expect(text).toContain('Etihad');
     expect(text).toContain('Furnished');
-    expect(text).toContain('First rent cheque');
+    expect(fixture.nativeElement.querySelector('.tenant-services-table')).not.toBeNull();
+    expect(text).toContain('ELECTRICITY, WATER, SEWAGE AND SERVICES');
+    expect(text).toContain('Payee / المستفيد');
+    expect(text).toContain('Mode / النظام');
+    expect(text).toContain('Provided service or amenity / الخدمة أو المرفق');
     expect(text).toContain('Electricity and water included.');
     expect(text).toContain('Office 000, Business Bay, Dubai, United Arab Emirates');
     expect(text).toContain('If the lease contract includes electricity and water');
+    expect(text).toContain('Unit No / رقم الوحدة');
+    expect(text).not.toContain('Category / الفئة');
+    expect(text).toContain('20M - Ali Juma Villa / V-20M');
+    expect(text).toContain('3 Rooms Villa');
+    expect(fixture.nativeElement.querySelectorAll('.print-signatures td').length).toBe(3);
+    expect(text).toContain('Lessor Signature / Stamp');
+    expect(text).toContain('Tenant Signature / Stamp');
+    expect(text).not.toContain('Leaser’s Signature & Stamp');
+    expect(text).not.toContain('Plot No / القطعة رقم');
+    expect(text).not.toContain('File No / رقم الملف');
+    expect(text).not.toContain('Landmark / معلم معروف');
+    expect(text).not.toContain('Usage / الاستخدام');
+    expect(text).toContain('Property Address / عنوان العقار');
+    expect(text).toContain('Faseel, Fujairah, Fujairah');
+    expect(text).not.toContain('PAYMENT SCHEDULE / جدول الدفعات');
+    expect(text).toContain('Mode of payment / طريقة الدفع');
+    expect(text).not.toContain('Mode of pay / طريقة الدفع');
+    expect(text).toContain('Unit No / رقم الوحدة');
+    expect(text).not.toContain('Category / الفئة');
+    expect(text).toContain('20M - Ali Juma Villa / V-20M');
   });
 
   it('renders the owner party and owner-specific terms for an owner agreement', () => {
@@ -195,14 +233,63 @@ describe('BmAgreementPrintSheetComponent', () => {
     fixture.detectChanges();
 
     const text = fixture.nativeElement.textContent;
+    expect(text).toContain('OWNER AGREEMENT / اتفاقية المالك');
+    expect(text).toContain('Agreement No. / رقم الاتفاقية: L-3');
+    expect(fixture.nativeElement.querySelector('.print-header')).not.toBeNull();
+    expect(text).not.toContain('Status / الحالة:');
+    expect(text).toContain('1014157');
+    expect(text).toContain('092236364, 055 4191214');
+    expect(text).not.toContain('Owner Agreement / اتفاقية المالك');
+    expect(text).toContain('OWNER DETAILS / بيانات المالك');
     expect(text).toContain('Gurpreet Singh Surinder Singh');
     expect(text).toContain('BAITHUL MADEENA REAL ESTATE');
+    expect(fixture.nativeElement.querySelector('.owner-services-table')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.tenant-services-table')).toBeNull();
     expect(text).toContain(
       'The tenant has the right to lease the property without referring to the lessor.',
     );
     expect(text).toContain(
       'The lessor does not have the right to cancel the lease without the consent of the tenant.',
     );
+  });
+
+  it('keeps the shared print layout ready for letterhead and omits removed detail sections', () => {
+    const ownerAgreement = {
+      ...agreement,
+      agreement_no: 'L-3',
+      owner_customer_id: 2,
+      owner: customer,
+    } as OwnerAgreement;
+    const component = fixture.componentInstance as any;
+    component.agreement = ownerAgreement;
+    component.branch = branch;
+    component.isOwnerAgreement = true;
+    component.firstPartyName = customer.display_name;
+    component.firstPartyRole = 'Owner / المالك';
+    component.secondPartyName = 'BAITHUL MADEENA REAL ESTATE';
+    component.secondPartyRole = 'Tenant / المستأجر';
+    component.properties = [property];
+    component.firstParty = {
+      name: customer.display_name,
+      role: component.firstPartyRole,
+      customer,
+    };
+    component.secondParty = { name: component.secondPartyName, role: component.secondPartyRole };
+
+    fixture.detectChanges();
+
+    const text = fixture.nativeElement.textContent;
+    expect(fixture.nativeElement.querySelector('.print-letterhead-space')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.print-header')).not.toBeNull();
+    expect(text).not.toContain('Plot No / القطعة رقم');
+    expect(text).not.toContain('File No / رقم الملف');
+    expect(text).not.toContain('Landmark / معلم معروف');
+    expect(text).not.toContain('Usage / الاستخدام');
+    expect(text).toContain('Property Address / عنوان العقار');
+    expect(text).toContain('Faseel, Fujairah, Fujairah');
+    expect(text).not.toContain('PAYMENT SCHEDULE / جدول الدفعات');
+    expect(text).toContain('Mode of payment / طريقة الدفع');
+    expect(text).not.toContain('Mode of pay / طريقة الدفع');
   });
 
   it('renders safe placeholders when optional branch, party, and property data is missing', () => {
@@ -226,9 +313,20 @@ describe('BmAgreementPrintSheetComponent', () => {
     fixture.detectChanges();
 
     const text = fixture.nativeElement.textContent;
-    expect(text).toContain('First fallback party');
+    expect(text).toContain('BAITHUL MADEENA REAL ESTATE');
     expect(text).toContain('Second fallback party');
     expect(text).toContain('—');
+  });
+
+  it('formats the inclusive agreement duration as calendar units', () => {
+    const component = fixture.componentInstance as any;
+    component.agreement = {
+      ...agreement,
+      start_date: '2025-06-01',
+      end_date: '2026-07-01',
+    };
+
+    expect(component.duration).toBe('1 year 1 month 1 day');
   });
 
   it('falls back to the agreement branch id and omits an empty amenities section', () => {
@@ -303,13 +401,16 @@ describe('BmAgreementPrintSheetComponent', () => {
 
     expect(open).toHaveBeenCalledOnce();
     expect(html).toContain('@page { size: A4');
-    expect(html).toContain('LEASE AGREEMENT');
+    expect(html).toContain('Noto+Sans+Arabic');
+    expect(html).toContain('/bm-logo-black.png');
+    expect(html).not.toContain('Status / الحالة:');
+    expect(html).toContain('TENANT AGREEMENT');
     expect(html).toContain('T-20');
     expect(html).toContain('PAYMENT TERMS');
     expect(html).toContain('20M - Ali Juma Villa');
     expect(html).toContain('Electricity');
     expect(html).toContain('If the lease contract includes electricity and water');
-    expect(html).toContain('Leaser’s Signature &amp; Stamp');
+    expect(html).toContain('Lessor Signature / Stamp');
     expect(print).toHaveBeenCalledOnce();
 
     open.mockRestore();

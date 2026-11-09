@@ -9,10 +9,12 @@ import { TenantAgreementsApiService } from '../../core/api/tenant-agreements-api
 import { OwnerAgreementsApiService } from '../../core/api/owner-agreements-api.service';
 import { CustomersApiService } from '../../core/api/customers-api.service';
 import { PropertiesApiService } from '../../core/api/properties-api.service';
+import { AuthService } from '../../core/auth/auth.service';
 import { Customer } from '../../shared/models/customer.models';
 import { Property } from '../../shared/models/property.models';
 import { InstallmentItem, OwnerAgreement, PaymentMode } from '../../shared/models/agreement.models';
 import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
+import { generateInstallmentSchedule } from '../../shared/utils/installment-generator';
 
 import {
   BmComboboxComponent,
@@ -274,6 +276,16 @@ import {
                     {{ formatDate(selectedOwnerAgreement()?.end_date) }}
                   </div>
                 </div>
+              </div>
+            }
+
+            @if (isCoverageOutsideOwnerAgreement()) {
+              <div
+                class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs font-medium text-amber-900"
+              >
+                The selected tenant dates extend beyond the source owner agreement. The property
+                remains selectable, but an authorized coverage override and reason are required when
+                creating this tenant agreement.
               </div>
             }
 
@@ -651,6 +663,53 @@ import {
             </div>
           </div>
         </form>
+
+        @if (coverageOverrideDialogOpen()) {
+          <div
+            class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="coverage-override-title"
+          >
+            <div class="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
+              <h2 id="coverage-override-title" class="text-lg font-extrabold text-slate-900">
+                Confirm Owner Coverage Override
+              </h2>
+              <p class="mt-2 text-sm leading-6 text-slate-600">
+                The tenant agreement dates exceed the selected owner agreement period. This action
+                is authorized and will be recorded in the audit log.
+              </p>
+              <label class="block mt-4 text-sm font-semibold text-slate-800">
+                Reason <span class="text-rose-600">*</span>
+                <textarea
+                  [value]="coverageOverrideReason"
+                  (input)="onCoverageOverrideReasonInput($event)"
+                  rows="4"
+                  maxlength="2000"
+                  class="mt-2 w-full rounded-xl border border-slate-300 p-3 text-sm focus:border-emerald-600 focus:outline-none focus:ring-4 focus:ring-emerald-500/10"
+                  placeholder="Explain why the tenant agreement extends beyond owner coverage..."
+                ></textarea>
+              </label>
+              <div class="mt-5 flex justify-end gap-3">
+                <button
+                  type="button"
+                  (click)="cancelCoverageOverride()"
+                  class="px-4 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  (click)="confirmCoverageOverride()"
+                  [disabled]="!coverageOverrideReason.trim()"
+                  class="px-4 py-2.5 rounded-xl bg-emerald-800 text-white text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Authorize & Create
+                </button>
+              </div>
+            </div>
+          </div>
+        }
       }
     </div>
   `,
@@ -662,6 +721,7 @@ export class TenantAgreementFormComponent implements OnInit {
   private ownerAgreementsApi = inject(OwnerAgreementsApiService);
   private customersApi = inject(CustomersApiService);
   private propertiesApi = inject(PropertiesApiService);
+  private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
@@ -724,6 +784,9 @@ export class TenantAgreementFormComponent implements OnInit {
   isSubmitting = signal(false);
   error = signal<string | null>(null);
   serverError = signal<string | null>(null);
+  coverageOverrideDialogOpen = signal(false);
+  coverageOverrideConfirmed = signal(false);
+  coverageOverrideReason = '';
   private availabilityRequest = 0;
   scheduleDetails = signal<
     Record<
@@ -758,39 +821,29 @@ export class TenantAgreementFormComponent implements OnInit {
     this.formVersion();
     const total = Number(this.agreementForm.value.total_amount) || 0;
     const count = Number(this.agreementForm.value.payment_count) || 1;
-    const startDateStr = this.agreementForm.value.start_date;
+    const startDateStr = this.agreementForm.value.start_date || uaeDateInput();
+    const endDateStr = this.agreementForm.value.end_date || startDateStr;
     const frequency = this.agreementForm.value.payment_frequency || 'monthly';
 
     if (total <= 0 || count <= 0) return [];
 
-    const totalCents = Math.round(total * 100);
-    const baseCents = Math.floor(totalCents / count);
-    const remainderCents = totalCents - baseCents * count;
-    const items: InstallmentItem[] = [];
-    let baseDate = new Date(`${startDateStr || uaeDateInput()}T12:00:00Z`);
-    if (isNaN(baseDate.getTime())) baseDate = new Date(`${uaeDateInput()}T12:00:00Z`);
+    const generated = generateInstallmentSchedule({
+      totalAmount: total,
+      startDate: startDateStr,
+      endDate: endDateStr,
+      paymentCount: count,
+      paymentFrequency: frequency,
+      paymentMode: this.agreementForm.value.payment_mode || 'cheque',
+    });
 
-    for (let i = 1; i <= count; i++) {
-      const dueDate = new Date(baseDate);
-      if (i > 1) {
-        if (frequency === 'monthly') dueDate.setMonth(dueDate.getMonth() + (i - 1));
-        else if (frequency === 'quarterly') dueDate.setMonth(dueDate.getMonth() + (i - 1) * 3);
-        else if (frequency === 'semi-annually') dueDate.setMonth(dueDate.getMonth() + (i - 1) * 6);
-        else if (frequency === 'annually') dueDate.setFullYear(dueDate.getFullYear() + (i - 1));
-      }
-
-      items.push({
-        installment_number: i,
-        due_date: this.scheduleDetails()[i]?.due_date || dueDate.toISOString().split('T')[0],
-        amount:
-          this.scheduleDetails()[i]?.amount ?? (baseCents + (i === 1 ? remainderCents : 0)) / 100,
-        category: this.scheduleDetails()[i]?.category || 'rent',
-        particulars: this.scheduleDetails()[i]?.particulars || '',
-        status: 'pending',
-      });
-    }
-
-    return items;
+    return generated.map((line) => ({
+      installment_number: line.installment_no,
+      due_date: this.scheduleDetails()[line.installment_no]?.due_date || line.due_date,
+      amount: this.scheduleDetails()[line.installment_no]?.amount ?? line.amount,
+      category: this.scheduleDetails()[line.installment_no]?.category || 'rent',
+      particulars: this.scheduleDetails()[line.installment_no]?.particulars || '',
+      status: 'pending',
+    }));
   });
 
   scheduleTotal = computed(() =>
@@ -870,6 +923,7 @@ export class TenantAgreementFormComponent implements OnInit {
       value.total_amount,
       value.payment_count,
       value.start_date,
+      value.end_date,
       value.payment_frequency,
     ].join('|');
   }
@@ -1091,6 +1145,9 @@ export class TenantAgreementFormComponent implements OnInit {
   }
 
   onAvailabilityInputsChange(): void {
+    this.coverageOverrideDialogOpen.set(false);
+    this.coverageOverrideConfirmed.set(false);
+    this.coverageOverrideReason = '';
     const oaId = Number(this.agreementForm.value.source_owner_agreement_id);
     if (oaId) {
       const oa = this.ownerAgreements().find((item) => item.id === oaId);
@@ -1130,6 +1187,41 @@ export class TenantAgreementFormComponent implements OnInit {
     this.propertySearch.set((event.target as HTMLInputElement).value);
   }
 
+  isCoverageOutsideOwnerAgreement(): boolean {
+    if (this.isEditMode()) return false;
+    const ownerAgreement = this.selectedOwnerAgreementForForm();
+    const { start_date: startDate, end_date: endDate } = this.agreementForm.getRawValue();
+    return !!(
+      ownerAgreement &&
+      startDate &&
+      endDate &&
+      (startDate < ownerAgreement.start_date || endDate > ownerAgreement.end_date)
+    );
+  }
+
+  onCoverageOverrideReasonInput(event: Event): void {
+    this.coverageOverrideReason = (event.target as HTMLTextAreaElement).value;
+  }
+
+  cancelCoverageOverride(): void {
+    this.coverageOverrideDialogOpen.set(false);
+    this.coverageOverrideConfirmed.set(false);
+    this.coverageOverrideReason = '';
+  }
+
+  confirmCoverageOverride(): void {
+    if (!this.coverageOverrideReason.trim()) return;
+    this.coverageOverrideReason = this.coverageOverrideReason.trim();
+    this.coverageOverrideConfirmed.set(true);
+    this.coverageOverrideDialogOpen.set(false);
+    this.onSubmit();
+  }
+
+  private selectedOwnerAgreementForForm(): OwnerAgreement | null {
+    const id = Number(this.agreementForm.getRawValue().source_owner_agreement_id);
+    return id ? this.ownerAgreements().find((agreement) => agreement.id === id) || null : null;
+  }
+
   isFieldInvalid(field: string): boolean {
     const control = this.agreementForm.get(field);
     return !!(control && control.invalid && (control.dirty || control.touched));
@@ -1148,6 +1240,19 @@ export class TenantAgreementFormComponent implements OnInit {
     }
     if (!this.scheduleMatchesTotal()) {
       this.serverError.set('Installment amounts must add up exactly to the total rent amount.');
+      return;
+    }
+
+    const coverageOverride = this.isCoverageOutsideOwnerAgreement();
+    if (coverageOverride && !this.coverageOverrideConfirmed()) {
+      if (!this.authService.hasPermission('agreements.override_coverage')) {
+        this.serverError.set(
+          'The tenant dates exceed the owner agreement period. An authorized user must create this agreement or adjust the dates.',
+        );
+        return;
+      }
+      this.serverError.set(null);
+      this.coverageOverrideDialogOpen.set(true);
       return;
     }
 
@@ -1178,6 +1283,12 @@ export class TenantAgreementFormComponent implements OnInit {
         source_owner_agreement_id: Number(val.source_owner_agreement_id),
       })),
       notes: val.notes || null,
+      ...(coverageOverride
+        ? {
+            coverage_override: true,
+            coverage_override_reason: this.coverageOverrideReason,
+          }
+        : {}),
     };
 
     if (this.isEditMode()) {

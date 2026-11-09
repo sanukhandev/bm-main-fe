@@ -1,4 +1,11 @@
-import { Component, OnInit, inject, signal, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  inject,
+  signal,
+  CUSTOM_ELEMENTS_SCHEMA,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -6,7 +13,11 @@ import { BmLoadingStateComponent } from '../../shared/components/bm-loading-stat
 import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm-error-state.component';
 import { BmConfirmDialogComponent } from '../../shared/components/bm-confirm-dialog/bm-confirm-dialog.component';
 import { BmReceiptChequeModalComponent } from '../../shared/components/bm-receipt-cheque-modal/bm-receipt-cheque-modal.component';
-import { BmAgreementPrintSheetComponent } from '../../shared/components/bm-agreement-print-sheet/bm-agreement-print-sheet.component';
+import {
+  BmAgreementPrintSheetComponent,
+  PrintableParty,
+} from '../../shared/components/bm-agreement-print-sheet/bm-agreement-print-sheet.component';
+import { BranchContextService } from '../../core/branch-context/branch-context.service';
 import { TenantAgreementsApiService } from '../../core/api/tenant-agreements-api.service';
 import { AccountTransaction } from '../../core/api/accounts-api.service';
 import { TenantAgreement, AgreementInstallment } from '../../shared/models/agreement.models';
@@ -1581,10 +1592,13 @@ import { formatUaeDate, uaeDateInput } from '../../shared/utils/uae-formatters';
       </div>
       <bm-agreement-print-sheet
         [agreement]="agreement()!"
-        [firstPartyName]="'Baithul Madeena Real Estate'"
-        firstPartyRole="Property Management Company / شركة إدارة العقارات"
+        firstPartyName="BAITHUL MADEENA REAL ESTATE"
+        firstPartyRole="Lessor / المؤجر"
+        [firstParty]="businessPrintParty()"
         [secondPartyName]="tenantName()"
         secondPartyRole="Tenant / المستأجر"
+        [secondParty]="tenantPrintParty()"
+        [branch]="branchContext.activeBranch()"
         [properties]="propertiesList()"
       ></bm-agreement-print-sheet>
     }
@@ -1594,6 +1608,8 @@ export class TenantAgreementDetailComponent implements OnInit {
   private api = inject(TenantAgreementsApiService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  readonly branchContext = inject(BranchContextService);
+  @ViewChild(BmAgreementPrintSheetComponent) private printSheet?: BmAgreementPrintSheetComponent;
 
   agreement = signal<TenantAgreement | null>(null);
   selectedVoucherTransaction = signal<AccountTransaction | null>(null);
@@ -1657,7 +1673,7 @@ export class TenantAgreementDetailComponent implements OnInit {
   }
 
   printAgreement(): void {
-    window.print();
+    this.printSheet?.openPrintWindow();
   }
 
   loadAgreement(silent = false): void {
@@ -1709,6 +1725,14 @@ export class TenantAgreementDetailComponent implements OnInit {
   tenantName(): string {
     const tc = this.tenantCustomer();
     return tc ? tc.display_name : '—';
+  }
+
+  businessPrintParty(): PrintableParty {
+    return { name: 'BAITHUL MADEENA REAL ESTATE', role: 'Lessor / المؤجر' };
+  }
+
+  tenantPrintParty(): PrintableParty {
+    return { name: this.tenantName(), role: 'Tenant / المستأجر', customer: this.tenantCustomer() };
   }
 
   propertiesList(): any[] {

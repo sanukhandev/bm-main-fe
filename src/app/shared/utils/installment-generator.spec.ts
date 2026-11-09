@@ -35,4 +35,24 @@ describe('installment-generator utility', () => {
     expect(schedule[0].amount).toBe(5000);
     expect(schedule[0].payment_mode).toBe('bank_transfer');
   });
+
+  it('keeps frequency-based payments inside the agreement period', () => {
+    const schedule = generateInstallmentSchedule({
+      totalAmount: 120000,
+      startDate: '2026-11-01',
+      endDate: '2027-11-30',
+      paymentCount: 6,
+      paymentFrequency: 'quarterly',
+      paymentMode: 'cheque',
+    });
+
+    expect(schedule.map((item) => item.due_date)).toEqual([
+      '2026-11-01',
+      '2027-02-01',
+      '2027-05-01',
+      '2027-08-01',
+      '2027-11-01',
+      '2027-11-30',
+    ]);
+  });
 });

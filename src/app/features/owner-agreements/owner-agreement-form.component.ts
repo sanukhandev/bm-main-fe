@@ -12,6 +12,7 @@ import { Customer } from '../../shared/models/customer.models';
 import { Property } from '../../shared/models/property.models';
 import { InstallmentItem, PaymentMode } from '../../shared/models/agreement.models';
 import { uaeDateInput } from '../../shared/utils/uae-formatters';
+import { generateInstallmentSchedule } from '../../shared/utils/installment-generator';
 
 import {
   BmComboboxComponent,
@@ -615,39 +616,29 @@ export class OwnerAgreementFormComponent implements OnInit {
     this.formVersion();
     const total = Number(this.agreementForm.value.total_amount) || 0;
     const count = Number(this.agreementForm.value.payment_count) || 1;
-    const startDateStr = this.agreementForm.value.start_date;
+    const startDateStr = this.agreementForm.value.start_date || uaeDateInput();
+    const endDateStr = this.agreementForm.value.end_date || startDateStr;
     const frequency = this.agreementForm.value.payment_frequency || 'monthly';
 
     if (total <= 0 || count <= 0) return [];
 
-    const totalCents = Math.round(total * 100);
-    const baseCents = Math.floor(totalCents / count);
-    const remainderCents = totalCents - baseCents * count;
-    const items: InstallmentItem[] = [];
-    let baseDate = new Date(`${startDateStr || uaeDateInput()}T12:00:00Z`);
-    if (isNaN(baseDate.getTime())) baseDate = new Date(`${uaeDateInput()}T12:00:00Z`);
+    const generated = generateInstallmentSchedule({
+      totalAmount: total,
+      startDate: startDateStr,
+      endDate: endDateStr,
+      paymentCount: count,
+      paymentFrequency: frequency,
+      paymentMode: this.agreementForm.value.payment_mode || 'bank_transfer',
+    });
 
-    for (let i = 1; i <= count; i++) {
-      const dueDate = new Date(baseDate);
-      if (i > 1) {
-        if (frequency === 'monthly') dueDate.setMonth(dueDate.getMonth() + (i - 1));
-        else if (frequency === 'quarterly') dueDate.setMonth(dueDate.getMonth() + (i - 1) * 3);
-        else if (frequency === 'semi-annually') dueDate.setMonth(dueDate.getMonth() + (i - 1) * 6);
-        else if (frequency === 'annually') dueDate.setFullYear(dueDate.getFullYear() + (i - 1));
-      }
-
-      items.push({
-        installment_number: i,
-        due_date: this.scheduleDetails()[i]?.due_date || dueDate.toISOString().split('T')[0],
-        amount:
-          this.scheduleDetails()[i]?.amount ?? (baseCents + (i === 1 ? remainderCents : 0)) / 100,
-        category: this.scheduleDetails()[i]?.category || 'rent',
-        particulars: this.scheduleDetails()[i]?.particulars || '',
-        status: 'pending',
-      });
-    }
-
-    return items;
+    return generated.map((line) => ({
+      installment_number: line.installment_no,
+      due_date: this.scheduleDetails()[line.installment_no]?.due_date || line.due_date,
+      amount: this.scheduleDetails()[line.installment_no]?.amount ?? line.amount,
+      category: this.scheduleDetails()[line.installment_no]?.category || 'rent',
+      particulars: this.scheduleDetails()[line.installment_no]?.particulars || '',
+      status: 'pending',
+    }));
   });
 
   scheduleTotal = computed(() =>
@@ -727,6 +718,7 @@ export class OwnerAgreementFormComponent implements OnInit {
       value.total_amount,
       value.payment_count,
       value.start_date,
+      value.end_date,
       value.payment_frequency,
     ].join('|');
   }

@@ -33,11 +33,15 @@ export function generateInstallmentSchedule(
   // Remainder added to last installment to prevent rounding drift
   const remainder = Math.round((total - baseAmount * count) * 100) / 100;
 
-  const start = input.startDate ? new Date(input.startDate) : new Date();
+  const start = input.startDate
+    ? new Date(`${input.startDate}T12:00:00Z`)
+    : new Date(`${uaeDateInput()}T12:00:00Z`);
+  const end = input.endDate ? new Date(`${input.endDate}T12:00:00Z`) : null;
   const monthStepMap: Record<string, number> = {
     monthly: 1,
     quarterly: 3,
     semi_annually: 6,
+    'semi-annually': 6,
     annually: 12,
   };
   const stepMonths = monthStepMap[input.paymentFrequency?.toLowerCase()] || 1;
@@ -46,7 +50,8 @@ export function generateInstallmentSchedule(
 
   for (let i = 0; i < count; i++) {
     const dueDate = new Date(start);
-    dueDate.setMonth(start.getMonth() + i * stepMonths);
+    dueDate.setUTCMonth(start.getUTCMonth() + i * stepMonths);
+    if (end && dueDate > end) dueDate.setTime(end.getTime());
 
     const isLast = i === count - 1;
     const installmentAmount = isLast

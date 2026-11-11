@@ -23,7 +23,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         };
       } else if (error.status === 0) {
         normalizedError.message =
-          'Unable to connect to backend server. Please verify backend (Laravel) is running at http://127.0.0.1:8000.';
+          'Unable to connect to backend server. Please verify backend (Laravel) is running at http://127.0.0.1:8001.';
         normalizedError.code = 'NETWORK_ERROR';
       } else if (error.status === 404) {
         normalizedError.message =

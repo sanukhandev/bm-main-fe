@@ -158,7 +158,9 @@ describe('BmAgreementPrintSheetComponent', () => {
     fixture.detectChanges();
 
     const text = fixture.nativeElement.textContent;
-    expect(text).toContain('TENANT AGREEMENT / اتفاقية المستأجر');
+    expect(text).toContain('LEASING AGREEMENT / اتفاقية إيجار');
+    expect(text).not.toContain('TENANT AGREEMENT');
+    expect(text).not.toContain('OWNER AGREEMENT');
     expect(text).toContain('Agreement No. / رقم الاتفاقية: T-20');
     expect(fixture.nativeElement.querySelector('.print-header')).not.toBeNull();
     expect(fixture.nativeElement.querySelector('.print-logo')?.getAttribute('src')).toBe(
@@ -167,7 +169,8 @@ describe('BmAgreementPrintSheetComponent', () => {
     expect(text).not.toContain('Status / الحالة:');
     expect(text).toContain('1014157');
     expect(text).toContain('092236364, 055 4191214');
-    expect(text).not.toContain('Tenant Agreement / اتفاقية المستأجر');
+    expect(text).toContain('CUSTOMER COPY / نسخة العميل');
+    expect(text).toContain('This document is computer-generated');
     expect(text).toContain('LESSOR DETAILS / بيانات المؤجر');
     expect(text).not.toContain('OWNER DETAILS / بيانات المالك');
     expect(text).toContain('Leaser Name / اسم المؤجر');
@@ -233,13 +236,15 @@ describe('BmAgreementPrintSheetComponent', () => {
     fixture.detectChanges();
 
     const text = fixture.nativeElement.textContent;
-    expect(text).toContain('OWNER AGREEMENT / اتفاقية المالك');
+    expect(text).toContain('LEASING AGREEMENT / اتفاقية إيجار');
+    expect(text).not.toContain('OWNER AGREEMENT');
+    expect(text).not.toContain('TENANT AGREEMENT');
     expect(text).toContain('Agreement No. / رقم الاتفاقية: L-3');
     expect(fixture.nativeElement.querySelector('.print-header')).not.toBeNull();
     expect(text).not.toContain('Status / الحالة:');
     expect(text).toContain('1014157');
     expect(text).toContain('092236364, 055 4191214');
-    expect(text).not.toContain('Owner Agreement / اتفاقية المالك');
+    expect(text).toContain('CUSTOMER COPY / نسخة العميل');
     expect(text).toContain('OWNER DETAILS / بيانات المالك');
     expect(text).toContain('Gurpreet Singh Surinder Singh');
     expect(text).toContain('BAITHUL MADEENA REAL ESTATE');
@@ -404,7 +409,8 @@ describe('BmAgreementPrintSheetComponent', () => {
     expect(html).toContain('Noto+Sans+Arabic');
     expect(html).toContain('/bm-logo-black.png');
     expect(html).not.toContain('Status / الحالة:');
-    expect(html).toContain('TENANT AGREEMENT');
+    expect(html).toContain('LEASING AGREEMENT');
+    expect(html).toContain('CUSTOMER COPY');
     expect(html).toContain('T-20');
     expect(html).toContain('PAYMENT TERMS');
     expect(html).toContain('20M - Ali Juma Villa');
@@ -424,5 +430,61 @@ describe('BmAgreementPrintSheetComponent', () => {
     expect(open).toHaveBeenCalledOnce();
 
     open.mockRestore();
+  });
+
+  it('supports comma-separated utility ids for multiple rooms and omits role/branch from tenant details', () => {
+    const room1 = {
+      ...property,
+      id: 11,
+      property_code: 'RM-101',
+      unit_number: 'Room 101',
+      utility_details: null,
+      electricity_account_number: 'E-101',
+      gas_connection_number: 'G-101',
+      notes: null,
+    };
+    const room2 = {
+      ...property,
+      id: 12,
+      property_code: 'RM-102',
+      unit_number: 'Room 102',
+      utility_details: null,
+      electricity_account_number: 'E-102',
+      gas_connection_number: 'G-102',
+      notes: null,
+    };
+    const component = fixture.componentInstance as any;
+    component.agreement = { ...agreement, file_no: 'F-99', notes: 'Electricity and water included.' };
+    component.branch = branch;
+    component.isOwnerAgreement = false;
+    component.firstPartyName = 'BAITHUL MADEENA REAL ESTATE';
+    component.secondPartyName = customer.display_name;
+    component.properties = [room1, room2];
+    component.firstParty = { name: component.firstPartyName, role: 'Lessor' };
+    component.secondParty = { name: customer.display_name, role: 'Tenant', customer };
+
+    fixture.detectChanges();
+
+    const text = fixture.nativeElement.textContent;
+    const tenantTableText = fixture.nativeElement.querySelector('.tenant-table')?.textContent || '';
+
+    // Tenant details has no role or branch
+    expect(tenantTableText).not.toContain('Role / الصفة');
+    expect(tenantTableText).not.toContain('Branch / الفرع');
+    expect(tenantTableText).toContain('Gurpreet Singh Surinder Singh');
+
+    // Leased premise replaces unit no with unit type, area with unit number, and includes file no
+    expect(text).toContain('Unit Type / نوع الوحدة');
+    expect(text).toContain('Unit No / رقم الوحدة');
+    expect(text).toContain('Property & File No / العقار ورقم ملف العقار');
+    expect(text).toContain('File: F-99');
+
+    // Comma-separated IDs for multiple rooms
+    expect(text).toContain('E-101, E-102');
+    expect(text).toContain('G-101, G-102');
+
+    // Payable by column
+    expect(text).toContain('Payee / المستفيد · Payable by / يُدفع بواسطة');
+    expect(text).toContain('Leaser / المؤجر');
   });
 });

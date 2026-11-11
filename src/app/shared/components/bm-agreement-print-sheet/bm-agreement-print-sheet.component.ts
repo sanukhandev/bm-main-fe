@@ -27,53 +27,79 @@ interface PrintableClause {
   ar: string;
 }
 
+export interface PrintableAmenityRow {
+  name: string;
+  nameAr: string;
+  identifier: string;
+  provider: string;
+  mode: string;
+  payableBy: string;
+  payableByAr: string;
+}
+
 const AGREEMENT_PRINT_STYLES = `
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; background: #fff; color: #000; }
-  body { font-family: 'Noto Sans Arabic', Arial, Tahoma, sans-serif; font-size: 9pt; line-height: 1.28; }
+  body { font-family: 'Noto Sans Arabic', Arial, Tahoma, sans-serif; font-size: 7.2pt; line-height: 1.25; }
   .agreement-print-sheet { display: none; background: #fff; color: #000; }
-  body.print-window .agreement-print-sheet { display: block; width: 210mm; min-height: 297mm; margin: 0 auto; padding: 10mm 12mm; }
-  .print-header { display: grid; grid-template-columns: 34mm 1fr 45mm; gap: 4mm; align-items: center; border-bottom: 1px solid #000; padding-bottom: 3mm; }
-  .print-brand { display: flex; flex-direction: column; align-items: flex-start; gap: 1mm; font-size: 6.5pt; line-height: 1.15; }
-  .print-logo { width: 30mm; max-height: 15mm; object-fit: contain; }
+  body.print-window .agreement-print-sheet {
+    display: block;
+    width: 200mm;
+    max-height: 287mm;
+    margin: 0 auto;
+    padding: 4mm 6mm;
+  }
+  .print-header {
+    display: grid;
+    grid-template-columns: 28mm 1fr 44mm;
+    gap: 3mm;
+    align-items: center;
+    border-bottom: 1px solid #000;
+    padding-bottom: 1.5mm;
+  }
+  .print-brand { display: flex; align-items: center; }
+  .print-logo { width: 28mm; max-height: 12mm; object-fit: contain; }
   .print-title { padding: 0; text-align: center; }
-  .print-title h1 { margin: 0; font-size: 14pt; }
-  .print-agreement-no { margin: 1mm 0 2mm; font-size: 8.5pt; font-weight: 700; }
-  .print-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 1mm; text-align: right; font-size: 7.5pt; }
-  .print-section { margin-top: 4mm; break-inside: avoid; }
-  .print-section h2 { margin: 0 0 1.5mm; font-size: 9pt; }
+  .print-title h1 { margin: 0; font-size: 11.5pt; font-weight: 700; letter-spacing: 0.2px; }
+  .print-agreement-no { margin: 0.5mm 0; font-size: 7.5pt; font-weight: 700; }
+  .print-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 0.5mm; text-align: right; font-size: 6.5pt; line-height: 1.25; }
+  .print-section { margin-top: 1.8mm; break-inside: avoid; page-break-inside: avoid; }
+  .print-section h2 { margin: 0 0 0.8mm; font-size: 7.5pt; font-weight: 700; }
   .print-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-  .print-table th, .print-table td { border: 1px solid #000; padding: 1.7mm 1.8mm; vertical-align: top; overflow-wrap: anywhere; }
-  .print-table th { font-weight: 700; }
-  .print-table th span { font-weight: 400; }
-  .party-table th, .party-table td { width: 20%; }
-  .party-table th:first-child, .party-table td:first-child { width: 25%; }
-  .party-table th:nth-child(3), .party-table td:nth-child(3) { width: 25%; }
-  .party-table th:nth-child(4), .party-table td:nth-child(4) { width: 15%; }
-  .party-table th:nth-child(5), .party-table td:nth-child(5) { width: 15%; }
-  .lessor-table th:nth-child(1), .lessor-table td:nth-child(1),
-  .lessor-table th:nth-child(2), .lessor-table td:nth-child(2),
-  .lessor-table th:nth-child(3), .lessor-table td:nth-child(3),
-  .lessor-table th:nth-child(4), .lessor-table td:nth-child(4) { width: 25%; }
-  .property-table th:nth-child(1), .property-table td:nth-child(1) { width: 23%; }
-  .property-table th:nth-child(2), .property-table td:nth-child(2) { width: 17%; }
-  .property-table th:nth-child(3), .property-table td:nth-child(3) { width: 38%; }
-  .property-table th:nth-child(4), .property-table td:nth-child(4) { width: 22%; }
+  .print-table th, .print-table td { border: 1px solid #000; padding: 0.9mm 1.2mm; vertical-align: middle; overflow-wrap: anywhere; font-size: 6.8pt; line-height: 1.22; }
+  .print-table th { font-weight: 700; background-color: #f7f7f7; }
+  .party-table th, .party-table td { width: 25%; }
+  .party-table th:first-child, .party-table td:first-child { width: 28%; }
+  .party-table th:nth-child(2), .party-table td:nth-child(2) { width: 24%; }
+  .party-table th:nth-child(3), .party-table td:nth-child(3) { width: 24%; }
+  .party-table th:nth-child(4), .party-table td:nth-child(4) { width: 24%; }
+  .property-table th:nth-child(1), .property-table td:nth-child(1) { width: 30%; }
+  .property-table th:nth-child(2), .property-table td:nth-child(2) { width: 18%; }
+  .property-table th:nth-child(3), .property-table td:nth-child(3) { width: 18%; }
+  .property-table th:nth-child(4), .property-table td:nth-child(4) { width: 34%; }
   .property-table .empty-row td { text-align: center; }
-  .terms-table { font-size: 7.5pt; }
-  .terms-table td:first-child { width: 4%; text-align: center; }
-  .terms-table td:nth-child(2), .terms-table td:nth-child(3) { width: 48%; }
-  .terms-table td:nth-child(3) { direction: rtl; text-align: right; }
-  .print-signatures { width: 100%; border-collapse: collapse; table-layout: fixed; margin-top: 14mm; break-inside: avoid; }
-  .print-signatures td { width: 33.33%; border: 0; padding: 0 1mm; text-align: center; height: 25mm; vertical-align: bottom; font-size: 7.5pt; }
-  .signature-line { display: block; border-bottom: 1px solid #000; margin: 0 3mm 2mm; height: 13mm; }
-  .print-footer { margin-top: 5mm; border-top: 1px solid #000; padding-top: 2mm; text-align: center; font-size: 7pt; }
-  @page { size: A4; margin: 0; }
+  .services-table th:nth-child(1), .services-table td:nth-child(1) { width: 24%; }
+  .services-table th:nth-child(2), .services-table td:nth-child(2) { width: 22%; }
+  .services-table th:nth-child(3), .services-table td:nth-child(3) { width: 20%; }
+  .services-table th:nth-child(4), .services-table td:nth-child(4) { width: 16%; }
+  .services-table th:nth-child(5), .services-table td:nth-child(5) { width: 18%; }
+  .amenity-notes-row td { font-size: 6.2pt; background-color: #fafafa; }
+  .terms-table { font-size: 6.2pt; line-height: 1.2; }
+  .terms-table td:first-child { width: 3.5%; text-align: center; font-weight: 700; vertical-align: top; }
+  .terms-table td:nth-child(2) { width: 48.25%; padding: 0.8mm 1.2mm; vertical-align: top; text-align: left; line-height: 1.2; }
+  .terms-table td:nth-child(3) { width: 48.25%; padding: 0.8mm 1.2mm; vertical-align: top; direction: rtl; text-align: right; line-height: 1.35; }
+  .print-signatures { width: 100%; border-collapse: collapse; table-layout: fixed; margin-top: 2.5mm; break-inside: avoid; page-break-inside: avoid; }
+  .print-signatures td { width: 33.33%; border: 0; padding: 0 1mm; text-align: center; height: 13mm; vertical-align: bottom; font-size: 6.5pt; line-height: 1.25; }
+  .signature-line { display: block; border-bottom: 1px solid #000; margin: 0 3mm 1mm; height: 7mm; }
+  .print-footer { margin-top: 2mm; border-top: 1px solid #000; padding-top: 1mm; text-align: center; font-size: 5.8pt; line-height: 1.2; color: #222; }
+  .print-footer-copy { font-weight: 700; margin-bottom: 0.3mm; font-size: 6.2pt; }
+  .print-footer-disclaimer { font-size: 5.2pt; line-height: 1.15; color: #444; }
+  .print-footer-disclaimer span { display: block; margin-top: 0.3mm; }
+  @page { size: A4 portrait; margin: 4mm 6mm; }
   @media print {
-    html, body { width: 210mm; min-height: 297mm; }
-    body.print-window .agreement-print-sheet { margin: 0; }
-    .print-section { break-inside: avoid; }
-    .terms-table tr, .print-signatures { break-inside: avoid; }
+    html, body { width: 210mm; height: 297mm; margin: 0 !important; padding: 0 !important; overflow: hidden !important; }
+    body.print-window .agreement-print-sheet { width: 100% !important; max-height: 287mm !important; margin: 0 !important; padding: 4mm 6mm !important; overflow: hidden !important; }
+    .print-section, .print-table tr, .print-signatures { break-inside: avoid !important; page-break-inside: avoid !important; }
   }
 `;
 
@@ -86,16 +112,9 @@ const AGREEMENT_PRINT_STYLES = `
       <header class="print-header">
         <div class="print-brand">
           <img class="print-logo" src="/bm-logo-black.png" alt="Baithul Madeena Real Estate" />
-          <strong>BAITHUL MADEENA REAL ESTATE</strong>
         </div>
         <div class="print-title">
-          <h1>
-            {{
-              isOwnerAgreement
-                ? 'OWNER AGREEMENT / اتفاقية المالك'
-                : 'TENANT AGREEMENT / اتفاقية المستأجر'
-            }}
-          </h1>
+          <h1>LEASING AGREEMENT / اتفاقية إيجار</h1>
           <div class="print-agreement-no">
             Agreement No. / رقم الاتفاقية: {{ display(agreement.agreement_no) }}
           </div>
@@ -163,14 +182,13 @@ const AGREEMENT_PRINT_STYLES = `
 
       <section class="print-section">
         <h2>TENANT DETAILS / بيانات المستأجر</h2>
-        <table class="print-table party-table">
+        <table class="print-table party-table tenant-table">
           <thead>
             <tr>
               <th>Tenant Name / اسم المستأجر</th>
+              <th>Address / العنوان</th>
               <th>License / ID No / رقم الرخصة/الهوية</th>
               <th>Contact / التواصل</th>
-              <th>Role / الصفة</th>
-              <th>Branch / الفرع</th>
             </tr>
           </thead>
           <tbody>
@@ -180,10 +198,9 @@ const AGREEMENT_PRINT_STYLES = `
                   isOwnerAgreement ? business.name : partyName(secondParty, secondPartyName)
                 }}</strong>
               </td>
+              <td>{{ partyAddress(secondParty, isOwnerAgreement) }}</td>
               <td>{{ partyIdentity(secondParty, isOwnerAgreement) }}</td>
               <td>{{ partyContact(secondParty, isOwnerAgreement) }}</td>
-              <td>{{ partyRole(secondParty, secondPartyRole) }}</td>
-              <td>{{ branchName }}</td>
             </tr>
           </tbody>
         </table>
@@ -194,21 +211,26 @@ const AGREEMENT_PRINT_STYLES = `
         <table class="print-table property-table">
           <thead>
             <tr>
+              <th>Property & File No / العقار ورقم ملف العقار</th>
+              <th>Unit Type / نوع الوحدة</th>
               <th>Unit No / رقم الوحدة</th>
-              <th>No. of rooms / عدد الغرف</th>
               <th>Property Address / عنوان العقار</th>
-              <th>Area / المنطقة</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let property of properties">
               <td>
-                {{ getPropertyField(property, 'name') }} /
-                {{ getPropertyField(property, 'property_code') }}
+                {{ propertyFileAndCode(property) }}
               </td>
-              <td>{{ getPropertyField(property, 'unit_number') }}</td>
-              <td>{{ propertyAddress(property) }}</td>
-              <td>{{ getPropertyField(property, 'area') }}</td>
+              <td>
+                {{ formatPropertyType(getPropertyField(property, 'property_type')) }}
+              </td>
+              <td>
+                {{ getPropertyField(property, 'unit_number') }}
+              </td>
+              <td>
+                {{ propertyAddress(property) }}
+              </td>
             </tr>
             <tr *ngIf="properties.length === 0" class="empty-row">
               <td colspan="4">No property details recorded / لا توجد تفاصيل عقار مسجلة</td>
@@ -217,52 +239,37 @@ const AGREEMENT_PRINT_STYLES = `
         </table>
       </section>
 
-      <ng-container *ngIf="isOwnerAgreement; else tenantServices">
-        <section class="print-section" *ngIf="propertyServiceRows.length">
-          <h2>ELECTRICITY, WATER, SEWAGE AND SERVICES / الكهرباء والمياه والصرف الصحي والخدمات</h2>
-          <table class="print-table owner-services-table">
-            <thead>
-              <tr>
-                <th>Property / العقار</th>
-                <th>Payee / المستفيد</th>
-                <th>Mode / النظام</th>
-                <th>Provided service or amenity / الخدمة أو المرفق</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let row of propertyServiceRows">
-                <td>{{ row.property }}</td>
-                <td>Owner</td>
-                <td>As recorded / حسب السجل</td>
-                <td>{{ row.services }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
-      </ng-container>
-      <ng-template #tenantServices>
-        <section class="print-section" *ngIf="propertyServiceRows.length">
-          <h2>ELECTRICITY, WATER, SEWAGE AND SERVICES / الكهرباء والمياه والصرف الصحي والخدمات</h2>
-          <table class="print-table tenant-services-table">
-            <thead>
-              <tr>
-                <th>Property / العقار</th>
-                <th>Payee / المستفيد</th>
-                <th>Mode / النظام</th>
-                <th>Provided service or amenity / الخدمة أو المرفق</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let row of propertyServiceRows">
-                <td>{{ row.property }}</td>
-                <td>Tenant</td>
-                <td>As recorded / حسب السجل</td>
-                <td>{{ row.services }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
-      </ng-template>
+      <section class="print-section" *ngIf="hasRecordedUtilities">
+        <h2>ELECTRICITY, WATER, SEWAGE AND SERVICES / الكهرباء والمياه والصرف الصحي والخدمات</h2>
+        <table
+          class="print-table services-table"
+          [ngClass]="isOwnerAgreement ? 'owner-services-table' : 'tenant-services-table'"
+        >
+          <thead>
+            <tr>
+              <th>Provided service or amenity / الخدمة أو المرفق</th>
+              <th>Meter / Connection ID / رقم العداد/الحساب</th>
+              <th>Provider / Type / المزود / النوع</th>
+              <th>Mode / النظام</th>
+              <th>Payee / المستفيد · Payable by / يُدفع بواسطة</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of amenityRows">
+              <td><strong>{{ row.name }}</strong> / {{ row.nameAr }}</td>
+              <td>{{ row.identifier }}</td>
+              <td>{{ row.provider }}</td>
+              <td>{{ row.mode }}</td>
+              <td><strong>{{ row.payableBy }}</strong> / {{ row.payableByAr }}</td>
+            </tr>
+            <tr *ngIf="amenityNotes" class="amenity-notes-row">
+              <td colspan="5">
+                <strong>Notes / ملاحظات:</strong> {{ amenityNotes }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
 
       <section class="print-section">
         <h2>LEASE PERIOD / فترة الإيجار</h2>
@@ -314,7 +321,7 @@ const AGREEMENT_PRINT_STYLES = `
             <tr>
               <td colspan="3"><b>Deposit / التأمين:</b> {{ depositAmount }}</td>
             </tr>
-            <tr>
+            <tr *ngIf="agreementTerms && agreementTerms !== '—'">
               <td colspan="3"><b>Remarks / ملاحظات:</b> {{ agreementTerms }}</td>
             </tr>
           </tbody>
@@ -375,8 +382,13 @@ const AGREEMENT_PRINT_STYLES = `
       </table>
 
       <footer class="print-footer">
-        <div>Baithul Madeena Real Estate · {{ branchName }} · Official Agreement Copy</div>
-        <div>هذه الوثيقة نسخة رسمية من الاتفاقية</div>
+        <div class="print-footer-copy">
+          <strong>CUSTOMER COPY / نسخة العميل</strong> · Baithul Madeena Real Estate · {{ branchName }}
+        </div>
+        <div class="print-footer-disclaimer">
+          This document is computer-generated and serves as an official copy of the agreement. No physical signature or stamp is required for electronic validation.
+          <span dir="rtl">هذه الوثيقة مستخرجة إلكترونياً وتعتبر نسخة رسمية صالحة من الاتفاقية دون الحاجة إلى توقيع أو ختم يدوي.</span>
+        </div>
       </footer>
     </article>
   `,
@@ -466,7 +478,7 @@ export class BmAgreementPrintSheetComponent {
     printWindow.addEventListener('load', print, { once: true });
     printWindow.document.open();
     printWindow.document.write(
-      `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Agreement ${this.display(this.agreement?.agreement_no)}</title><link rel="stylesheet" href="${AGREEMENT_PRINT_FONT_URL}"><style>${AGREEMENT_PRINT_STYLES}</style></head><body class="print-window">${source.outerHTML}</body></html>`,
+      `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Leasing Agreement ${this.display(this.agreement?.agreement_no)}</title><link rel="stylesheet" href="${AGREEMENT_PRINT_FONT_URL}"><style>${AGREEMENT_PRINT_STYLES}</style></head><body class="print-window">${source.outerHTML}</body></html>`,
     );
     printWindow.document.close();
   }
@@ -549,15 +561,213 @@ export class BmAgreementPrintSheetComponent {
     return payment ? this.money(payment.amount) : 'NIL';
   }
 
-  get propertyServiceRows(): Array<{ property: string; services: string }> {
-    return this.properties
-      .map((property) => ({
-        property:
-          this.getPropertyField(property, 'name') ||
-          this.getPropertyField(property, 'property_code'),
-        services: this.propertyUtilities(property).join('; '),
-      }))
-      .filter((row) => row.services.length > 0);
+  get hasRecordedUtilities(): boolean {
+    if (!this.properties?.length) return false;
+    return this.properties.some((property) => {
+      const val = this.propertyValue(property);
+      if (val.utility_details && val.utility_details.length > 0) return true;
+      if (val.electricity_provider || val.electricity_account_number) return true;
+      if (val.cooling_provider || val.cooling_account_number) return true;
+      if (val.gas_provider || val.gas_connection_number || val.gas_connection_type) return true;
+      if (val.notes) return true;
+      return false;
+    });
+  }
+
+  get amenityNotes(): string {
+    const propertyNotes = this.properties
+      .map((p) => this.propertyValue(p).notes)
+      .filter(Boolean);
+    const agreementNotes = [this.agreement?.notes].filter(Boolean);
+    const all = Array.from(new Set([...propertyNotes, ...agreementNotes]));
+    return all.join(' · ');
+  }
+
+  get amenityRows(): PrintableAmenityRow[] {
+    if (!this.hasRecordedUtilities) return [];
+
+    const rows: PrintableAmenityRow[] = [];
+
+    // 1. Electricity
+    const electricityIds = this.getCommaSeparatedValues((p) => {
+      const val = this.propertyValue(p);
+      const acc = val.electricity_account_number;
+      const utilAcc = (val.utility_details || [])
+        .filter((u) => u.type === 'electricity')
+        .map((u) => u.account_number || u.connection_number)
+        .filter(Boolean);
+      return [acc, ...utilAcc].filter(Boolean) as string[];
+    });
+    const electricityProviders = this.getCommaSeparatedValues((p) => {
+      const val = this.propertyValue(p);
+      const prov = val.electricity_provider;
+      const utilProv = (val.utility_details || [])
+        .filter((u) => u.type === 'electricity')
+        .map((u) => u.provider)
+        .filter(Boolean);
+      return [prov, ...utilProv].filter(Boolean) as string[];
+    });
+    const electricityIncluded = this.isUtilityIncluded('electricity');
+    const electricityPayable = this.isOwnerAgreement
+      ? { en: 'Owner', ar: 'المالك' }
+      : electricityIncluded
+        ? { en: 'Leaser', ar: 'المؤجر' }
+        : { en: 'Tenant', ar: 'المستأجر' };
+
+    rows.push({
+      name: 'Electricity',
+      nameAr: 'الكهرباء',
+      identifier: electricityIds,
+      provider: electricityProviders !== '—' ? electricityProviders : 'EtihadWE / DEWA / SEWA',
+      mode: 'As recorded / حسب السجل',
+      payableBy: electricityPayable.en,
+      payableByAr: electricityPayable.ar,
+    });
+
+    // 2. Gas
+    const gasIds = this.getCommaSeparatedValues((p) => {
+      const val = this.propertyValue(p);
+      const conn = val.gas_connection_number;
+      const utilConn = (val.utility_details || [])
+        .filter((u) => u.type === 'gas')
+        .map((u) => u.connection_number || u.account_number)
+        .filter(Boolean);
+      return [conn, ...utilConn].filter(Boolean) as string[];
+    });
+    const gasProviders = this.getCommaSeparatedValues((p) => {
+      const val = this.propertyValue(p);
+      const prov = [val.gas_provider, val.gas_connection_type].filter(Boolean);
+      const utilProv = (val.utility_details || [])
+        .filter((u) => u.type === 'gas')
+        .map((u) => [u.provider, u.connection_type].filter(Boolean).join(' '))
+        .filter(Boolean);
+      return [...prov, ...utilProv].filter(Boolean) as string[];
+    });
+    const gasPayable = this.isOwnerAgreement
+      ? { en: 'Owner', ar: 'المالك' }
+      : this.isUtilityIncluded('gas')
+        ? { en: 'Leaser', ar: 'المؤجر' }
+        : { en: 'Tenant', ar: 'المستأجر' };
+
+    rows.push({
+      name: 'Gas',
+      nameAr: 'الغاز',
+      identifier: gasIds,
+      provider: gasProviders !== '—' ? gasProviders : 'Central / Cylinder',
+      mode: 'As recorded / حسب السجل',
+      payableBy: gasPayable.en,
+      payableByAr: gasPayable.ar,
+    });
+
+    // 3. Cooling / Cooler
+    const coolingIds = this.getCommaSeparatedValues((p) => {
+      const val = this.propertyValue(p);
+      const acc = val.cooling_account_number;
+      const utilAcc = (val.utility_details || [])
+        .filter((u) => u.type === 'cooling')
+        .map((u) => u.account_number || u.connection_number)
+        .filter(Boolean);
+      return [acc, ...utilAcc].filter(Boolean) as string[];
+    });
+    const coolingProviders = this.getCommaSeparatedValues((p) => {
+      const val = this.propertyValue(p);
+      const prov = val.cooling_provider;
+      const utilProv = (val.utility_details || [])
+        .filter((u) => u.type === 'cooling')
+        .map((u) => u.provider)
+        .filter(Boolean);
+      return [prov, ...utilProv].filter(Boolean) as string[];
+    });
+    const coolingPayable = this.isOwnerAgreement
+      ? { en: 'Owner', ar: 'المالك' }
+      : this.isUtilityIncluded('cooling')
+        ? { en: 'Leaser', ar: 'المؤجر' }
+        : { en: 'Tenant', ar: 'المستأجر' };
+
+    rows.push({
+      name: 'Cooling / AC',
+      nameAr: 'التبريد والتكييف',
+      identifier: coolingIds,
+      provider: coolingProviders !== '—' ? coolingProviders : 'Split / Central AC',
+      mode: 'As recorded / حسب السجل',
+      payableBy: coolingPayable.en,
+      payableByAr: coolingPayable.ar,
+    });
+
+    // 4. Furniture
+    const furnitureDetails = this.getCommaSeparatedValues((p) => {
+      const val = this.propertyValue(p);
+      return (val.utility_details || [])
+        .filter((u) => u.type === 'furniture')
+        .map((u) => u.details)
+        .filter(Boolean) as string[];
+    });
+    const furniturePayable = this.isOwnerAgreement
+      ? { en: 'Owner', ar: 'المالك' }
+      : { en: 'Leaser', ar: 'المؤجر' };
+
+    rows.push({
+      name: 'Furniture',
+      nameAr: 'الأثاث',
+      identifier: '—',
+      provider: furnitureDetails !== '—' ? furnitureDetails : 'Unfurnished',
+      mode: 'As recorded / حسب السجل',
+      payableBy: furniturePayable.en,
+      payableByAr: furniturePayable.ar,
+    });
+
+    return rows;
+  }
+
+  isUtilityIncluded(type: 'electricity' | 'water' | 'gas' | 'cooling'): boolean {
+    const text = `${this.agreement?.notes || ''} ${this.agreement?.terms_text || ''}`.toLowerCase();
+    if (type === 'electricity' || type === 'water') {
+      return text.includes('electricity') || text.includes('water') || text.includes('all utilities');
+    }
+    if (type === 'cooling') {
+      return text.includes('cooling') || text.includes('chiller free') || text.includes('ac included');
+    }
+    if (type === 'gas') {
+      return text.includes('gas included') || text.includes('all utilities');
+    }
+    return false;
+  }
+
+  getCommaSeparatedValues(extractor: (p: PrintableProperty) => string[]): string {
+    const values: string[] = [];
+    for (const prop of this.properties) {
+      const items = extractor(prop).map((v) => String(v).trim()).filter(Boolean);
+      for (const item of items) {
+        if (!values.includes(item)) {
+          values.push(item);
+        }
+      }
+    }
+    return values.length > 0 ? values.join(', ') : '—';
+  }
+
+  propertyFileAndCode(property: PrintableProperty): string {
+    const name = this.getPropertyField(property, 'name');
+    const code = this.getPropertyField(property, 'property_code');
+    const fileNo = this.agreement?.file_no;
+    const base = [name, code].filter((v) => v && v !== '—').join(' / ') || '—';
+    return fileNo ? `${base} (File: ${fileNo})` : base;
+  }
+
+  formatPropertyType(type?: string | null): string {
+    if (!type || type === '—') return '—';
+    const map: Record<string, string> = {
+      apartment: 'Apartment / شقة',
+      villa: 'Villa / فيلا',
+      shop: 'Shop / محل',
+      office: 'Office / مكتب',
+      space: 'Space / مساحة',
+      labor_camp: 'Labor Camp / سكن عمال',
+      warehouse: 'Warehouse / مستودع',
+      land: 'Land / أرض',
+      garage: 'Garage / كراج',
+    };
+    return map[type.toLowerCase()] || this.formatStatus(type);
   }
 
   partyName(party: PrintableParty | null, fallback: string): string {
@@ -614,41 +824,6 @@ export class BmAgreementPrintSheetComponent {
   getPropertyField(property: PrintableProperty, field: keyof Property): string {
     const value = this.propertyValue(property)[field];
     return this.display(value);
-  }
-
-  propertyUtilities(property: PrintableProperty): string[] {
-    const value = this.propertyValue(property);
-    const services = new Set<string>();
-    const add = (label: string, details: Array<unknown>) => {
-      const text = details
-        .filter(Boolean)
-        .map((item) => String(item))
-        .join(' / ');
-      if (text) services.add(`${label}: ${text}`);
-    };
-
-    const utilityTypes = new Set<PropertyUtility['type']>();
-    for (const utility of value.utility_details || []) {
-      utilityTypes.add(utility.type);
-      add(this.utilityLabel(utility.type), [
-        utility.provider,
-        utility.connection_type,
-        utility.account_number || utility.connection_number,
-        utility.details,
-      ]);
-    }
-    if (!utilityTypes.has('electricity'))
-      add('Electricity', [value.electricity_provider, value.electricity_account_number]);
-    if (!utilityTypes.has('cooling'))
-      add('Cooling', [value.cooling_provider, value.cooling_account_number]);
-    if (!utilityTypes.has('gas'))
-      add('Gas', [value.gas_provider, value.gas_connection_type, value.gas_connection_number]);
-    add('Amenities / Notes', [value.notes]);
-    return [...services];
-  }
-
-  utilityLabel(type: PropertyUtility['type']): string {
-    return type.charAt(0).toUpperCase() + type.slice(1);
   }
 
   amountInWords(value: unknown): string {

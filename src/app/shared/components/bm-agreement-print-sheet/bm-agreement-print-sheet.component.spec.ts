@@ -158,14 +158,13 @@ describe('BmAgreementPrintSheetComponent', () => {
     fixture.detectChanges();
 
     const text = fixture.nativeElement.textContent;
-    expect(text).toContain('LEASING AGREEMENT / اتفاقية إيجار');
+    expect(text).toContain('TENANT CONTRACT / عقد إيجار');
     expect(text).not.toContain('TENANT AGREEMENT');
     expect(text).not.toContain('OWNER AGREEMENT');
-    expect(text).toContain('Agreement No. / رقم الاتفاقية: T-20');
+    expect(text).toContain('Agreement No. / رقم الاتفاقية');
+    expect(text).toContain('T-20');
     expect(fixture.nativeElement.querySelector('.print-header')).not.toBeNull();
-    expect(fixture.nativeElement.querySelector('.print-logo')?.getAttribute('src')).toBe(
-      '/bm-logo-black.png',
-    );
+    expect(fixture.nativeElement.querySelector('.print-logo')).toBeNull();
     expect(text).not.toContain('Status / الحالة:');
     expect(text).toContain('1014157');
     expect(text).toContain('092236364, 055 4191214');
@@ -183,21 +182,22 @@ describe('BmAgreementPrintSheetComponent', () => {
     expect(fixture.nativeElement.querySelector('.tenant-services-table')).not.toBeNull();
     expect(text).toContain('ELECTRICITY, WATER, SEWAGE AND SERVICES');
     expect(text).toContain('Payee / المستفيد');
-    expect(text).toContain('Mode / النظام');
+    expect(text).not.toContain('Mode / النظام');
     expect(text).toContain('Provided service or amenity / الخدمة أو المرفق');
     expect(text).toContain('Electricity and water included.');
     expect(text).toContain('Office 000, Business Bay, Dubai, United Arab Emirates');
     expect(text).toContain('If the lease contract includes electricity and water');
     expect(text).toContain('Unit No / رقم الوحدة');
+    expect(text).toContain('File No / رقم الملف');
+    expect(text).toContain('Available Units Inside Property / الوحدات المتاحة داخل العقار');
     expect(text).not.toContain('Category / الفئة');
-    expect(text).toContain('20M - Ali Juma Villa / V-20M');
+    expect(text).toContain('20M - Ali Juma Villa / Lulu Manager Villa / V-20M');
     expect(text).toContain('3 Rooms Villa');
     expect(fixture.nativeElement.querySelectorAll('.print-signatures td').length).toBe(3);
     expect(text).toContain('Lessor Signature / Stamp');
     expect(text).toContain('Tenant Signature / Stamp');
     expect(text).not.toContain('Leaser’s Signature & Stamp');
     expect(text).not.toContain('Plot No / القطعة رقم');
-    expect(text).not.toContain('File No / رقم الملف');
     expect(text).not.toContain('Landmark / معلم معروف');
     expect(text).not.toContain('Usage / الاستخدام');
     expect(text).toContain('Property Address / عنوان العقار');
@@ -205,9 +205,6 @@ describe('BmAgreementPrintSheetComponent', () => {
     expect(text).not.toContain('PAYMENT SCHEDULE / جدول الدفعات');
     expect(text).toContain('Mode of payment / طريقة الدفع');
     expect(text).not.toContain('Mode of pay / طريقة الدفع');
-    expect(text).toContain('Unit No / رقم الوحدة');
-    expect(text).not.toContain('Category / الفئة');
-    expect(text).toContain('20M - Ali Juma Villa / V-20M');
   });
 
   it('renders the owner party and owner-specific terms for an owner agreement', () => {
@@ -239,7 +236,8 @@ describe('BmAgreementPrintSheetComponent', () => {
     expect(text).toContain('LEASING AGREEMENT / اتفاقية إيجار');
     expect(text).not.toContain('OWNER AGREEMENT');
     expect(text).not.toContain('TENANT AGREEMENT');
-    expect(text).toContain('Agreement No. / رقم الاتفاقية: L-3');
+    expect(text).toContain('Agreement No. / رقم الاتفاقية');
+    expect(text).toContain('L-3');
     expect(fixture.nativeElement.querySelector('.print-header')).not.toBeNull();
     expect(text).not.toContain('Status / الحالة:');
     expect(text).toContain('1014157');
@@ -287,7 +285,7 @@ describe('BmAgreementPrintSheetComponent', () => {
     expect(fixture.nativeElement.querySelector('.print-letterhead-space')).toBeNull();
     expect(fixture.nativeElement.querySelector('.print-header')).not.toBeNull();
     expect(text).not.toContain('Plot No / القطعة رقم');
-    expect(text).not.toContain('File No / رقم الملف');
+    expect(text).toContain('File No / رقم الملف');
     expect(text).not.toContain('Landmark / معلم معروف');
     expect(text).not.toContain('Usage / الاستخدام');
     expect(text).toContain('Property Address / عنوان العقار');
@@ -407,9 +405,9 @@ describe('BmAgreementPrintSheetComponent', () => {
     expect(open).toHaveBeenCalledOnce();
     expect(html).toContain('@page { size: A4');
     expect(html).toContain('Noto+Sans+Arabic');
-    expect(html).toContain('/bm-logo-black.png');
+    expect(html).not.toContain('/bm-logo-black.png');
     expect(html).not.toContain('Status / الحالة:');
-    expect(html).toContain('LEASING AGREEMENT');
+    expect(html).toContain('TENANT CONTRACT');
     expect(html).toContain('CUSTOMER COPY');
     expect(html).toContain('T-20');
     expect(html).toContain('PAYMENT TERMS');
@@ -476,8 +474,9 @@ describe('BmAgreementPrintSheetComponent', () => {
     // Leased premise replaces unit no with unit type, area with unit number, and includes file no
     expect(text).toContain('Unit Type / نوع الوحدة');
     expect(text).toContain('Unit No / رقم الوحدة');
-    expect(text).toContain('Property & File No / العقار ورقم ملف العقار');
-    expect(text).toContain('File: F-99');
+    expect(text).toContain('Available Units Inside Property / الوحدات المتاحة داخل العقار');
+    expect(text).toContain('File No / رقم الملف');
+    expect(text).toContain('F-99');
 
     // Comma-separated IDs for multiple rooms
     expect(text).toContain('E-101, E-102');

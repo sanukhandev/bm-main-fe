@@ -4,7 +4,13 @@ export type PropertyType =
   'apartment' | 'villa' | 'shop' | 'office' | 'space' | 'labor_camp' | 'warehouse' | 'land' | 'garage';
 
 export type PropertyStatus = 'active' | 'inactive' | 'archived';
-export type PropertyUtilityType = 'electricity' | 'cooling' | 'gas' | 'furniture';
+export type PropertyUtilityType =
+  | 'electricity'
+  | 'cooling'
+  | 'gas'
+  | 'furniture'
+  | 'water'
+  | 'sewage';
 
 export interface PropertyUtility {
   type: PropertyUtilityType;

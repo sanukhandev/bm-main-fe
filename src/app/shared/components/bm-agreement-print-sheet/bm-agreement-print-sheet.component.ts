@@ -50,22 +50,25 @@ const AGREEMENT_PRINT_STYLES = `
     padding: 35mm 6mm 2mm 6mm;
   }
   .print-header {
-    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: end;
+    column-gap: 3mm;
     border-bottom: 1.5px solid #000;
     padding-bottom: 1.5mm;
     margin-bottom: 2mm;
     min-height: 10mm;
   }
-  .print-title-area { text-align: center; }
+  .print-title-area { grid-column: 2; text-align: center; }
   .print-title-area h1 { margin: 0; font-size: 13pt; font-weight: 800; letter-spacing: 0.2px; line-height: 1.2; }
-  .print-meta-below {
-    margin-top: 0.4mm;
+  .print-created-on {
+    grid-column: 1;
     font-size: 7.8pt;
+    white-space: nowrap;
   }
   .print-agreement-no {
-    position: absolute;
-    right: 0;
-    bottom: 1.5mm;
+    grid-column: 3;
+    justify-self: end;
     display: flex;
     align-items: baseline;
     gap: 1mm;
@@ -124,19 +127,17 @@ const AGREEMENT_PRINT_STYLES = `
   template: `
     <article class="agreement-print-sheet" aria-label="Printable agreement">
       <header class="print-header">
+        <div class="print-created-on">
+          <b>Created On / تاريخ الإنشاء:</b> {{ formatDate(agreement.created_at) }}
+        </div>
         <div class="print-title-area">
           <h1>
-            {{ isOwnerAgreement ? 'LEASE AGREEMENT / اتفاقية إيجار' : 'TENANCY AGREEMENT' }}
+            {{ isOwnerAgreement ? 'LEASE AGREEMENT / اتفاقية إيجار' : 'TENANCY AGREEMENT / اتفاقية إيجار' }}
           </h1>
-          <div class="print-meta-below">
-            <b>Created On / تاريخ الإنشاء:</b> {{ formatDate(agreement.created_at) }}
-          </div>
         </div>
-        <div>
-          <div class="print-agreement-no">
-            <span class="print-agreement-label">Agreement No:</span>
-            <span class="print-agreement-val">{{ display(agreement.agreement_no) }}</span>
-          </div>
+        <div class="print-agreement-no">
+          <span class="print-agreement-label">Agreement No:</span>
+          <span class="print-agreement-val">{{ display(agreement.agreement_no) }}</span>
         </div>
       </header>
 

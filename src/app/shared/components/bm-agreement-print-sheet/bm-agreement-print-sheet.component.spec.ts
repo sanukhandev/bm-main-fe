@@ -166,6 +166,7 @@ describe('BmAgreementPrintSheetComponent', () => {
 
     const text = fixture.nativeElement.textContent;
     expect(text).toContain('TENANCY AGREEMENT');
+    expect(text).toContain('اتفاقية إيجار');
     expect(text).not.toContain('TENANT CONTRACT');
     expect(text).toContain('Agreement No:');
     expect(text).toContain('T-20');

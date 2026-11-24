@@ -38,6 +38,11 @@ yarn-error.log
 testem.log
 /typings
 __screenshots__/
+.superpowers/
+login
+docs/*
+*.md
+!README.md
 
 # System files
 .DS_Store

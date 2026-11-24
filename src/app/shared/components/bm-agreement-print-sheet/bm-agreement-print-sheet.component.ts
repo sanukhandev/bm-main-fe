@@ -83,14 +83,14 @@ const AGREEMENT_PRINT_STYLES = `
   .capitalize-text { text-transform: capitalize; }
   .party-table th, .party-table td { width: 25%; }
   .owner-party-table th, .owner-party-table td { width: 20%; }
-  .property-table th:nth-child(1), .property-table td:nth-child(1) { width: 23%; }
+  .property-table th:nth-child(1), .property-table td:nth-child(1) { width: 19%; }
   .property-table th:nth-child(2), .property-table td:nth-child(2) { width: 9%; }
   .property-table th:nth-child(3), .property-table td:nth-child(3) { width: 12%; }
   .property-table th:nth-child(4), .property-table td:nth-child(4) { width: 9%; }
   .property-table th:nth-child(5), .property-table td:nth-child(5) { width: 10%; }
   .property-table th:nth-child(6), .property-table td:nth-child(6) { width: 11%; }
   .property-table th:nth-child(7), .property-table td:nth-child(7) { width: 10%; }
-  .property-table th:nth-child(8), .property-table td:nth-child(8) { width: 16%; }
+  .property-table th:nth-child(8), .property-table td:nth-child(8) { width: 20%; }
   .property-table .empty-row td { text-align: center; }
   .services-table th:nth-child(1), .services-table td:nth-child(1) { width: 28%; }
   .services-table th:nth-child(2), .services-table td:nth-child(2) { width: 25%; }

@@ -40,7 +40,7 @@ export interface PrintableAmenityRow {
 const AGREEMENT_PRINT_STYLES = `
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; background: #fff; color: #000; }
-  body { font-family: 'Noto Sans Arabic', Arial, Tahoma, sans-serif; font-size: 8pt; line-height: 1.25; }
+  body { font-family: 'Noto Sans Arabic', Arial, Tahoma, sans-serif; font-size: 8.2pt; line-height: 1.3; }
   .agreement-print-sheet { display: none; background: #fff; color: #000; }
   body.print-window .agreement-print-sheet {
     display: block;
@@ -52,15 +52,15 @@ const AGREEMENT_PRINT_STYLES = `
   .print-header {
     position: relative;
     border-bottom: 1.5px solid #000;
-    padding-bottom: 1.3mm;
-    margin-bottom: 1.5mm;
+    padding-bottom: 1.5mm;
+    margin-bottom: 2mm;
     min-height: 10mm;
   }
   .print-title-area { text-align: center; }
-  .print-title-area h1 { margin: 0; font-size: 12pt; font-weight: 800; letter-spacing: 0.2px; line-height: 1.2; }
+  .print-title-area h1 { margin: 0; font-size: 13pt; font-weight: 800; letter-spacing: 0.2px; line-height: 1.2; }
   .print-meta-below {
     margin-top: 0.4mm;
-    font-size: 7.5pt;
+    font-size: 7.8pt;
   }
   .print-agreement-no {
     position: absolute;
@@ -76,10 +76,10 @@ const AGREEMENT_PRINT_STYLES = `
     letter-spacing: 0.2px;
     white-space: nowrap;
   }
-  .print-section { margin-top: 1.8mm; break-inside: avoid; page-break-inside: avoid; }
-  .print-section h2 { margin: 0 0 0.8mm; font-size: 7.8pt; font-weight: 700; text-transform: uppercase; }
+  .print-section { margin-top: 2.2mm; break-inside: avoid; page-break-inside: avoid; }
+  .print-section h2 { margin: 0 0 1mm; font-size: 8pt; font-weight: 700; text-transform: uppercase; }
   .print-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-  .print-table th, .print-table td { border: 1px solid #000; padding: 1.1mm 1.4mm; vertical-align: middle; overflow-wrap: anywhere; font-size: 7.4pt; line-height: 1.22; }
+  .print-table th, .print-table td { border: 1px solid #000; padding: 1.25mm 1.5mm; vertical-align: middle; overflow-wrap: anywhere; font-size: 7.6pt; line-height: 1.25; }
   .capitalize-text { text-transform: capitalize; }
   .party-table th, .party-table td { width: 25%; }
   .owner-party-table th, .owner-party-table td { width: 20%; }
@@ -101,13 +101,13 @@ const AGREEMENT_PRINT_STYLES = `
   .payment-table th:nth-child(3), .payment-table td:nth-child(3) { width: 18%; }
   .payment-table th:nth-child(4), .payment-table td:nth-child(4) { width: 16%; }
   .payment-table th:nth-child(5), .payment-table td:nth-child(5) { width: 30%; }
-  .payment-table th, .payment-table td { font-size: 7pt; }
-  .terms-table { font-size: 6.8pt; line-height: 1.2; }
+  .payment-table th, .payment-table td { font-size: 7.3pt; }
+  .terms-table { font-size: 7.1pt; line-height: 1.25; }
   .terms-table td:first-child { width: 3.5%; text-align: center; font-weight: 700; vertical-align: top; }
-  .terms-table td:nth-child(2) { width: 48.25%; padding: 0.8mm 1.2mm; vertical-align: top; text-align: left; line-height: 1.2; }
-  .terms-table td:nth-child(3) { width: 48.25%; padding: 0.8mm 1.2mm; vertical-align: top; direction: rtl; text-align: right; line-height: 1.35; }
-  .print-signatures { width: 100%; border-collapse: collapse; table-layout: fixed; margin-top: 2.2mm; break-inside: avoid; page-break-inside: avoid; }
-  .print-signatures td { width: 33.33%; border: 0; padding: 0 1mm; text-align: center; height: 13mm; vertical-align: bottom; font-size: 7.2pt; line-height: 1.25; }
+  .terms-table td:nth-child(2) { width: 48.25%; padding: 1mm 1.3mm; vertical-align: top; text-align: left; line-height: 1.25; }
+  .terms-table td:nth-child(3) { width: 48.25%; padding: 1mm 1.3mm; vertical-align: top; direction: rtl; text-align: right; line-height: 1.4; }
+  .print-signatures { width: 100%; border-collapse: collapse; table-layout: fixed; margin-top: 2.8mm; break-inside: avoid; page-break-inside: avoid; }
+  .print-signatures td { width: 33.33%; border: 0; padding: 0 1mm; text-align: center; height: 14mm; vertical-align: bottom; font-size: 7.4pt; line-height: 1.3; }
   .signature-line { display: block; border-bottom: 1.2px solid #000; margin: 0 3mm 1mm; height: 7mm; }
   @page { size: A4 portrait; margin: 0; }
   @media print {

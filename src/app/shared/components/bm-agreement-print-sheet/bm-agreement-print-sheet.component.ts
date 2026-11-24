@@ -47,42 +47,31 @@ const AGREEMENT_PRINT_STYLES = `
     width: 200mm;
     max-height: 297mm;
     margin: 0 auto;
-    padding: 35mm 6mm 4mm 6mm;
+    padding: 35mm 6mm 2mm 6mm;
   }
   .print-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    position: relative;
     border-bottom: 1.5px solid #000;
-    padding-bottom: 1.5mm;
+    padding-bottom: 1.3mm;
     margin-bottom: 1.5mm;
+    min-height: 10mm;
   }
-  .print-title-area { text-align: left; }
+  .print-title-area { text-align: center; }
   .print-title-area h1 { margin: 0; font-size: 12pt; font-weight: 800; letter-spacing: 0.2px; line-height: 1.2; }
   .print-meta-below {
-    margin-top: 0.8mm;
+    margin-top: 0.4mm;
     font-size: 7.5pt;
-    display: flex;
-    align-items: center;
-    gap: 2mm;
-    color: #111;
   }
-  .meta-sep { font-weight: bold; }
-  .print-agreement-right-top { text-align: right; }
   .print-agreement-no {
+    position: absolute;
+    right: 0;
+    bottom: 1.5mm;
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.3mm;
-  }
-  .print-agreement-label {
-    font-size: 7.2pt;
-    font-weight: 600;
-    color: #222;
-    white-space: nowrap;
+    align-items: baseline;
+    gap: 1mm;
   }
   .print-agreement-val {
-    font-size: 10pt;
+    font-size: 8pt;
     font-weight: 800;
     letter-spacing: 0.2px;
     white-space: nowrap;
@@ -91,24 +80,29 @@ const AGREEMENT_PRINT_STYLES = `
   .print-section h2 { margin: 0 0 0.8mm; font-size: 7.8pt; font-weight: 700; text-transform: uppercase; }
   .print-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
   .print-table th, .print-table td { border: 1px solid #000; padding: 1.1mm 1.4mm; vertical-align: middle; overflow-wrap: anywhere; font-size: 7.4pt; line-height: 1.22; }
-  .print-table th { font-weight: 700; background-color: #f7f7f7; }
   .capitalize-text { text-transform: capitalize; }
   .party-table th, .party-table td { width: 25%; }
-  .party-table th:first-child, .party-table td:first-child { width: 28%; }
-  .party-table th:nth-child(2), .party-table td:nth-child(2) { width: 24%; }
-  .party-table th:nth-child(3), .party-table td:nth-child(3) { width: 24%; }
-  .party-table th:nth-child(4), .party-table td:nth-child(4) { width: 24%; }
+  .owner-party-table th, .owner-party-table td { width: 20%; }
   .property-table th:nth-child(1), .property-table td:nth-child(1) { width: 18%; }
-  .property-table th:nth-child(2), .property-table td:nth-child(2) { width: 26%; }
-  .property-table th:nth-child(3), .property-table td:nth-child(3) { width: 30%; }
+  .property-table th:nth-child(2), .property-table td:nth-child(2) { width: 11%; }
+  .property-table th:nth-child(3), .property-table td:nth-child(3) { width: 13%; }
   .property-table th:nth-child(4), .property-table td:nth-child(4) { width: 13%; }
-  .property-table th:nth-child(5), .property-table td:nth-child(5) { width: 13%; }
+  .property-table th:nth-child(5), .property-table td:nth-child(5) { width: 12%; }
+  .property-table th:nth-child(6), .property-table td:nth-child(6) { width: 12%; }
+  .property-table th:nth-child(7), .property-table td:nth-child(7) { width: 9%; }
+  .property-table th:nth-child(8), .property-table td:nth-child(8) { width: 12%; }
   .property-table .empty-row td { text-align: center; }
   .services-table th:nth-child(1), .services-table td:nth-child(1) { width: 28%; }
-  .services-table th:nth-child(2), .services-table td:nth-child(2) { width: 26%; }
+  .services-table th:nth-child(2), .services-table td:nth-child(2) { width: 25%; }
   .services-table th:nth-child(3), .services-table td:nth-child(3) { width: 24%; }
-  .services-table th:nth-child(4), .services-table td:nth-child(4) { width: 22%; }
-  .amenity-notes-row td { font-size: 6.8pt; background-color: #fafafa; }
+  .services-table th:nth-child(4), .services-table td:nth-child(4) { width: 23%; }
+  .payment-table th:nth-child(1), .payment-table td:nth-child(1) { width: 12%; }
+  .payment-table th:nth-child(2), .payment-table td:nth-child(2) { width: 15%; }
+  .payment-table th:nth-child(3), .payment-table td:nth-child(3) { width: 16%; }
+  .payment-table th:nth-child(4), .payment-table td:nth-child(4) { width: 16%; }
+  .payment-table th:nth-child(5), .payment-table td:nth-child(5) { width: 18%; }
+  .payment-table th:nth-child(6), .payment-table td:nth-child(6) { width: 23%; }
+  .payment-table th, .payment-table td { font-size: 7pt; }
   .terms-table { font-size: 6.8pt; line-height: 1.2; }
   .terms-table td:first-child { width: 3.5%; text-align: center; font-weight: 700; vertical-align: top; }
   .terms-table td:nth-child(2) { width: 48.25%; padding: 0.8mm 1.2mm; vertical-align: top; text-align: left; line-height: 1.2; }
@@ -116,14 +110,10 @@ const AGREEMENT_PRINT_STYLES = `
   .print-signatures { width: 100%; border-collapse: collapse; table-layout: fixed; margin-top: 2.2mm; break-inside: avoid; page-break-inside: avoid; }
   .print-signatures td { width: 33.33%; border: 0; padding: 0 1mm; text-align: center; height: 13mm; vertical-align: bottom; font-size: 7.2pt; line-height: 1.25; }
   .signature-line { display: block; border-bottom: 1.2px solid #000; margin: 0 3mm 1mm; height: 7mm; }
-  .print-footer { margin-top: 2mm; border-top: 1px solid #000; padding-top: 1mm; text-align: center; font-size: 6.5pt; line-height: 1.2; color: #222; }
-  .print-footer-copy { font-weight: 700; margin-bottom: 0.3mm; font-size: 7pt; }
-  .print-footer-disclaimer { font-size: 5.8pt; line-height: 1.15; color: #444; }
-  .print-footer-disclaimer span { display: block; margin-top: 0.3mm; }
   @page { size: A4 portrait; margin: 0; }
   @media print {
     html, body { width: 210mm; height: 297mm; margin: 0 !important; padding: 0 !important; overflow: hidden !important; }
-    body.print-window .agreement-print-sheet { width: 210mm !important; max-height: 297mm !important; margin: 0 !important; padding: 35mm 8mm 4mm 8mm !important; overflow: hidden !important; box-sizing: border-box !important; }
+    body.print-window .agreement-print-sheet { width: 210mm !important; max-height: 297mm !important; margin: 0 !important; padding: 35mm 8mm 2mm 8mm !important; overflow: hidden !important; box-sizing: border-box !important; }
     .print-section, .print-table tr, .print-signatures { break-inside: avoid !important; page-break-inside: avoid !important; }
   }
 `;
@@ -137,21 +127,15 @@ const AGREEMENT_PRINT_STYLES = `
       <header class="print-header">
         <div class="print-title-area">
           <h1>
-            {{
-              isOwnerAgreement
-                ? 'LEASING AGREEMENT / اتفاقية إيجار'
-                : 'TENANT CONTRACT / عقد إيجار'
-            }}
+            {{ isOwnerAgreement ? 'LEASE AGREEMENT / اتفاقية إيجار' : 'TENANCY AGREEMENT' }}
           </h1>
           <div class="print-meta-below">
-            <span><b>Branch / الفرع:</b> {{ branchName }}</span>
-            <span class="meta-sep">·</span>
-            <span><b>Created On / تاريخ الإنشاء:</b> {{ formatDate(agreement.created_at) }}</span>
+            <b>Created On / تاريخ الإنشاء:</b> {{ formatDate(agreement.created_at) }}
           </div>
         </div>
-        <div class="print-agreement-right-top">
+        <div>
           <div class="print-agreement-no">
-            <span class="print-agreement-label">Agreement No. / رقم الاتفاقية</span>
+            <span class="print-agreement-label">Agreement No:</span>
             <span class="print-agreement-val">{{ display(agreement.agreement_no) }}</span>
           </div>
         </div>
@@ -160,13 +144,13 @@ const AGREEMENT_PRINT_STYLES = `
       <ng-container *ngIf="isOwnerAgreement; else lessorDetails">
         <section class="print-section">
           <h2>OWNER DETAILS / بيانات المالك</h2>
-          <table class="print-table party-table">
+          <table class="print-table party-table owner-party-table">
             <thead>
               <tr>
                 <th>Owner Name / اسم المالك</th>
                 <th>Leaser Name / اسم المؤجر</th>
                 <th>Address / العنوان</th>
-                <th>License / ID No / رقم الرخصة/الهوية</th>
+                <th>License / ID No / رقم<br />الرخصة/الهوية</th>
                 <th>Contact / التواصل</th>
               </tr>
             </thead>
@@ -214,7 +198,10 @@ const AGREEMENT_PRINT_STYLES = `
 
       <section class="print-section">
         <h2>TENANT DETAILS / بيانات المستأجر</h2>
-        <table class="print-table party-table tenant-table">
+        <table
+          *ngIf="isOwnerAgreement; else tenancyTenantDetails"
+          class="print-table party-table tenant-table"
+        >
           <thead>
             <tr>
               <th>Tenant Name / اسم المستأجر</th>
@@ -226,28 +213,53 @@ const AGREEMENT_PRINT_STYLES = `
           <tbody>
             <tr>
               <td>
-                <strong>{{
-                  isOwnerAgreement ? business.name : partyName(secondParty, secondPartyName)
-                }}</strong>
+                <strong>{{ business.name }}</strong>
               </td>
-              <td>{{ partyAddress(secondParty, isOwnerAgreement) }}</td>
-              <td>{{ partyIdentity(secondParty, isOwnerAgreement) }}</td>
-              <td>{{ partyContact(secondParty, isOwnerAgreement) }}</td>
+              <td>{{ partyAddress(secondParty, true) }}</td>
+              <td>{{ partyIdentity(secondParty, true) }}</td>
+              <td>{{ partyContact(secondParty, true) }}</td>
             </tr>
           </tbody>
         </table>
+        <ng-template #tenancyTenantDetails>
+          <table class="print-table party-table tenant-table">
+            <thead>
+              <tr>
+                <th>Tenant Name / اسم المستأجر</th>
+                <th>License / ID No</th>
+                <th>Cont No</th>
+                <th>GMAIL ID</th>
+                <th>Address</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <strong>{{ partyName(secondParty, secondPartyName) }}</strong>
+                </td>
+                <td>{{ partyIdentity(secondParty, false) }}</td>
+                <td>{{ partyContact(secondParty, false) }}</td>
+                <td>{{ partyEmail(secondParty) }}</td>
+                <td>{{ partyAddress(secondParty, false) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </ng-template>
       </section>
 
       <section class="print-section">
-        <h2>LEASED PREMISE / المبنى أو المكان المؤجر</h2>
+        <h2>LEASED PROPERTY / العقار المؤجر</h2>
         <table class="print-table property-table">
           <thead>
             <tr>
-              <th>Unit Type / نوع الوحدة</th>
-              <th>Available Units Inside Property / الوحدات المتاحة داخل العقار</th>
-              <th>Property Address / عنوان العقار</th>
-              <th>Unit No / رقم الوحدة</th>
-              <th>File No / رقم الملف</th>
+              <th>Category</th>
+              <th>Unit</th>
+              <th>UNIT NO:</th>
+              <th>PLOT NO:</th>
+              <th>{{ isOwnerAgreement ? 'File no' : 'FILE NO' }}</th>
+              <th>Usage</th>
+              <th>LAND MARK</th>
+              <th>ADDRESS</th>
             </tr>
           </thead>
           <tbody>
@@ -255,51 +267,46 @@ const AGREEMENT_PRINT_STYLES = `
               <td class="capitalize-text">
                 {{ formatPropertyType(getPropertyField(property, 'property_type')) }}
               </td>
-              <td>
-                {{ propertyUnitsInside(property) }}
-              </td>
-              <td>
-                {{ propertyAddress(property) }}
-              </td>
-              <td>
-                {{ getPropertyField(property, 'unit_number') }}
-              </td>
-              <td>
-                {{ display(agreement.file_no) }}
-              </td>
+              <td>{{ propertyUnitsInside(property) }}</td>
+              <td>{{ getPropertyField(property, 'unit_number') }}</td>
+              <td>—</td>
+              <td>{{ display(agreement.file_no) }}</td>
+              <td>—</td>
+              <td>—</td>
+              <td>{{ propertyAddress(property) }}</td>
             </tr>
             <tr *ngIf="properties.length === 0" class="empty-row">
-              <td colspan="5">No property details recorded / لا توجد تفاصيل عقار مسجلة</td>
+              <td colspan="8">No property details recorded / لا توجد تفاصيل عقار مسجلة</td>
             </tr>
           </tbody>
         </table>
       </section>
 
-      <section class="print-section" *ngIf="hasRecordedUtilities">
-        <h2>ELECTRICITY, WATER, SEWAGE AND SERVICES / الكهرباء والمياه والصرف الصحي والخدمات</h2>
+      <section class="print-section">
+        <h2>ELECTRICITY, WATER, SEWAGE, AC AND FURNITURE</h2>
         <table
           class="print-table services-table"
           [ngClass]="isOwnerAgreement ? 'owner-services-table' : 'tenant-services-table'"
         >
           <thead>
             <tr>
-              <th>Provided service or amenity / الخدمة أو المرفق</th>
-              <th>Meter / Connection ID / رقم العداد/الحساب</th>
-              <th>Provider / Type / المزود / النوع</th>
-              <th>Payee / المستفيد · Payable by / يُدفع بواسطة</th>
+              <th>Etihad W&amp;E Account No / Premise ID</th>
+              <th>Payed By ({{ isOwnerAgreement ? 'Leaser / Tenant' : 'Tenant / Leaser' }})</th>
+              <th>
+                Furniture ({{ isOwnerAgreement ? 'Include / Exclude' : 'Including / Excluding' }})
+              </th>
+              <th>Aircondition (With / Without)</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let row of amenityRows">
-              <td><strong>{{ row.name }}</strong> / {{ row.nameAr }}</td>
-              <td>{{ row.identifier }}</td>
-              <td>{{ row.provider }}</td>
-              <td><strong>{{ row.payableBy }}</strong> / {{ row.payableByAr }}</td>
+            <tr>
+              <td>{{ utilityAccountNumbers }}</td>
+              <td>{{ paidBy }}</td>
+              <td>{{ furnitureValue }}</td>
+              <td>{{ airConditionValue }}</td>
             </tr>
             <tr *ngIf="amenityNotes" class="amenity-notes-row">
-              <td colspan="4">
-                <strong>Notes / ملاحظات:</strong> {{ amenityNotes }}
-              </td>
+              <td colspan="4"><strong>Remarks:</strong> {{ amenityNotes }}</td>
             </tr>
           </tbody>
         </table>
@@ -333,30 +340,28 @@ const AGREEMENT_PRINT_STYLES = `
 
       <section class="print-section">
         <h2>PAYMENT TERMS / شروط الدفع</h2>
-        <table class="print-table">
+        <table class="print-table payment-table">
+          <thead>
+            <tr>
+              <th>Total Rent</th>
+              <th>In Words</th>
+              <th>Mode of Pay<br />(Cash / Cheque)</th>
+              <th>No of Pay<br />(1,2,4,6,8,10,12)</th>
+              <th>Cheques No</th>
+              <th>Deposit (Cash, Dated Cheque, Undated Cheque)</th>
+            </tr>
+          </thead>
           <tbody>
             <tr>
-              <td><b>Total Rent / قيمة الإيجار:</b> {{ money(agreement.total_amount) }}</td>
-              <td>
-                <b>Mode of payment / طريقة الدفع:</b>
-                {{ formatPaymentMode(agreement.payment_mode) }}
-              </td>
-              <td>
-                <b>No. of payments / عدد الدفعات:</b> {{ display(agreement.payment_count) }}
-                {{ display(agreement.payment_frequency) }}
-              </td>
+              <td>{{ money(agreement.total_amount) }}</td>
+              <td>{{ amountInWords(agreement.total_amount) }}</td>
+              <td>{{ formatPaymentMode(agreement.payment_mode) }}</td>
+              <td>{{ display(agreement.payment_count) }}</td>
+              <td>{{ chequeNumbers }}</td>
+              <td>{{ depositAmount }}</td>
             </tr>
             <tr>
-              <td><b>Total Rent in Words / قيمة الإيجار كتابة:</b></td>
-              <td colspan="2">
-                <strong>{{ amountInWords(agreement.total_amount) }}</strong>
-              </td>
-            </tr>
-            <tr>
-              <td colspan="3"><b>Deposit / التأمين:</b> {{ depositAmount }}</td>
-            </tr>
-            <tr *ngIf="agreementTerms && agreementTerms !== '—'">
-              <td colspan="3"><b>Remarks / ملاحظات:</b> {{ agreementTerms }}</td>
+              <td colspan="6"><b>REMARKS:</b> {{ agreementTerms }}</td>
             </tr>
           </tbody>
         </table>
@@ -414,16 +419,6 @@ const AGREEMENT_PRINT_STYLES = `
           </tr>
         </tbody>
       </table>
-
-      <footer class="print-footer">
-        <div class="print-footer-copy">
-          <strong>CUSTOMER COPY / نسخة العميل</strong> · Baithul Madeena Real Estate · {{ branchName }}
-        </div>
-        <div class="print-footer-disclaimer">
-          This document is computer-generated and serves as an official copy of the agreement. No physical signature or stamp is required for electronic validation.
-          <span dir="rtl">هذه الوثيقة مستخرجة إلكترونياً وتعتبر نسخة رسمية صالحة من الاتفاقية دون الحاجة إلى توقيع أو ختم يدوي.</span>
-        </div>
-      </footer>
     </article>
   `,
   styles: [AGREEMENT_PRINT_STYLES],
@@ -592,6 +587,53 @@ export class BmAgreementPrintSheetComponent {
     return this.display(terms);
   }
 
+  get chequeNumbers(): string {
+    return '—';
+  }
+
+  get paidBy(): string {
+    if (this.isOwnerAgreement) return '—';
+    return ['electricity', 'water', 'gas', 'cooling'].some((type) =>
+      this.isUtilityIncluded(type as 'electricity' | 'water' | 'gas' | 'cooling'),
+    )
+      ? 'Leaser / المؤجر'
+      : 'Tenant / المستأجر';
+  }
+
+  get furnitureValue(): string {
+    const values = this.getCommaSeparatedValues(
+      (property) =>
+        (this.propertyValue(property).utility_details || [])
+          .filter((utility) => utility.type === 'furniture')
+          .map((utility) => utility.details)
+          .filter(Boolean) as string[],
+    );
+    return values;
+  }
+
+  get airConditionValue(): string {
+    const values = this.getCommaSeparatedValues((property) => {
+      const value = this.propertyValue(property);
+      const utilityValues = (value.utility_details || [])
+        .filter((utility) => utility.type === 'cooling')
+        .flatMap((utility) => [utility.details, utility.provider, utility.connection_type])
+        .filter(Boolean) as string[];
+      return [value.cooling_provider, ...utilityValues].filter(Boolean) as string[];
+    });
+    return values;
+  }
+
+  get utilityAccountNumbers(): string {
+    const values = this.amenityRows
+      .filter((row) => row.name !== 'Furniture')
+      .map((row) =>
+        row.identifier === '—'
+          ? `${row.name}: ${row.provider}`
+          : `${row.name}: ${row.identifier} (${row.provider})`,
+      );
+    return values.length > 0 ? values.join(' / ') : '—';
+  }
+
   get depositAmount(): string {
     const payment = this.agreement?.additional_payments?.find(
       (item) => item.category === 'security',
@@ -605,9 +647,7 @@ export class BmAgreementPrintSheetComponent {
   }
 
   get amenityNotes(): string {
-    const propertyNotes = this.properties
-      .map((p) => this.propertyValue(p).notes)
-      .filter(Boolean);
+    const propertyNotes = this.properties.map((p) => this.propertyValue(p).notes).filter(Boolean);
     const agreementNotes = [this.agreement?.notes].filter(Boolean);
     const all = Array.from(new Set([...propertyNotes, ...agreementNotes]));
     return all.join(' · ');
@@ -825,10 +865,14 @@ export class BmAgreementPrintSheetComponent {
   isUtilityIncluded(type: 'electricity' | 'water' | 'gas' | 'cooling'): boolean {
     const text = `${this.agreement?.notes || ''} ${this.agreement?.terms_text || ''}`.toLowerCase();
     if (type === 'electricity' || type === 'water') {
-      return text.includes('electricity') || text.includes('water') || text.includes('all utilities');
+      return (
+        text.includes('electricity') || text.includes('water') || text.includes('all utilities')
+      );
     }
     if (type === 'cooling') {
-      return text.includes('cooling') || text.includes('chiller free') || text.includes('ac included');
+      return (
+        text.includes('cooling') || text.includes('chiller free') || text.includes('ac included')
+      );
     }
     if (type === 'gas') {
       return text.includes('gas included') || text.includes('all utilities');
@@ -839,7 +883,9 @@ export class BmAgreementPrintSheetComponent {
   getCommaSeparatedValues(extractor: (p: PrintableProperty) => string[]): string {
     const values: string[] = [];
     for (const prop of this.properties) {
-      const items = extractor(prop).map((v) => String(v).trim()).filter(Boolean);
+      const items = extractor(prop)
+        .map((v) => String(v).trim())
+        .filter(Boolean);
       for (const item of items) {
         if (!values.includes(item)) {
           values.push(item);
@@ -906,6 +952,10 @@ export class BmAgreementPrintSheetComponent {
   partyContact(party: PrintableParty | null, useBusiness: boolean): string {
     if (useBusiness) return this.business.contact;
     return this.display(this.partyCustomer(party)?.phone);
+  }
+
+  partyEmail(party: PrintableParty | null): string {
+    return this.display(this.partyCustomer(party)?.email);
   }
 
   partyAddress(party: PrintableParty | null, useBusiness: boolean): string {

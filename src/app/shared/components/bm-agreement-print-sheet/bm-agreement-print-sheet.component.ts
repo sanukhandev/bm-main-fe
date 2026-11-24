@@ -83,25 +83,24 @@ const AGREEMENT_PRINT_STYLES = `
   .capitalize-text { text-transform: capitalize; }
   .party-table th, .party-table td { width: 25%; }
   .owner-party-table th, .owner-party-table td { width: 20%; }
-  .property-table th:nth-child(1), .property-table td:nth-child(1) { width: 18%; }
-  .property-table th:nth-child(2), .property-table td:nth-child(2) { width: 11%; }
-  .property-table th:nth-child(3), .property-table td:nth-child(3) { width: 13%; }
-  .property-table th:nth-child(4), .property-table td:nth-child(4) { width: 13%; }
-  .property-table th:nth-child(5), .property-table td:nth-child(5) { width: 12%; }
-  .property-table th:nth-child(6), .property-table td:nth-child(6) { width: 12%; }
-  .property-table th:nth-child(7), .property-table td:nth-child(7) { width: 9%; }
-  .property-table th:nth-child(8), .property-table td:nth-child(8) { width: 12%; }
+  .property-table th:nth-child(1), .property-table td:nth-child(1) { width: 23%; }
+  .property-table th:nth-child(2), .property-table td:nth-child(2) { width: 9%; }
+  .property-table th:nth-child(3), .property-table td:nth-child(3) { width: 12%; }
+  .property-table th:nth-child(4), .property-table td:nth-child(4) { width: 9%; }
+  .property-table th:nth-child(5), .property-table td:nth-child(5) { width: 10%; }
+  .property-table th:nth-child(6), .property-table td:nth-child(6) { width: 11%; }
+  .property-table th:nth-child(7), .property-table td:nth-child(7) { width: 10%; }
+  .property-table th:nth-child(8), .property-table td:nth-child(8) { width: 16%; }
   .property-table .empty-row td { text-align: center; }
   .services-table th:nth-child(1), .services-table td:nth-child(1) { width: 28%; }
   .services-table th:nth-child(2), .services-table td:nth-child(2) { width: 25%; }
   .services-table th:nth-child(3), .services-table td:nth-child(3) { width: 24%; }
   .services-table th:nth-child(4), .services-table td:nth-child(4) { width: 23%; }
-  .payment-table th:nth-child(1), .payment-table td:nth-child(1) { width: 12%; }
-  .payment-table th:nth-child(2), .payment-table td:nth-child(2) { width: 15%; }
-  .payment-table th:nth-child(3), .payment-table td:nth-child(3) { width: 16%; }
+  .payment-table th:nth-child(1), .payment-table td:nth-child(1) { width: 14%; }
+  .payment-table th:nth-child(2), .payment-table td:nth-child(2) { width: 22%; }
+  .payment-table th:nth-child(3), .payment-table td:nth-child(3) { width: 18%; }
   .payment-table th:nth-child(4), .payment-table td:nth-child(4) { width: 16%; }
-  .payment-table th:nth-child(5), .payment-table td:nth-child(5) { width: 18%; }
-  .payment-table th:nth-child(6), .payment-table td:nth-child(6) { width: 23%; }
+  .payment-table th:nth-child(5), .payment-table td:nth-child(5) { width: 30%; }
   .payment-table th, .payment-table td { font-size: 7pt; }
   .terms-table { font-size: 6.8pt; line-height: 1.2; }
   .terms-table td:first-child { width: 3.5%; text-align: center; font-weight: 700; vertical-align: top; }
@@ -228,7 +227,7 @@ const AGREEMENT_PRINT_STYLES = `
                 <th>Tenant Name / اسم المستأجر</th>
                 <th>License / ID No</th>
                 <th>Cont No</th>
-                <th>GMAIL ID</th>
+                <th>Email Id</th>
                 <th>Address</th>
               </tr>
             </thead>
@@ -269,10 +268,10 @@ const AGREEMENT_PRINT_STYLES = `
               </td>
               <td>{{ propertyUnitsInside(property) }}</td>
               <td>{{ getPropertyField(property, 'unit_number') }}</td>
-              <td>—</td>
+              <td>{{ getPropertyField(property, 'plot_number') }}</td>
               <td>{{ display(agreement.file_no) }}</td>
-              <td>—</td>
-              <td>—</td>
+              <td>{{ formatPropertyUsage(getPropertyField(property, 'usage')) }}</td>
+              <td>{{ getPropertyField(property, 'landmark') }}</td>
               <td>{{ propertyAddress(property) }}</td>
             </tr>
             <tr *ngIf="properties.length === 0" class="empty-row">
@@ -347,7 +346,6 @@ const AGREEMENT_PRINT_STYLES = `
               <th>In Words</th>
               <th>Mode of Pay<br />(Cash / Cheque)</th>
               <th>No of Pay<br />(1,2,4,6,8,10,12)</th>
-              <th>Cheques No</th>
               <th>Deposit (Cash, Dated Cheque, Undated Cheque)</th>
             </tr>
           </thead>
@@ -357,11 +355,10 @@ const AGREEMENT_PRINT_STYLES = `
               <td>{{ amountInWords(agreement.total_amount) }}</td>
               <td>{{ formatPaymentMode(agreement.payment_mode) }}</td>
               <td>{{ display(agreement.payment_count) }}</td>
-              <td>{{ chequeNumbers }}</td>
               <td>{{ depositAmount }}</td>
             </tr>
             <tr>
-              <td colspan="6"><b>REMARKS:</b> {{ agreementTerms }}</td>
+              <td colspan="5"><b>REMARKS:</b> {{ agreementTerms }}</td>
             </tr>
           </tbody>
         </table>
@@ -585,10 +582,6 @@ export class BmAgreementPrintSheetComponent {
   get agreementTerms(): string {
     const terms = [this.agreement?.terms_text, this.agreement?.notes].filter(Boolean).join(' · ');
     return this.display(terms);
-  }
-
-  get chequeNumbers(): string {
-    return '—';
   }
 
   get paidBy(): string {
@@ -899,12 +892,7 @@ export class BmAgreementPrintSheetComponent {
     const name = this.getPropertyField(property, 'name');
     const building = this.getPropertyField(property, 'building_name');
     const code = this.getPropertyField(property, 'property_code');
-    const parts = [
-      name !== '—' ? name : null,
-      building !== '—' && building !== name ? building : null,
-      code !== '—' && code !== name ? code : null,
-    ].filter(Boolean);
-    return parts.length > 0 ? parts.join(' / ') : '—';
+    return building !== '—' ? building : name !== '—' ? name : code;
   }
 
   propertyFileAndCode(property: PrintableProperty): string {
@@ -929,6 +917,16 @@ export class BmAgreementPrintSheetComponent {
       garage: 'Garage / كراج',
     };
     return map[type.toLowerCase()] || this.formatStatus(type);
+  }
+
+  formatPropertyUsage(usage?: string | null): string {
+    if (!usage || usage === '—') return '—';
+    const map: Record<string, string> = {
+      residential: 'Residential',
+      commercial: 'Commercial',
+      others: 'Others',
+    };
+    return map[usage.toLowerCase()] || this.formatStatus(usage);
   }
 
   partyName(party: PrintableParty | null, fallback: string): string {

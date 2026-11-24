@@ -147,7 +147,14 @@ describe('BmAgreementPrintSheetComponent', () => {
     component.firstPartyRole = 'Lessor / المؤجر';
     component.secondPartyName = customer.display_name;
     component.secondPartyRole = 'Tenant / المستأجر';
-    component.properties = agreement.properties;
+    component.properties = [
+      {
+        ...property,
+        plot_number: 'PLOT-101',
+        usage: 'residential',
+        landmark: 'Near Central Park',
+      },
+    ];
     component.firstParty = { name: component.firstPartyName, role: component.firstPartyRole };
     component.secondParty = {
       name: customer.display_name,
@@ -191,8 +198,14 @@ describe('BmAgreementPrintSheetComponent', () => {
     expect(text).toContain('PLOT NO');
     expect(text).toContain('Usage');
     expect(text).toContain('LAND MARK');
-    expect(text).toContain('20M - Ali Juma Villa / Lulu Manager Villa');
+    expect(text).toContain('PLOT-101');
+    expect(text).toContain('Residential');
+    expect(text).toContain('Near Central Park');
+    expect(text).toContain('Lulu Manager Villa');
+    expect(text).not.toContain('20M - Ali Juma Villa / Lulu Manager Villa');
     expect(text).toContain('3 Rooms Villa');
+    expect(text).toContain('Email Id');
+    expect(text).not.toContain('GMAIL ID');
     expect(fixture.nativeElement.querySelectorAll('.print-signatures td').length).toBe(3);
     expect(text).toContain('Lessor Signature / Stamp');
     expect(text).toContain('Tenant Signature / Stamp');
@@ -202,7 +215,7 @@ describe('BmAgreementPrintSheetComponent', () => {
     expect(text).toContain('Usage');
     expect(text).toContain('ADDRESS');
     expect(text).toContain('Faseel, Fujairah, Fujairah');
-    expect(text).toContain('Cheques No');
+    expect(text).not.toContain('Cheques No');
     expect(text).toContain('Mode of Pay');
     expect(text).not.toContain('Mode of payment / طريقة الدفع');
   });
@@ -291,7 +304,7 @@ describe('BmAgreementPrintSheetComponent', () => {
     expect(text).toContain('ADDRESS');
     expect(text).toContain('Faseel, Fujairah, Fujairah');
     expect(text).toContain('Mode of Pay');
-    expect(text).toContain('Cheques No');
+    expect(text).not.toContain('Cheques No');
   });
 
   it('renders safe placeholders when optional branch, party, and property data is missing', () => {
@@ -409,8 +422,8 @@ describe('BmAgreementPrintSheetComponent', () => {
     expect(html).toContain('TENANCY AGREEMENT');
     expect(html).not.toContain('CUSTOMER COPY');
     expect(html).toContain('T-20');
-    expect(html).toContain('Cheques No');
-    expect(html).toContain('20M - Ali Juma Villa');
+    expect(html).not.toContain('Cheques No');
+    expect(html).toContain('Lulu Manager Villa');
     expect(html).toContain('Electricity');
     expect(html).toContain('If the lease contract includes electricity and water');
     expect(html).toContain('Lessor Signature / Stamp');

@@ -477,6 +477,20 @@ import { formatUaeDate } from '../../shared/utils/uae-formatters';
                 </div>
 
                 <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                  <div class="text-[10px] font-bold text-slate-400 uppercase">Plot Number</div>
+                  <div class="font-extrabold text-slate-900 mt-0.5 text-xs tabular-nums">
+                    {{ property()!.plot_number || '—' }}
+                  </div>
+                </div>
+
+                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                  <div class="text-[10px] font-bold text-slate-400 uppercase">Usage</div>
+                  <div class="font-extrabold text-slate-900 mt-0.5 text-xs capitalize">
+                    {{ formatType(property()!.usage || '') || '—' }}
+                  </div>
+                </div>
+
+                <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
                   <div class="text-[10px] font-bold text-slate-400 uppercase mb-0.5">
                     Classification
                   </div>
@@ -561,6 +575,13 @@ import { formatUaeDate } from '../../shared/utils/uae-formatters';
                     @if (property()!.address_line_2) {
                       <div class="text-slate-600 font-normal">{{ property()!.address_line_2 }}</div>
                     }
+                  </div>
+                </div>
+
+                <div class="pt-2 border-t border-slate-100">
+                  <span class="text-[10px] font-bold text-slate-400 uppercase block">Landmark</span>
+                  <div class="text-slate-900 font-semibold mt-0.5">
+                    {{ property()!.landmark || '—' }}
                   </div>
                 </div>
 

@@ -4,6 +4,7 @@ export type PropertyType =
   'apartment' | 'villa' | 'shop' | 'office' | 'space' | 'labor_camp' | 'warehouse' | 'land' | 'garage';
 
 export type PropertyStatus = 'active' | 'inactive' | 'archived';
+export type PropertyUsage = 'residential' | 'commercial' | 'others';
 export type PropertyUtilityType =
   | 'electricity'
   | 'cooling'
@@ -28,9 +29,12 @@ export interface Property {
   owner?: { data: Customer } | Customer;
   property_code: string;
   unit_number: string;
+  plot_number?: string | null;
+  usage?: PropertyUsage | null;
   property_type: PropertyType;
   name: string;
   building_name?: string | null;
+  landmark?: string | null;
   address_line_1?: string | null;
   address_line_2?: string | null;
   city?: string | null;
@@ -55,9 +59,12 @@ export interface CreatePropertyDto {
   owner_customer_id: number;
   property_code?: string;
   unit_number: string;
+  plot_number?: string | null;
+  usage?: PropertyUsage | null;
   property_type: PropertyType;
   name: string;
   building_name?: string | null;
+  landmark?: string | null;
   address_line_1?: string | null;
   address_line_2?: string | null;
   city?: string | null;

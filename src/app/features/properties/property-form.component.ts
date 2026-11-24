@@ -7,7 +7,7 @@ import { BmLoadingStateComponent } from '../../shared/components/bm-loading-stat
 import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm-error-state.component';
 import { PropertiesApiService } from '../../core/api/properties-api.service';
 import { CustomersApiService } from '../../core/api/customers-api.service';
-import { Property, PropertyType, PropertyUtility, PropertyUtilityType } from '../../shared/models/property.models';
+import { Property, PropertyType, PropertyUsage, PropertyUtility, PropertyUtilityType } from '../../shared/models/property.models';
 import { Customer } from '../../shared/models/customer.models';
 
 import {
@@ -234,6 +234,19 @@ import {
                 }
               </div>
 
+              <!-- Plot Number -->
+              <div>
+                <label class="block text-[13px] font-semibold text-[#26312C] mb-2">
+                  Plot Number
+                </label>
+                <input
+                  type="text"
+                  formControlName="plot_number"
+                  placeholder="e.g. 42"
+                  class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium shadow-2xs placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
+                />
+              </div>
+
               <!-- Property Type -->
               <div>
                 <label class="block text-[13px] font-semibold text-[#26312C] mb-2">
@@ -252,6 +265,22 @@ import {
                   <option value="warehouse">Warehouse</option>
                   <option value="land">Land</option>
                   <option value="garage">Garage</option>
+                </select>
+              </div>
+
+              <!-- Usage -->
+              <div>
+                <label class="block text-[13px] font-semibold text-[#26312C] mb-2">
+                  Usage
+                </label>
+                <select
+                  formControlName="usage"
+                  class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium shadow-2xs focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
+                >
+                  <option value="">Select usage</option>
+                  <option value="residential">Residential</option>
+                  <option value="commercial">Commercial</option>
+                  <option value="others">Others</option>
                 </select>
               </div>
 
@@ -333,6 +362,19 @@ import {
                   type="text"
                   formControlName="address_line_1"
                   placeholder="Street address or physical property location"
+                  class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium shadow-2xs placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
+                />
+              </div>
+
+              <!-- Landmark -->
+              <div class="md:col-span-3">
+                <label class="block text-[13px] font-semibold text-[#26312C] mb-2">
+                  Landmark
+                </label>
+                <input
+                  type="text"
+                  formControlName="landmark"
+                  placeholder="e.g. Near Central Park"
                   class="w-full h-11 px-3.5 rounded-xl border border-slate-300/90 bg-white text-slate-900 text-sm font-medium shadow-2xs placeholder:text-slate-400 placeholder:font-normal focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-150"
                 />
               </div>
@@ -569,9 +611,12 @@ export class PropertyFormComponent implements OnInit {
     owner_customer_id: ['', Validators.required],
     property_code: [{ value: '', disabled: true }],
     unit_number: ['', Validators.required],
+    plot_number: [''],
+    usage: ['' as PropertyUsage | ''],
     name: ['', Validators.required],
     property_type: ['apartment' as PropertyType, Validators.required],
     building_name: [''],
+    landmark: [''],
     address_line_1: [''],
     city: ['Dubai'],
     state_or_emirate: ['Dubai'],
@@ -648,9 +693,12 @@ export class PropertyFormComponent implements OnInit {
           owner_customer_id: String(p.owner_customer_id),
           property_code: p.property_code,
           unit_number: p.unit_number,
+          plot_number: p.plot_number || '',
+          usage: p.usage || '',
           name: p.name,
           property_type: p.property_type,
           building_name: p.building_name || '',
+          landmark: p.landmark || '',
           address_line_1: p.address_line_1 || '',
           city: p.city || 'Dubai',
           state_or_emirate: p.state_or_emirate || 'Dubai',
@@ -686,9 +734,12 @@ export class PropertyFormComponent implements OnInit {
     const dto = {
       owner_customer_id: Number(val.owner_customer_id),
       unit_number: val.unit_number!,
+      plot_number: val.plot_number || null,
+      usage: (val.usage || null) as PropertyUsage | null,
       name: val.name!,
       property_type: val.property_type as PropertyType,
       building_name: val.building_name || null,
+      landmark: val.landmark || null,
       address_line_1: val.address_line_1 || null,
       city: val.city || null,
       state_or_emirate: val.state_or_emirate || null,

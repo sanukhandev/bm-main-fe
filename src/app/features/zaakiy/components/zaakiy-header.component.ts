@@ -12,6 +12,24 @@ import { ZaakiyOrbComponent } from './zaakiy-orb.component';
     <header class="bg-white border-b border-slate-100 px-4 sm:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3 shrink-0">
       <!-- Left: Identity & Status -->
       <div class="flex items-center gap-3 min-w-0">
+        <button
+          type="button"
+          (click)="onToggleHistory.emit()"
+          class="text-xs font-medium px-2.5 py-1.5 rounded-full border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
+          [ngClass]="{ 'border-brand-300 bg-brand-50 text-brand-800': historyOpen }"
+          title="Toggle recent chats"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h10" />
+          </svg>
+          <span class="hidden sm:inline">History</span>
+          @if (threadCount > 0) {
+            <span class="text-[10px] font-semibold px-1.5 py-0.2 rounded-full bg-slate-100 text-slate-600">
+              {{ threadCount }}
+            </span>
+          }
+        </button>
+
         <bm-zaakiy-orb size="sm" />
 
         <div class="min-w-0 flex items-center gap-2.5">
@@ -21,7 +39,7 @@ import { ZaakiyOrbComponent } from './zaakiy-orb.component';
 
           <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-100 text-[11px] font-medium text-emerald-800">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-            Verified ERP • Read-only
+            {{ canProposeActions ? 'Verified ERP • Agentic (Approval Required)' : 'Verified ERP • Read-only' }}
           </span>
         </div>
       </div>
@@ -86,5 +104,9 @@ export class ZaakiyHeaderComponent {
   @Input() activeBranch: Branch | null = null;
   @Input() isStreaming = false;
   @Input() hasMessages = false;
+  @Input() historyOpen = false;
+  @Input() threadCount = 0;
+  @Input() canProposeActions = false;
   @Output() onReset = new EventEmitter<void>();
+  @Output() onToggleHistory = new EventEmitter<void>();
 }

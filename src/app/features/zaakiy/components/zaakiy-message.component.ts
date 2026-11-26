@@ -5,19 +5,33 @@ import { ZaakiyComparisonCardComponent } from './zaakiy-comparison-card.componen
 import { ZaakiyTrendCardComponent } from './zaakiy-trend-card.component';
 import { ZaakiyExplanationCardComponent } from './zaakiy-explanation-card.component';
 import { ZaakiyAnomalyCardComponent } from './zaakiy-anomaly-card.component';
+import { ZaakiyActionProposalCardComponent } from './zaakiy-action-proposal-card.component';
+import { ZaakiyDisambiguationCardComponent } from './zaakiy-disambiguation-card.component';
 import {
+  ZaakiyActionProposal,
+  ZaakiyFeedback,
   ZaakiyMetricCard,
   ZaakiyNavigationAction,
   ZaakiyStructuredBlock,
   ZaakiyStructuredRecord,
 } from '../../../core/api/zaakiy-api.service';
 
+export interface ZaakiyProposalUiState {
+  submitting?: boolean;
+  error?: string | null;
+  status?: 'pending' | 'executed' | 'rejected' | 'expired';
+  result_label?: string;
+  result_route?: string;
+}
+
 export interface ZaakiyMessageModel {
+  id?: number;
   role: 'user' | 'model';
   text: string;
   blocks: ZaakiyStructuredBlock[];
   actions?: ZaakiyNavigationAction[];
   statusLabel?: string;
+  feedback?: ZaakiyFeedback | null;
 }
 
 @Component({
@@ -30,6 +44,8 @@ export interface ZaakiyMessageModel {
     ZaakiyTrendCardComponent,
     ZaakiyExplanationCardComponent,
     ZaakiyAnomalyCardComponent,
+    ZaakiyActionProposalCardComponent,
+    ZaakiyDisambiguationCardComponent,
   ],
   template: `
     <div
@@ -210,6 +226,31 @@ export interface ZaakiyMessageModel {
                 </div>
               }
 
+              <!-- Disambiguation Candidate Cards -->
+              @if (block.type === 'disambiguation' && block.candidates?.length) {
+                <div class="my-3">
+                  <bm-zaakiy-disambiguation-card
+                    [query]="block.query"
+                    [candidates]="block.candidates!"
+                    (onSelectPrompt)="onSelectPrompt.emit($event)"
+                  />
+                </div>
+              }
+
+              <!-- Human-in-the-Loop Action Proposal Card -->
+              @if (block.type === 'action_proposal' && block.proposal) {
+                <div class="my-3">
+                  <bm-zaakiy-action-proposal-card
+                    [proposal]="mergedProposal(block.proposal)"
+                    [submitting]="proposalState(block.proposal.proposal_id)?.submitting ?? false"
+                    [errorMessage]="proposalState(block.proposal.proposal_id)?.error ?? null"
+                    (onConfirm)="onConfirmProposal.emit($event)"
+                    (onReject)="onRejectProposal.emit($event)"
+                    (onNavigate)="onNavigate.emit($event)"
+                  />
+                </div>
+              }
+
               <!-- Next Question Suggestions (shown ONLY with response message) -->
               @if (block.type === 'suggestions' && block.suggestions?.length) {
                 <div class="mt-3 pt-2.5 border-t border-slate-100 flex flex-wrap items-center gap-2">
@@ -248,6 +289,34 @@ export interface ZaakiyMessageModel {
                 </svg>
               </button>
             }
+          </div>
+        }
+
+        <!-- Per-message Feedback Controls -->
+        @if (message.role === 'model' && message.id && !(isLoading && isLast)) {
+          <div class="flex items-center gap-2 mt-2.5 text-[11px] text-slate-400">
+            <button
+              type="button"
+              (click)="onFeedback.emit({ messageId: message.id!, feedback: 'helpful' })"
+              class="px-2 py-0.5 rounded-full border transition cursor-pointer"
+              [ngClass]="{
+                'border-emerald-300 bg-emerald-50 text-emerald-700 font-semibold': message.feedback === 'helpful',
+                'border-slate-200 bg-white hover:bg-slate-50 text-slate-500': message.feedback !== 'helpful'
+              }"
+            >
+              Helpful
+            </button>
+            <button
+              type="button"
+              (click)="onFeedback.emit({ messageId: message.id!, feedback: 'unhelpful' })"
+              class="px-2 py-0.5 rounded-full border transition cursor-pointer"
+              [ngClass]="{
+                'border-rose-300 bg-rose-50 text-rose-700 font-semibold': message.feedback === 'unhelpful',
+                'border-slate-200 bg-white hover:bg-slate-50 text-slate-500': message.feedback !== 'unhelpful'
+              }"
+            >
+              Needs work
+            </button>
           </div>
         }
       </div>
@@ -309,10 +378,29 @@ export class ZaakiyMessageComponent {
   @Input() isLoading = false;
   @Input() isLast = false;
   @Input() actions: ZaakiyNavigationAction[] = [];
+  @Input() proposalStates: Record<string, ZaakiyProposalUiState> = {};
   @Output() onSelectPrompt = new EventEmitter<string>();
   @Output() onNavigate = new EventEmitter<string>();
+  @Output() onConfirmProposal = new EventEmitter<{ proposalId: string; overrides: Record<string, unknown> }>();
+  @Output() onRejectProposal = new EventEmitter<string>();
+  @Output() onFeedback = new EventEmitter<{ messageId: number; feedback: ZaakiyFeedback }>();
 
   copied = signal(false);
+
+  proposalState(proposalId: string): ZaakiyProposalUiState | undefined {
+    return this.proposalStates[proposalId];
+  }
+
+  mergedProposal(proposal: ZaakiyActionProposal): ZaakiyActionProposal {
+    const state = this.proposalStates[proposal.proposal_id];
+    if (!state) return proposal;
+    return {
+      ...proposal,
+      status: state.status ?? proposal.status,
+      result_label: state.result_label ?? proposal.result_label,
+      result_route: state.result_route ?? proposal.result_route,
+    };
+  }
 
   get resolvedActions(): ZaakiyNavigationAction[] {
     if (this.message.actions && this.message.actions.length > 0) {

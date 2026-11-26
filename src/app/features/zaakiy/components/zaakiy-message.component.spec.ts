@@ -139,4 +139,59 @@ describe('ZaakiyMessageComponent', () => {
 
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('Analyzing branch data...');
   });
+
+  it('renders disambiguation candidates, HITL action proposals, and feedback controls', () => {
+    const fixture = createComponent(
+      {
+        id: 77,
+        role: 'model',
+        text: 'Select the intended tenant or confirm the proposed work order.',
+        blocks: [
+          {
+            type: 'disambiguation',
+            query: 'Ahmed',
+            candidates: [
+              {
+                type: 'tenant',
+                id: 5,
+                label: 'Ahmed Al Mansoori',
+                subtitle: 'TENANT · TEN-005',
+                follow_up_prompt: 'Tell me about tenant #5 (Ahmed Al Mansoori)',
+              },
+            ],
+          },
+          {
+            type: 'action_proposal',
+            proposal: {
+              proposal_id: 'prop-77',
+              action_type: 'create_work_order',
+              title: 'Create Maintenance Work Order',
+              summary: 'AC leak in Flat 101',
+              risk_level: 'medium',
+              status: 'pending',
+              expires_at: new Date(Date.now() + 10 * 60_000).toISOString(),
+            },
+          },
+        ],
+      },
+      false,
+      true,
+    );
+
+    const promptSpy = vi.fn();
+    const feedbackSpy = vi.fn();
+    fixture.componentInstance.onSelectPrompt.subscribe(promptSpy);
+    fixture.componentInstance.onFeedback.subscribe(feedbackSpy);
+
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('bm-zaakiy-disambiguation-card')).not.toBeNull();
+    expect(el.querySelector('bm-zaakiy-action-proposal-card')).not.toBeNull();
+
+    const buttons = Array.from(el.querySelectorAll('button')) as HTMLButtonElement[];
+    buttons.find((b) => b.textContent?.includes('Ahmed Al Mansoori'))?.click();
+    expect(promptSpy).toHaveBeenCalledWith('Tell me about tenant #5 (Ahmed Al Mansoori)');
+
+    buttons.find((b) => b.textContent?.includes('Helpful'))?.click();
+    expect(feedbackSpy).toHaveBeenCalledWith({ messageId: 77, feedback: 'helpful' });
+  });
 });

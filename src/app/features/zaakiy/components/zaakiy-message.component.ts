@@ -49,222 +49,176 @@ export interface ZaakiyMessageModel {
   ],
   template: `
     <div
-      class="flex gap-3 sm:gap-4 transition-all duration-200"
+      class="flex gap-3.5 transition-all duration-200"
       [class.justify-end]="message.role === 'user'"
     >
-      <!-- Zaakiy Avatar -->
+      <!-- Gemini-Style Sparkle Avatar for Assistant -->
       @if (message.role === 'model') {
         <div class="mt-1 shrink-0">
-          <bm-zaakiy-orb size="sm" />
+          <bm-zaakiy-orb size="sm" [pulse]="isLoading && isLast && !message.text" />
         </div>
       }
 
       <div
-        class="max-w-[95%] sm:max-w-[88%] flex flex-col"
-        [class.items-end]="message.role === 'user'"
+        class="min-w-0 flex flex-col"
+        [ngClass]="{
+          'max-w-[82%] items-end': message.role === 'user',
+          'flex-1 max-w-full': message.role === 'model'
+        }"
       >
-        <!-- Author / Time Line -->
-        <div class="flex items-center gap-2 mb-1 px-1 text-[11px] text-slate-400 font-medium">
-          <span>{{ message.role === 'user' ? 'You' : 'Zaakiy' }}</span>
-          @if (message.role === 'model' && message.text) {
-            <span>•</span>
-            <button
-              type="button"
-              (click)="copyMessageText()"
-              class="text-slate-400 hover:text-slate-600 transition flex items-center gap-1 cursor-pointer"
-            >
-              @if (copied()) {
-                <span class="text-emerald-600 font-semibold">Copied</span>
-              } @else {
-                <span>Copy</span>
-              }
-            </button>
-          }
-        </div>
-
-        <!-- Message Body Container -->
-        <div
-          class="text-sm leading-relaxed font-poppins transition-all"
-          [ngClass]="{
-            'bg-slate-100 text-slate-800 rounded-2xl rounded-tr-xs px-4 py-2.5 shadow-2xs': message.role === 'user',
-            'text-slate-800 py-1 w-full': message.role === 'model'
-          }"
-        >
-          @if (message.role === 'user') {
-            <div class="whitespace-pre-wrap font-normal">{{ message.text }}</div>
-          } @else {
-            <!-- Rich Text Format Stream -->
+        <!-- Message Body -->
+        @if (message.role === 'user') {
+          <div class="bg-slate-100 text-slate-900 rounded-3xl rounded-tr-md px-4 py-2.5 text-[15px] leading-relaxed font-poppins whitespace-pre-wrap">
+            {{ message.text }}
+          </div>
+        } @else {
+          <div class="text-[15px] leading-7 font-poppins text-slate-800 w-full">
             @if (message.text) {
               <div
-                class="zaakiy-formatted-text space-y-2 text-slate-800"
+                class="zaakiy-formatted-text space-y-2.5"
                 [innerHTML]="formattedMarkdown"
               ></div>
             } @else if (isLoading && isLast) {
-              <div class="flex items-center gap-2 text-slate-400 py-2">
-                <span class="w-2 h-2 rounded-full bg-brand-500 animate-ping"></span>
-                <span class="text-xs italic font-medium">{{ message.statusLabel || 'Zaakiy is thinking...' }}</span>
+              <div class="flex items-center gap-2 text-slate-500 py-1">
+                <span class="text-sm font-normal animate-pulse">
+                  {{ message.statusLabel || 'Thinking...' }}
+                </span>
               </div>
             }
-          }
-        </div>
+          </div>
+        }
 
-        <!-- Response Data Blocks, Badges, Suggestions & CTAs -->
+        <!-- Structured Data Blocks (Clean Flat Hierarchy, Zero Pill Clutter) -->
         @if (message.role === 'model' && message.blocks.length > 0) {
-          <div class="mt-3 space-y-3 w-full">
+          <div class="mt-3 space-y-3.5 w-full">
             @for (block of message.blocks; track $index) {
-              <!-- Summary Metrics: Clean Inline Rich Badges -->
+              <!-- Summary Metrics: Minimal Borderless Grid (No Pill Soup) -->
               @if (block.type === 'summary' && block.metrics?.length) {
-                <div class="my-3 flex flex-wrap gap-2 font-poppins text-xs">
-                  @for (metric of block.metrics; track metric.metric) {
-                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200/80 shadow-2xs">
-                      <span class="text-slate-500 font-normal">{{ metric.label }}:</span>
-                      <span class="font-semibold text-slate-900 font-mono">{{ formatMetricValue(metric) }}</span>
-                    </div>
-                  }
-                </div>
-              }
-
-              <!-- Verified Records: Clean Structured List with View Details CTAs -->
-              @if (block.type === 'records' && block.records?.length) {
-                <div class="my-3 p-3 rounded-2xl bg-slate-50/80 border border-slate-200/70 space-y-2 text-xs font-poppins">
-                  <div class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-                    Verified Records ({{ block.records?.length }})
-                  </div>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    @for (record of block.records; track (record.type || '') + ':' + (record.id || '') + ':' + (record.label || '')) {
-                      <div class="flex items-center justify-between p-2.5 rounded-xl bg-white border border-slate-200/60 shadow-2xs">
-                        <div class="truncate min-w-0 pr-2">
-                          <div class="font-semibold text-slate-900 truncate">{{ record.label || record.type }}</div>
-                          @if (record.id) {
-                            <div class="text-[10px] text-slate-400 font-mono">ID: #{{ record.id }}</div>
-                          }
-                        </div>
-                        <div class="flex items-center gap-1.5 shrink-0">
-                          @if (record.status) {
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60">
-                              {{ record.status }}
-                            </span>
-                          }
-                          @if (recordRoute(record)) {
-                            <button
-                              type="button"
-                              (click)="onNavigate.emit(recordRoute(record)!)"
-                              class="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-brand-50 text-brand-800 hover:bg-brand-100 border border-brand-200/60 cursor-pointer transition flex items-center gap-1 shadow-2xs"
-                            >
-                              <span>Details</span>
-                              <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                              </svg>
-                            </button>
-                          }
+                <div class="py-3 border-y border-slate-100 space-y-2">
+                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3">
+                    @for (metric of visibleMetrics(block.metrics!, $index); track metric.metric) {
+                      <div class="min-w-0">
+                        <div class="text-[11px] text-slate-400 font-normal truncate">{{ metric.label }}</div>
+                        <div class="text-sm font-semibold text-slate-900 tabular-nums mt-0.5">
+                          {{ formatMetricValue(metric) }}
                         </div>
                       </div>
                     }
                   </div>
-                </div>
-              }
-
-              <!-- Metric Comparisons -->
-              @if (block.type === 'comparison' && block.comparisons?.length) {
-                <div class="my-3 space-y-2">
-                  @for (comparison of block.comparisons; track $index) {
-                    <bm-zaakiy-comparison-card [comparison]="comparison" />
+                  @if (block.metrics!.length > 6) {
+                    <button
+                      type="button"
+                      (click)="toggleMetrics($index)"
+                      class="text-xs font-medium text-slate-500 hover:text-slate-800 transition cursor-pointer pt-1"
+                    >
+                      {{ isMetricsExpanded($index) ? 'Show fewer figures' : 'Show all ' + block.metrics!.length + ' verified figures' }}
+                    </button>
                   }
                 </div>
               }
 
-              <!-- Time-Series Trends -->
-              @if (block.type === 'trend' && block.trends?.length) {
-                <div class="my-3 space-y-2">
-                  @for (trend of block.trends; track $index) {
-                    <bm-zaakiy-trend-card [trend]="trend" />
-                  }
-                </div>
-              }
-
-              <!-- Driver Explanations -->
-              @if (block.type === 'explanation' && block.explanations?.length) {
-                <div class="my-3 space-y-2">
-                  @for (exp of block.explanations; track $index) {
-                    <bm-zaakiy-explanation-card [explanation]="exp" />
-                  }
-                </div>
-              }
-
-              <!-- Anomalies / Attention Items -->
-              @if (block.type === 'anomalies' && block.anomalies?.length) {
-                <div class="my-3 space-y-2">
-                  @for (anomaly of block.anomalies; track $index) {
-                    <bm-zaakiy-anomaly-card [anomaly]="anomaly" />
-                  }
-                </div>
-              }
-
-              <!-- Sections: Clean Headers -->
-              @if (block.type === 'sections' && block.sections?.length) {
-                <div class="my-3 space-y-2 text-xs font-poppins">
-                  @for (sec of block.sections; track $index) {
-                    <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center justify-between">
-                      <span class="font-semibold text-slate-900">{{ sec['title'] || sec['code'] }}</span>
-                      @if (sec['status']) {
-                        <span class="text-[10px] text-slate-500 font-medium">{{ sec['status'] }}</span>
+              <!-- Verified Records: Clean Flat List -->
+              @if (block.type === 'records' && block.records?.length) {
+                <div class="rounded-2xl border border-slate-200/70 bg-white divide-y divide-slate-100 overflow-hidden text-xs font-poppins">
+                  @for (record of block.records; track (record.type || '') + ':' + (record.id || '') + ':' + (record.label || '')) {
+                    <div class="flex items-center justify-between gap-3 px-3.5 py-2.5 hover:bg-slate-50/70 transition">
+                      <div class="min-w-0 flex items-center gap-2.5">
+                        <span class="font-medium text-slate-900 truncate">{{ record.label || record.type }}</span>
+                        @if (record.status) {
+                          <span class="text-[11px] text-slate-400 capitalize shrink-0">{{ record.status }}</span>
+                        }
+                      </div>
+                      @if (recordRoute(record)) {
+                        <button
+                          type="button"
+                          (click)="onNavigate.emit(recordRoute(record)!)"
+                          class="text-xs font-medium text-emerald-700 hover:text-emerald-900 cursor-pointer transition shrink-0"
+                        >
+                          Open →
+                        </button>
                       }
                     </div>
                   }
                 </div>
               }
 
-              <!-- Warnings Alert Line -->
+              <!-- Dedicated Analytics Cards -->
+              @if (block.type === 'comparison' && block.comparisons?.length) {
+                <div class="space-y-2">
+                  @for (comparison of block.comparisons; track $index) {
+                    <bm-zaakiy-comparison-card [comparison]="comparison" />
+                  }
+                </div>
+              }
+
+              @if (block.type === 'trend' && block.trends?.length) {
+                <div class="space-y-2">
+                  @for (trend of block.trends; track $index) {
+                    <bm-zaakiy-trend-card [trend]="trend" />
+                  }
+                </div>
+              }
+
+              @if (block.type === 'explanation' && block.explanations?.length) {
+                <div class="space-y-2">
+                  @for (exp of block.explanations; track $index) {
+                    <bm-zaakiy-explanation-card [explanation]="exp" />
+                  }
+                </div>
+              }
+
+              @if (block.type === 'anomalies' && block.anomalies?.length) {
+                <div class="space-y-2">
+                  @for (anomaly of block.anomalies; track $index) {
+                    <bm-zaakiy-anomaly-card [anomaly]="anomaly" />
+                  }
+                </div>
+              }
+
+              <!-- Warnings: Quiet Inline Note -->
               @if (block.type === 'warnings' && block.warnings?.length) {
-                <div class="my-2 p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-1">
+                <div class="space-y-1 text-xs text-slate-500">
                   @for (warn of block.warnings; track $index) {
                     <div class="flex items-start gap-2">
-                      <span class="font-bold text-amber-600">•</span>
+                      <span class="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 shrink-0"></span>
                       <span>{{ warn['message'] || warn['code'] }}</span>
                     </div>
                   }
                 </div>
               }
 
-              <!-- Disambiguation Candidate Cards -->
+              <!-- Disambiguation Candidates -->
               @if (block.type === 'disambiguation' && block.candidates?.length) {
-                <div class="my-3">
-                  <bm-zaakiy-disambiguation-card
-                    [query]="block.query"
-                    [candidates]="block.candidates!"
-                    (onSelectPrompt)="onSelectPrompt.emit($event)"
-                  />
-                </div>
+                <bm-zaakiy-disambiguation-card
+                  [query]="block.query"
+                  [candidates]="block.candidates!"
+                  (onSelectPrompt)="onSelectPrompt.emit($event)"
+                />
               }
 
               <!-- Human-in-the-Loop Action Proposal Card -->
               @if (block.type === 'action_proposal' && block.proposal) {
-                <div class="my-3">
-                  <bm-zaakiy-action-proposal-card
-                    [proposal]="mergedProposal(block.proposal)"
-                    [submitting]="proposalState(block.proposal.proposal_id)?.submitting ?? false"
-                    [errorMessage]="proposalState(block.proposal.proposal_id)?.error ?? null"
-                    (onConfirm)="onConfirmProposal.emit($event)"
-                    (onReject)="onRejectProposal.emit($event)"
-                    (onNavigate)="onNavigate.emit($event)"
-                  />
-                </div>
+                <bm-zaakiy-action-proposal-card
+                  [proposal]="mergedProposal(block.proposal)"
+                  [submitting]="proposalState(block.proposal.proposal_id)?.submitting ?? false"
+                  [errorMessage]="proposalState(block.proposal.proposal_id)?.error ?? null"
+                  (onConfirm)="onConfirmProposal.emit($event)"
+                  (onReject)="onRejectProposal.emit($event)"
+                  (onNavigate)="onNavigate.emit($event)"
+                />
               }
 
-              <!-- Next Question Suggestions (shown ONLY with response message) -->
-              @if (block.type === 'suggestions' && block.suggestions?.length) {
-                <div class="mt-3 pt-2.5 border-t border-slate-100 flex flex-wrap items-center gap-2">
-                  <span class="text-[11px] font-semibold text-slate-400 shrink-0">Follow-up questions:</span>
-                  @for (sug of block.suggestions; track sug) {
+              <!-- Follow-Up Suggestions: Clean Quiet Rows (No Pill Walls) -->
+              @if (block.type === 'suggestions' && block.suggestions?.length && isLast) {
+                <div class="pt-2 border-t border-slate-100 divide-y divide-slate-100/80">
+                  @for (sug of block.suggestions!.slice(0, 3); track sug) {
                     <button
                       type="button"
                       (click)="onSelectPrompt.emit(sug)"
-                      class="rounded-full border border-slate-200/90 bg-white hover:bg-slate-50 hover:border-brand-300 text-slate-700 hover:text-brand-900 px-3.5 py-1.5 text-xs font-medium transition cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                      class="w-full text-left py-2 px-1 text-[13px] text-slate-600 hover:text-slate-950 transition flex items-center justify-between gap-2 cursor-pointer group"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                      </svg>
                       <span>{{ sug }}</span>
+                      <span class="text-slate-300 group-hover:text-emerald-600 transition">→</span>
                     </button>
                   }
                 </div>
@@ -273,50 +227,79 @@ export interface ZaakiyMessageModel {
           </div>
         }
 
-        <!-- Next CTA Action Navigation Buttons (Preserved per message) -->
+        <!-- Quiet Inline Navigation Links (No Loud Solid Button Pills) -->
         @if (message.role === 'model' && resolvedActions.length > 0) {
-          <div class="flex flex-wrap items-center gap-2 mt-4 pt-1">
-            <span class="text-[11px] font-semibold text-slate-400 shrink-0 w-full sm:w-auto">Suggested Actions:</span>
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 mt-3">
             @for (action of resolvedActions; track formatActionUrl(action)) {
               <button
                 type="button"
                 (click)="onNavigate.emit(formatActionUrl(action))"
-                class="inline-flex items-center gap-2 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-full px-4 py-2 transition cursor-pointer shadow-xs"
+                class="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 hover:text-emerald-900 hover:bg-emerald-50/70 px-2 py-1 -ml-2 rounded-lg transition cursor-pointer"
               >
                 <span>{{ action.label }}</span>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </button>
             }
           </div>
         }
 
-        <!-- Per-message Feedback Controls -->
-        @if (message.role === 'model' && message.id && !(isLoading && isLast)) {
-          <div class="flex items-center gap-2 mt-2.5 text-[11px] text-slate-400">
+        <!-- Gemini-Style Subtle Bottom Icon Toolbar (Copy + Thumbs Up/Down) -->
+        @if (message.role === 'model' && message.text && !(isLoading && isLast)) {
+          <div class="flex items-center gap-1 mt-2 -ml-1.5 text-slate-400">
             <button
               type="button"
-              (click)="onFeedback.emit({ messageId: message.id!, feedback: 'helpful' })"
-              class="px-2 py-0.5 rounded-full border transition cursor-pointer"
-              [ngClass]="{
-                'border-emerald-300 bg-emerald-50 text-emerald-700 font-semibold': message.feedback === 'helpful',
-                'border-slate-200 bg-white hover:bg-slate-50 text-slate-500': message.feedback !== 'helpful'
-              }"
+              (click)="copyMessageText()"
+              [title]="copied() ? 'Copied' : 'Copy response'"
+              aria-label="Copy response"
+              class="w-8 h-8 rounded-full hover:bg-slate-100 hover:text-slate-700 transition flex items-center justify-center cursor-pointer"
+              [class.text-emerald-600]="copied()"
             >
-              Helpful
+              @if (copied()) {
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              } @else {
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+              }
             </button>
-            <button
-              type="button"
-              (click)="onFeedback.emit({ messageId: message.id!, feedback: 'unhelpful' })"
-              class="px-2 py-0.5 rounded-full border transition cursor-pointer"
-              [ngClass]="{
-                'border-rose-300 bg-rose-50 text-rose-700 font-semibold': message.feedback === 'unhelpful',
-                'border-slate-200 bg-white hover:bg-slate-50 text-slate-500': message.feedback !== 'unhelpful'
-              }"
-            >
-              Needs work
-            </button>
+
+            @if (message.id) {
+              <button
+                type="button"
+                (click)="onFeedback.emit({ messageId: message.id!, feedback: 'helpful' })"
+                title="Good response"
+                class="w-8 h-8 rounded-full hover:bg-slate-100 transition flex items-center justify-center cursor-pointer"
+                [ngClass]="{
+                  'text-emerald-600 bg-emerald-50': message.feedback === 'helpful',
+                  'text-slate-400 hover:text-slate-700': message.feedback !== 'helpful'
+                }"
+              >
+                <span class="sr-only">Helpful</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14zM7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3" />
+                </svg>
+              </button>
+
+              <button
+                type="button"
+                (click)="onFeedback.emit({ messageId: message.id!, feedback: 'unhelpful' })"
+                title="Needs work"
+                class="w-8 h-8 rounded-full hover:bg-slate-100 transition flex items-center justify-center cursor-pointer"
+                [ngClass]="{
+                  'text-rose-600 bg-rose-50': message.feedback === 'unhelpful',
+                  'text-slate-400 hover:text-slate-700': message.feedback !== 'unhelpful'
+                }"
+              >
+                <span class="sr-only">Needs work</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M10 15v4a3 3 0 003 3l4-9V2H5.72a2 2 0 00-2 1.7l-1.38 9a2 2 0 002 2.3H10zM17 2h2.67A2.31 2.31 0 0122 4v7a2.31 2.31 0 01-2.33 2H17" />
+                </svg>
+              </button>
+            }
           </div>
         }
       </div>
@@ -327,10 +310,10 @@ export interface ZaakiyMessageModel {
       :host ::ng-deep .zaakiy-formatted-text h1,
       :host ::ng-deep .zaakiy-formatted-text h2,
       :host ::ng-deep .zaakiy-formatted-text h3 {
-        font-weight: 700;
+        font-weight: 600;
         color: #0f172a;
-        margin-top: 0.75rem;
-        margin-bottom: 0.25rem;
+        margin-top: 1rem;
+        margin-bottom: 0.35rem;
       }
       :host ::ng-deep .zaakiy-formatted-text h3 {
         font-size: 0.95rem;
@@ -345,30 +328,30 @@ export interface ZaakiyMessageModel {
       }
       :host ::ng-deep .zaakiy-formatted-text code {
         background-color: #f1f5f9;
-        padding: 0.15rem 0.4rem;
+        padding: 0.1rem 0.35rem;
         border-radius: 0.375rem;
         font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-        font-size: 0.75rem;
+        font-size: 0.8rem;
         color: #047857;
       }
       :host ::ng-deep .zaakiy-formatted-text ul {
         list-style-type: disc;
         padding-left: 1.25rem;
         margin-top: 0.375rem;
-        margin-bottom: 0.375rem;
+        margin-bottom: 0.5rem;
       }
       :host ::ng-deep .zaakiy-formatted-text ol {
         list-style-type: decimal;
         padding-left: 1.25rem;
         margin-top: 0.375rem;
-        margin-bottom: 0.375rem;
+        margin-bottom: 0.5rem;
       }
       :host ::ng-deep .zaakiy-formatted-text li {
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.3rem;
       }
       :host ::ng-deep .zaakiy-formatted-text p {
-        margin-bottom: 0.375rem;
-        line-height: 1.6;
+        margin-bottom: 0.5rem;
+        line-height: 1.7;
       }
     `,
   ],
@@ -386,6 +369,22 @@ export class ZaakiyMessageComponent {
   @Output() onFeedback = new EventEmitter<{ messageId: number; feedback: ZaakiyFeedback }>();
 
   copied = signal(false);
+  private expandedMetrics = signal<Record<number, boolean>>({});
+
+  visibleMetrics(metrics: ZaakiyMetricCard[], blockIndex: number): ZaakiyMetricCard[] {
+    return this.isMetricsExpanded(blockIndex) ? metrics : metrics.slice(0, 6);
+  }
+
+  isMetricsExpanded(blockIndex: number): boolean {
+    return this.expandedMetrics()[blockIndex] === true;
+  }
+
+  toggleMetrics(blockIndex: number): void {
+    this.expandedMetrics.update((state) => ({
+      ...state,
+      [blockIndex]: !state[blockIndex],
+    }));
+  }
 
   proposalState(proposalId: string): ZaakiyProposalUiState | undefined {
     return this.proposalStates[proposalId];
@@ -458,6 +457,9 @@ export class ZaakiyMessageComponent {
     if (metric.unit === 'AED' && typeof val === 'number') {
       return `AED ${val.toLocaleString()}`;
     }
+    if (metric.unit === 'AED' && typeof val === 'string' && !Number.isNaN(Number(val))) {
+      return `AED ${Number(val).toLocaleString()}`;
+    }
     if (metric.unit === 'percent' && typeof val === 'number') {
       return `${val}%`;
     }
@@ -468,7 +470,8 @@ export class ZaakiyMessageComponent {
     if (!this.message.text) return '';
     let formatted = this.message.text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-    // Headings
+    // Headings (support ####, ###, ##, #)
+    formatted = formatted.replace(/^#### (.*$)/gim, '<h3>$1</h3>');
     formatted = formatted.replace(/^### (.*$)/gim, '<h3>$1</h3>');
     formatted = formatted.replace(/^## (.*$)/gim, '<h2>$1</h2>');
     formatted = formatted.replace(/^# (.*$)/gim, '<h1>$1</h1>');

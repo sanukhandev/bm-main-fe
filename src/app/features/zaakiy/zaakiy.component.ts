@@ -45,96 +45,85 @@ import { ZaakiyThreadSidebarComponent } from './components/zaakiy-thread-sidebar
     ZaakiyThreadSidebarComponent,
   ],
   template: `
-    <div class="w-full max-w-6xl mx-auto flex flex-col h-[calc(100vh-5rem)] pb-3 px-2 sm:px-4">
-      <!-- Main Agentic Workspace Canvas -->
-      <div class="flex-1 bg-white border border-surface-200/90 rounded-3xl shadow-xs overflow-hidden flex flex-col min-h-0">
-        <!-- Top Workspace Header -->
-        <bm-zaakiy-header
-          [activeBranch]="activeBranch()"
-          [isStreaming]="loading()"
-          [hasMessages]="messages().length > 0"
-          [historyOpen]="historyOpen()"
-          [threadCount]="threads().length"
-          [canProposeActions]="canProposeActions()"
-          (onReset)="resetChat()"
-          (onToggleHistory)="toggleHistory()"
+    <div class="w-full h-[calc(100vh-4.75rem)] flex flex-col bg-white rounded-2xl border border-slate-200/70 overflow-hidden">
+      <!-- Minimal Top Bar -->
+      <bm-zaakiy-header
+        [activeBranch]="activeBranch()"
+        [isStreaming]="loading()"
+        [hasMessages]="messages().length > 0"
+        [historyOpen]="historyOpen()"
+        [threadCount]="threads().length"
+        [canProposeActions]="canProposeActions()"
+        (onReset)="resetChat()"
+        (onToggleHistory)="toggleHistory()"
+      />
+
+      <div class="flex-1 flex flex-col sm:flex-row min-h-0 relative bg-white">
+        <!-- Collapsible Gemini-Style Left History Rail -->
+        <bm-zaakiy-thread-sidebar
+          [open]="historyOpen()"
+          [loading]="threadsLoading()"
+          [threads]="threads()"
+          [activeThreadId]="activeThreadId()"
+          (onSelectThread)="selectThread($event)"
+          (onDeleteThread)="deleteThread($event)"
+          (onNewChat)="resetChat()"
         />
 
-        <div class="flex-1 flex flex-col sm:flex-row min-h-0 relative bg-slate-50/30">
-          <!-- Collapsible Branch-Scoped Thread History Drawer -->
-          <bm-zaakiy-thread-sidebar
-            [open]="historyOpen()"
-            [loading]="threadsLoading()"
-            [threads]="threads()"
-            [activeThreadId]="activeThreadId()"
-            (onSelectThread)="selectThread($event)"
-            (onDeleteThread)="deleteThread($event)"
-            (onNewChat)="resetChat()"
-          />
-
-          <!-- Chat Column -->
-          <div class="flex-1 flex flex-col min-h-0 min-w-0">
-            <!-- Scrollable Messages Container -->
-            <div
-              #scrollContainer
-              class="flex-1 overflow-y-auto px-4 sm:px-8 py-6 space-y-6"
-              aria-live="polite"
-            >
-              @if (messages().length === 0) {
-                <bm-zaakiy-empty-state (onSelectPrompt)="ask($event)" />
-              } @else {
-                <div class="max-w-3xl mx-auto space-y-6">
-                  @for (message of messages(); track $index) {
-                    <bm-zaakiy-message
-                      [message]="message"
-                      [isLoading]="loading()"
-                      [isLast]="$last"
-                      [actions]="actions()"
-                      [proposalStates]="proposalStates()"
-                      (onSelectPrompt)="ask($event)"
-                      (onNavigate)="navigate($event)"
-                      (onConfirmProposal)="confirmProposal($event)"
-                      (onRejectProposal)="rejectProposal($event)"
-                      (onFeedback)="submitFeedback($event)"
-                    />
-                  }
-                </div>
-              }
-            </div>
-
-            <!-- Error Alert Banner -->
-            @if (error()) {
-              <div class="max-w-3xl mx-auto w-full px-4 sm:px-8 mb-2">
-                <div
-                  class="rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs px-4 py-3 flex items-center justify-between shadow-2xs"
-                >
-                  <div class="flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>{{ error() }}</span>
-                  </div>
-                  <button
-                    type="button"
-                    (click)="error.set(null)"
-                    class="text-rose-600 hover:text-rose-800 font-bold text-xs cursor-pointer px-2 py-1 rounded-lg hover:bg-rose-100"
-                  >
-                    Dismiss
-                  </button>
-                </div>
+        <!-- Serene Centered Chat Column -->
+        <div class="flex-1 flex flex-col min-h-0 min-w-0 bg-white">
+          <div
+            #scrollContainer
+            class="flex-1 overflow-y-auto px-4 sm:px-8 py-6"
+            aria-live="polite"
+          >
+            @if (messages().length === 0) {
+              <bm-zaakiy-empty-state (onSelectPrompt)="ask($event)" />
+            } @else {
+              <div class="max-w-3xl mx-auto space-y-8 pb-4">
+                @for (message of messages(); track $index) {
+                  <bm-zaakiy-message
+                    [message]="message"
+                    [isLoading]="loading()"
+                    [isLast]="$last"
+                    [actions]="actions()"
+                    [proposalStates]="proposalStates()"
+                    (onSelectPrompt)="ask($event)"
+                    (onNavigate)="navigate($event)"
+                    (onConfirmProposal)="confirmProposal($event)"
+                    (onRejectProposal)="rejectProposal($event)"
+                    (onFeedback)="submitFeedback($event)"
+                  />
+                }
               </div>
             }
+          </div>
 
-            <!-- Sticky Floating Composer -->
-            <div class="px-4 sm:px-8 pb-4 pt-1 bg-gradient-to-t from-white via-white/95 to-transparent shrink-0">
-              <div class="max-w-3xl mx-auto">
-                <bm-zaakiy-composer
-                  [(draft)]="draft"
-                  [isLoading]="loading()"
-                  (onSend)="send()"
-                  (onStop)="stopStreaming()"
-                />
+          <!-- Quiet Error Notice -->
+          @if (error()) {
+            <div class="max-w-3xl mx-auto w-full px-4 sm:px-8 mb-2">
+              <div class="rounded-2xl bg-rose-50 text-rose-700 text-xs px-4 py-2.5 flex items-center justify-between gap-3">
+                <span>{{ error() }}</span>
+                <button
+                  type="button"
+                  (click)="error.set(null)"
+                  class="text-rose-600 hover:text-rose-900 font-medium cursor-pointer shrink-0"
+                >
+                  Dismiss
+                </button>
               </div>
+            </div>
+          }
+
+          <!-- Bottom Gemini Composer -->
+          <div class="px-4 sm:px-8 pb-4 pt-2 bg-gradient-to-t from-white via-white to-transparent shrink-0">
+            <div class="max-w-3xl mx-auto">
+              <bm-zaakiy-composer
+                [(draft)]="draft"
+                [isLoading]="loading()"
+                (onSend)="send()"
+                (onStop)="stopStreaming()"
+              />
             </div>
           </div>
         </div>

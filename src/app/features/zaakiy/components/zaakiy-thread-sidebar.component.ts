@@ -8,32 +8,38 @@ import { ZaakiyThreadSummary } from '../../../core/api/zaakiy-api.service';
   imports: [CommonModule],
   template: `
     @if (open) {
-      <aside class="w-full sm:w-64 lg:w-72 border-b sm:border-b-0 sm:border-r border-slate-200/80 bg-slate-50/70 flex flex-col shrink-0 max-h-60 sm:max-h-none font-poppins">
-        <div class="px-3.5 py-3 border-b border-slate-200/70 flex items-center justify-between gap-2">
-          <span class="text-xs font-semibold text-slate-700">Recent Chats</span>
+      <aside class="w-full sm:w-64 border-b sm:border-b-0 sm:border-r border-slate-100 bg-slate-50/70 flex flex-col shrink-0 max-h-60 sm:max-h-none font-poppins">
+        <div class="p-3">
           <button
             type="button"
             (click)="onNewChat.emit()"
-            class="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-white border border-slate-200 hover:border-brand-300 text-slate-700 hover:text-brand-800 transition cursor-pointer"
+            class="w-full px-3.5 py-2 rounded-full bg-white hover:bg-slate-100 border border-slate-200/80 text-slate-700 text-xs font-medium transition flex items-center gap-2 cursor-pointer"
           >
-            + New
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>New chat</span>
           </button>
         </div>
 
-        <div class="flex-1 overflow-y-auto p-2 space-y-1">
+        <div class="px-4 pb-1.5 text-[11px] font-medium text-slate-400">
+          Recent
+        </div>
+
+        <div class="flex-1 overflow-y-auto px-2 pb-3 space-y-0.5">
           @if (loading) {
-            <div class="px-2 py-4 text-xs text-slate-400 text-center">Loading history...</div>
+            <div class="px-3 py-4 text-xs text-slate-400">Loading...</div>
           } @else if (threads.length === 0) {
-            <div class="px-2 py-4 text-xs text-slate-400 text-center">
-              No saved conversations in this branch yet.
+            <div class="px-3 py-4 text-xs text-slate-400">
+              No recent chats yet.
             </div>
           } @else {
             @for (thread of threads; track thread.uuid) {
               <div
-                class="group flex items-center gap-1 rounded-xl px-2.5 py-2 text-xs transition"
+                class="group flex items-center gap-1 rounded-full px-3 py-2 text-xs transition"
                 [ngClass]="{
-                  'bg-brand-50 border border-brand-200/80 text-brand-900 font-semibold': activeThreadId === thread.uuid,
-                  'hover:bg-white border border-transparent text-slate-700': activeThreadId !== thread.uuid
+                  'bg-emerald-50/90 text-emerald-900 font-medium': activeThreadId === thread.uuid,
+                  'hover:bg-slate-200/50 text-slate-700': activeThreadId !== thread.uuid
                 }"
               >
                 <button
@@ -49,10 +55,10 @@ import { ZaakiyThreadSummary } from '../../../core/api/zaakiy-api.service';
                   (click)="onDeleteThread.emit(thread.uuid); $event.stopPropagation()"
                   aria-label="Delete conversation"
                   title="Delete conversation"
-                  class="opacity-60 group-hover:opacity-100 text-slate-400 hover:text-rose-600 p-1 rounded-lg transition cursor-pointer shrink-0"
+                  class="opacity-0 group-hover:opacity-100 focus:opacity-100 text-slate-400 hover:text-rose-600 p-0.5 rounded-full transition cursor-pointer shrink-0"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               </div>

@@ -9,92 +9,65 @@ import { ZaakiyOrbComponent } from './zaakiy-orb.component';
   standalone: true,
   imports: [CommonModule, RouterLink, ZaakiyOrbComponent],
   template: `
-    <header class="bg-white border-b border-slate-100 px-4 sm:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3 shrink-0">
-      <!-- Left: Identity & Status -->
-      <div class="flex items-center gap-3 min-w-0">
+    <header class="bg-white/90 backdrop-blur-xs px-3 sm:px-5 h-14 flex items-center justify-between gap-3 shrink-0 border-b border-slate-100">
+      <!-- Left: Sidebar Toggle + Clean Gemini-Style Title -->
+      <div class="flex items-center gap-2 min-w-0">
         <button
           type="button"
           (click)="onToggleHistory.emit()"
-          class="text-xs font-medium px-2.5 py-1.5 rounded-full border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
-          [ngClass]="{ 'border-brand-300 bg-brand-50 text-brand-800': historyOpen }"
-          title="Toggle recent chats"
+          [attr.aria-expanded]="historyOpen"
+          aria-label="Toggle chat history"
+          title="Recent chats"
+          class="w-9 h-9 rounded-full flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition cursor-pointer shrink-0"
+          [class.bg-slate-100]="historyOpen"
+          [class.text-slate-900]="historyOpen"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h10" />
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h10" />
           </svg>
-          <span class="hidden sm:inline">History</span>
-          @if (threadCount > 0) {
-            <span class="text-[10px] font-semibold px-1.5 py-0.2 rounded-full bg-slate-100 text-slate-600">
-              {{ threadCount }}
-            </span>
-          }
         </button>
 
-        <bm-zaakiy-orb size="sm" />
-
-        <div class="min-w-0 flex items-center gap-2.5">
-          <h1 class="font-poppins font-semibold text-slate-900 text-base sm:text-lg tracking-tight">
-            Zaakiy
-          </h1>
-
-          <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-100 text-[11px] font-medium text-emerald-800">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-            {{ canProposeActions ? 'Verified ERP • Agentic (Approval Required)' : 'Verified ERP • Read-only' }}
-          </span>
+        <div class="flex items-center gap-2 min-w-0 pl-1">
+          <bm-zaakiy-orb size="sm" [pulse]="isStreaming" />
+          <div class="flex items-baseline gap-2 min-w-0">
+            <h1 class="font-poppins font-medium text-slate-900 text-[15px] tracking-tight">
+              Zaakiy
+            </h1>
+            @if (activeBranch) {
+              <span class="text-xs text-slate-400 truncate hidden sm:inline">
+                {{ activeBranch.name }}
+              </span>
+            }
+          </div>
         </div>
       </div>
 
-      <!-- Right: Active Branch, Streaming state & Action Controls -->
-      <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-        @if (activeBranch) {
-          <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100/80 border border-slate-200/60 text-xs font-medium text-slate-700">
-            <span class="w-2 h-2 rounded-full bg-brand-500"></span>
-            <span class="text-slate-400 font-normal">Branch:</span>
-            <span class="text-slate-900 font-semibold">{{ activeBranch.name }}</span>
-          </div>
-        }
-
-        <!-- Connection / Ready State Indicator -->
-        <div
-          class="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
-          [ngClass]="{
-            'text-emerald-700 bg-emerald-50': !isStreaming,
-            'text-amber-700 bg-amber-50': isStreaming
-          }"
-        >
-          <span
-            class="w-1.5 h-1.5 rounded-full"
-            [ngClass]="{ 'bg-emerald-500': !isStreaming, 'bg-amber-500 animate-pulse': isStreaming }"
-          ></span>
-          <span>{{ isStreaming ? 'Thinking...' : 'Ready' }}</span>
-        </div>
-
-        <!-- About Zaakiy Button Link -->
-        <a
-          routerLink="/app/about-zaakiy"
-          class="text-xs font-medium px-3 py-1.5 rounded-full border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
-          title="About Zaakiy Copilot"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span class="hidden sm:inline">About</span>
-        </a>
-
-        <!-- Reset / New Chat Button -->
+      <!-- Right: Minimal Ghost Controls -->
+      <div class="flex items-center gap-1 shrink-0">
         @if (hasMessages) {
           <button
             type="button"
             (click)="onReset.emit()"
-            class="text-xs font-medium px-3.5 py-1.5 rounded-full border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
-            title="Start new chat"
+            title="New chat"
+            class="h-9 px-3 rounded-full text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition inline-flex items-center gap-1.5 cursor-pointer"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
             </svg>
-            <span>New Chat</span>
+            <span class="hidden sm:inline">New chat</span>
           </button>
         }
+
+        <a
+          routerLink="/app/about-zaakiy"
+          aria-label="About Zaakiy"
+          [title]="canProposeActions ? 'About Zaakiy (Approval-gated actions enabled)' : 'About Zaakiy (Read-only mode)'"
+          class="w-9 h-9 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </a>
       </div>
     </header>
   `,

@@ -7,30 +7,28 @@ import { ZaakiyDisambiguationCandidate } from '../../../core/api/zaakiy-api.serv
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="rounded-2xl border border-brand-200/80 bg-brand-50/40 p-3.5 space-y-2.5 font-poppins">
-      <div class="flex items-center justify-between gap-2">
-        <span class="text-[11px] font-semibold uppercase tracking-wider text-brand-800">
-          Select Intended Record
-        </span>
+    <div class="rounded-2xl border border-slate-200/80 bg-white overflow-hidden font-poppins">
+      <div class="px-3.5 py-2.5 bg-slate-50/70 border-b border-slate-100 flex items-center justify-between gap-2 text-xs">
+        <span class="font-medium text-slate-700">Which record did you mean?</span>
         @if (query) {
-          <span class="text-[11px] text-slate-500">Matches for "{{ query }}"</span>
+          <span class="text-[11px] text-slate-400">"{{ query }}"</span>
         }
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      <div class="divide-y divide-slate-100">
         @for (candidate of candidates; track candidate.type + ':' + candidate.id) {
           <button
             type="button"
             (click)="selectCandidate(candidate)"
-            class="text-left p-2.5 rounded-xl bg-white border border-slate-200/90 hover:border-brand-400 hover:bg-brand-50/40 transition flex items-center justify-between gap-2 cursor-pointer shadow-2xs"
+            class="w-full text-left px-3.5 py-2.5 hover:bg-slate-50 transition flex items-center justify-between gap-3 cursor-pointer group"
           >
             <div class="min-w-0">
-              <div class="text-xs font-semibold text-slate-900 truncate">{{ candidate.label }}</div>
+              <div class="text-xs font-medium text-slate-900 truncate">{{ candidate.label }}</div>
               @if (candidate.subtitle) {
-                <div class="text-[10px] text-slate-500 truncate">{{ candidate.subtitle }}</div>
+                <div class="text-[11px] text-slate-400 truncate">{{ candidate.subtitle }}</div>
               }
             </div>
-            <span class="text-[10px] font-semibold text-brand-700 shrink-0">Select →</span>
+            <span class="text-xs text-slate-300 group-hover:text-emerald-600 transition shrink-0">→</span>
           </button>
         }
       </div>

@@ -1,22 +1,33 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   IntelligentReportApiService,
   IntelligentReportData,
   IntelligentReportPeriod,
   IntelligentReportScope,
+  ZaakiyPeriodComparison,
 } from '../../core/api/intelligent-report-api.service';
 import { AuthService } from '../../core/auth/auth.service';
 import { BmErrorStateComponent } from '../../shared/components/bm-error-state/bm-error-state.component';
 import { BmLoadingStateComponent } from '../../shared/components/bm-loading-state/bm-loading-state.component';
+import { ZaakiyOrbComponent } from '../zaakiy/components/zaakiy-orb.component';
+
+type SkillTab = 'all' | 'collections' | 'vacancy' | 'agreement_risk' | 'renewals' | 'maintenance';
 
 @Component({
   selector: 'bm-intelligent-report',
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [CommonModule, FormsModule, RouterLink, BmErrorStateComponent, BmLoadingStateComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    BmErrorStateComponent,
+    BmLoadingStateComponent,
+    ZaakiyOrbComponent,
+  ],
   template: `
     <div class="max-w-[1740px] mx-auto space-y-6 font-sans text-[#0F172A]">
       <!-- TOP EXECUTIVE PAGE HEADER & ACTIONS -->
@@ -39,6 +50,15 @@ import { BmLoadingStateComponent } from '../../shared/components/bm-loading-stat
         </div>
 
         <div class="flex items-center gap-3 flex-wrap">
+          <button
+            class="bm-btn bm-btn-secondary text-xs flex items-center gap-1.5"
+            type="button"
+            (click)="askPeriodBriefing()"
+          >
+            <bm-zaakiy-orb size="sm" />
+            <span>Ask Zaakiy</span>
+          </button>
+
           <button
             class="bm-btn bm-btn-secondary text-xs flex items-center gap-1.5"
             type="button"
@@ -587,6 +607,904 @@ import { BmLoadingStateComponent } from '../../shared/components/bm-loading-stat
           </div>
         </div>
 
+        <!-- 2B. ZAAKIY EXECUTIVE OVERVIEW & OPERATIONAL SKILLS -->
+        @if (report()!.zaakiy; as zaakiy) {
+          <!-- Zaakiy Executive Overview -->
+          <section
+            class="rounded-2xl border border-emerald-200/80 bg-white p-6 shadow-2xs space-y-6"
+          >
+            <div
+              class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100"
+            >
+              <div class="flex items-center gap-3">
+                <bm-zaakiy-orb size="sm" />
+                <div>
+                  <h2 class="text-base font-bold text-slate-900">Zaakiy Intelligence Overview</h2>
+                  <p class="text-xs text-slate-500">
+                    Deterministic executive briefing and period comparison vs
+                    {{ report()!.period.comparison_from }} to {{ report()!.period.comparison_to }}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                (click)="askPeriodBriefing()"
+                class="text-xs font-semibold text-emerald-700 hover:text-emerald-900 transition self-start sm:self-center cursor-pointer"
+              >
+                Explore in Zaakiy →
+              </button>
+            </div>
+
+            <!-- Executive Headline -->
+            <p class="text-sm sm:text-base font-semibold text-slate-900 leading-relaxed">
+              {{ zaakiy.overview.headline }}
+            </p>
+
+            <!-- Period-over-Period Comparison Strip -->
+            @if (zaakiy.overview.period_comparisons.length) {
+              <div
+                class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2 border-t border-slate-100"
+              >
+                @for (comp of zaakiy.overview.period_comparisons; track comp.metric) {
+                  <div class="space-y-1">
+                    <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                      {{ comp.label }}
+                    </div>
+                    <div class="flex items-baseline gap-2">
+                      <span class="text-base font-bold text-slate-900 tabular-nums">
+                        {{
+                          comp.unit === 'AED'
+                            ? 'AED ' + formatMoney(comp.current_value)
+                            : comp.current_value
+                        }}
+                      </span>
+                      <span
+                        class="text-xs font-bold tabular-nums"
+                        [class.text-emerald-700]="
+                          comp.direction !== 'unchanged' && isPositiveDelta(comp)
+                        "
+                        [class.text-rose-600]="
+                          comp.direction !== 'unchanged' && !isPositiveDelta(comp)
+                        "
+                        [class.text-slate-400]="comp.direction === 'unchanged'"
+                      >
+                        {{ formatDelta(comp) }}
+                      </span>
+                    </div>
+                    <div class="text-[11px] text-slate-400 tabular-nums">
+                      Prior:
+                      {{
+                        comp.unit === 'AED'
+                          ? 'AED ' + formatMoney(comp.comparison_value)
+                          : comp.comparison_value
+                      }}
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Highlights + Attention Signals -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-4 border-t border-slate-100">
+              <div class="lg:col-span-7 space-y-2.5">
+                <h3 class="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Executive Highlights
+                </h3>
+                <ul class="space-y-2 text-xs sm:text-sm text-slate-700 leading-relaxed">
+                  @for (point of zaakiy.overview.highlights; track point) {
+                    <li class="flex items-start gap-2.5">
+                      <span class="text-emerald-600 font-bold mt-0.5">•</span>
+                      <span>{{ point }}</span>
+                    </li>
+                  }
+                </ul>
+              </div>
+
+              <div class="lg:col-span-5 space-y-2.5">
+                <h3 class="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Priority Attention Signals ({{ zaakiy.overview.attention_items.length }})
+                </h3>
+                @if (!zaakiy.overview.attention_items.length) {
+                  <p class="text-xs text-emerald-700 font-medium">
+                    ✓ No critical or attention anomalies flagged across Zaakiy operational skills.
+                  </p>
+                } @else {
+                  <ul class="divide-y divide-slate-100">
+                    @for (item of zaakiy.overview.attention_items; track item.code + item.label) {
+                      <li class="py-2 first:pt-0 last:pb-0 flex items-start gap-2.5 text-xs">
+                        <span
+                          class="w-2 h-2 rounded-full mt-1.5 shrink-0"
+                          [class.bg-rose-600]="item.severity === 'critical'"
+                          [class.bg-amber-500]="item.severity !== 'critical'"
+                        ></span>
+                        <div class="min-w-0">
+                          <div class="font-semibold text-slate-900">
+                            {{ item.label }}
+                            @if (item.branch) {
+                              <span class="text-slate-400 font-normal">· {{ item.branch }}</span>
+                            }
+                          </div>
+                          <div class="text-slate-500">{{ item.rule }}</div>
+                        </div>
+                      </li>
+                    }
+                  </ul>
+                }
+              </div>
+            </div>
+
+            <!-- Contextual Ask Zaakiy Prompts -->
+            @if (zaakiy.overview.suggested_prompts.length) {
+              <div class="pt-4 border-t border-slate-100 space-y-2">
+                <h3 class="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                  Follow Up with Zaakiy
+                </h3>
+                <div class="flex flex-wrap gap-x-5 gap-y-2">
+                  @for (prompt of zaakiy.overview.suggested_prompts; track prompt) {
+                    <button
+                      type="button"
+                      (click)="askZaakiy(prompt)"
+                      class="text-xs font-medium text-emerald-700 hover:text-emerald-900 hover:underline transition text-left cursor-pointer"
+                    >
+                      {{ prompt }} →
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+          </section>
+
+          <!-- Zaakiy Operational Skills Hub -->
+          <section class="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-2xs space-y-6">
+            <div
+              class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100"
+            >
+              <div>
+                <h2 class="text-base font-bold text-slate-900">Zaakiy Operational Skills</h2>
+                <p class="text-xs text-slate-500">
+                  Live branch intelligence powered by Zaakiy’s five deterministic analytical skills
+                </p>
+              </div>
+
+              <!-- Skill Filter Tabs -->
+              <div class="flex flex-wrap items-center gap-1.5">
+                @for (tab of skillTabs; track tab.key) {
+                  <button
+                    type="button"
+                    (click)="activeSkill.set(tab.key)"
+                    class="px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer"
+                    [class.bg-slate-900]="activeSkill() === tab.key"
+                    [class.text-white]="activeSkill() === tab.key"
+                    [class.bg-slate-100]="activeSkill() !== tab.key"
+                    [class.text-slate-600]="activeSkill() !== tab.key"
+                    [class.hover:bg-slate-200]="activeSkill() !== tab.key"
+                  >
+                    {{ tab.label }}
+                  </button>
+                }
+              </div>
+            </div>
+
+            <div class="space-y-8">
+              <!-- SKILL 1: COLLECTIONS HEALTH -->
+              @if (activeSkill() === 'all' || activeSkill() === 'collections') {
+                <div class="space-y-4">
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <h3 class="text-sm font-bold text-slate-900">
+                        {{ zaakiy.skills.collections.title }}
+                      </h3>
+                      <p class="text-xs text-slate-500">
+                        Tenant collection velocity, receivable aging buckets, and cheque clearance
+                      </p>
+                    </div>
+                    <div class="flex items-center gap-4 text-xs font-semibold">
+                      <a
+                        [routerLink]="zaakiy.skills.collections.navigation"
+                        class="text-slate-600 hover:text-slate-900"
+                      >
+                        Inward Ledger ↗
+                      </a>
+                      <button
+                        type="button"
+                        (click)="askZaakiy(zaakiy.skills.collections.ask_zaakiy)"
+                        class="text-emerald-700 hover:text-emerald-900 cursor-pointer"
+                      >
+                        Ask Zaakiy →
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 py-3 border-y border-slate-100">
+                    <div>
+                      <div class="text-[11px] text-slate-400">Collected in Period</div>
+                      <div class="text-sm font-bold text-emerald-700 tabular-nums mt-0.5">
+                        AED {{ formatMoney(zaakiy.skills.collections.metrics.collected_amount) }}
+                      </div>
+                      <div class="text-[11px] text-slate-400">
+                        {{ zaakiy.skills.collections.metrics.payment_count }} payments
+                      </div>
+                    </div>
+                    <div>
+                      <div class="text-[11px] text-slate-400">Overdue Receivables</div>
+                      <div class="text-sm font-bold text-rose-600 tabular-nums mt-0.5">
+                        AED {{ formatMoney(zaakiy.skills.collections.metrics.overdue_total) }}
+                      </div>
+                      <div class="text-[11px] text-slate-400">
+                        {{ zaakiy.skills.collections.metrics.tenant_count_with_overdue }} tenant(s)
+                      </div>
+                    </div>
+                    <div>
+                      <div class="text-[11px] text-slate-400">Total Outstanding</div>
+                      <div class="text-sm font-bold text-slate-900 tabular-nums mt-0.5">
+                        AED {{ formatMoney(zaakiy.skills.collections.metrics.outstanding_total) }}
+                      </div>
+                      <div class="text-[11px] text-slate-400">
+                        {{ zaakiy.skills.collections.metrics.tenant_count_with_outstanding }}
+                        tenant(s)
+                      </div>
+                    </div>
+                    <div>
+                      <div class="text-[11px] text-slate-400">Cheque Risk</div>
+                      <div class="text-sm font-bold text-amber-700 tabular-nums mt-0.5">
+                        {{ zaakiy.skills.collections.metrics.pending_cheque_count }} pending /
+                        {{ zaakiy.skills.collections.metrics.bounced_cheque_count }} bounced
+                      </div>
+                      <div class="text-[11px] text-slate-400">Active inward cheques</div>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <!-- Receivable Aging -->
+                    <div class="lg:col-span-5 space-y-2.5">
+                      <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                        Receivable Aging Buckets
+                      </div>
+                      @for (bucket of zaakiy.skills.collections.aging; track bucket.bucket) {
+                        <div class="space-y-1">
+                          <div class="flex justify-between text-xs">
+                            <span class="font-medium text-slate-600 capitalize">{{
+                              bucket.bucket === 'current' ? 'Current' : bucket.bucket + ' days'
+                            }}</span>
+                            <span class="font-semibold text-slate-900 tabular-nums">
+                              AED {{ formatMoney(bucket.amount) }}
+                            </span>
+                          </div>
+                          <div class="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                            <div
+                              class="h-full rounded-full transition-all"
+                              [class.bg-emerald-500]="bucket.bucket === 'current'"
+                              [class.bg-amber-500]="
+                                bucket.bucket === '1-30' || bucket.bucket === '31-60'
+                              "
+                              [class.bg-rose-600]="
+                                bucket.bucket === '61-90' || bucket.bucket === '90+'
+                              "
+                              [style.width.%]="
+                                agingBarPercent(bucket.amount, zaakiy.skills.collections.aging)
+                              "
+                            ></div>
+                          </div>
+                        </div>
+                      }
+                    </div>
+
+                    <!-- Top Overdue Tenants -->
+                    <div class="lg:col-span-7 space-y-2.5">
+                      <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                        Top Overdue Tenants
+                      </div>
+                      @if (!zaakiy.skills.collections.top_overdue_tenants.length) {
+                        <p class="text-xs text-slate-500">No overdue tenant balances.</p>
+                      } @else {
+                        <div class="overflow-x-auto">
+                          <table class="w-full text-left text-xs">
+                            <thead>
+                              <tr class="border-b border-slate-100 text-slate-400 font-semibold">
+                                <th class="py-1.5 pr-3">Tenant</th>
+                                <th class="py-1.5 px-2 text-right">Overdue</th>
+                                <th class="py-1.5 pl-2 text-right">Total Balance</th>
+                              </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                              @for (
+                                tenant of zaakiy.skills.collections.top_overdue_tenants;
+                                track tenant.id + '-' + tenant.customer_code
+                              ) {
+                                <tr>
+                                  <td class="py-2 pr-3 font-medium text-slate-900">
+                                    {{ tenant.display_name }}
+                                    <span class="text-slate-400 font-normal">
+                                      ({{ tenant.customer_code }})
+                                    </span>
+                                    @if (tenant.branch) {
+                                      <span class="text-slate-400 font-normal">
+                                        · {{ tenant.branch }}
+                                      </span>
+                                    }
+                                  </td>
+                                  <td
+                                    class="py-2 px-2 text-right font-semibold text-rose-600 tabular-nums"
+                                  >
+                                    AED {{ formatMoney(tenant.overdue) }}
+                                  </td>
+                                  <td
+                                    class="py-2 pl-2 text-right font-medium text-slate-700 tabular-nums"
+                                  >
+                                    AED {{ formatMoney(tenant.outstanding) }}
+                                  </td>
+                                </tr>
+                              }
+                            </tbody>
+                          </table>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+
+              <!-- SKILL 2: VACANCY & LEASING -->
+              @if (activeSkill() === 'all' || activeSkill() === 'vacancy') {
+                <div class="space-y-4 pt-6 border-t border-slate-100 first:pt-0 first:border-t-0">
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <h3 class="text-sm font-bold text-slate-900">
+                        {{ zaakiy.skills.vacancy.title }}
+                      </h3>
+                      <p class="text-xs text-slate-500">
+                        Portfolio occupancy mix, vacancy duration, and maintenance-blocked units
+                      </p>
+                    </div>
+                    <div class="flex items-center gap-4 text-xs font-semibold">
+                      <a
+                        [routerLink]="zaakiy.skills.vacancy.navigation"
+                        class="text-slate-600 hover:text-slate-900"
+                      >
+                        Properties ↗
+                      </a>
+                      <button
+                        type="button"
+                        (click)="askZaakiy(zaakiy.skills.vacancy.ask_zaakiy)"
+                        class="text-emerald-700 hover:text-emerald-900 cursor-pointer"
+                      >
+                        Ask Zaakiy →
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 py-3 border-y border-slate-100">
+                    <div>
+                      <div class="text-[11px] text-slate-400">Occupancy / Vacancy Rate</div>
+                      <div class="text-sm font-bold text-slate-900 tabular-nums mt-0.5">
+                        {{ zaakiy.skills.vacancy.metrics.occupancy_rate }}% /
+                        {{ zaakiy.skills.vacancy.metrics.vacancy_rate }}%
+                      </div>
+                    </div>
+                    <div>
+                      <div class="text-[11px] text-slate-400">Occupied / Vacant Units</div>
+                      <div class="text-sm font-bold text-emerald-700 tabular-nums mt-0.5">
+                        {{ zaakiy.skills.vacancy.metrics.occupied_property_count }} /
+                        {{ zaakiy.skills.vacancy.metrics.vacant_property_count }}
+                      </div>
+                    </div>
+                    <div>
+                      <div class="text-[11px] text-slate-400">Future Occupied</div>
+                      <div class="text-sm font-bold text-sky-700 tabular-nums mt-0.5">
+                        {{ zaakiy.skills.vacancy.metrics.future_occupied_property_count }} units
+                      </div>
+                    </div>
+                    <div>
+                      <div class="text-[11px] text-slate-400">Vacant w/ Open Maintenance</div>
+                      <div class="text-sm font-bold text-amber-700 tabular-nums mt-0.5">
+                        {{ zaakiy.skills.vacancy.metrics.vacant_properties_with_open_work_orders }}
+                        units
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-5 space-y-2.5">
+                      <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                        Occupancy by Property Type
+                      </div>
+                      @if (!zaakiy.skills.vacancy.by_property_type.length) {
+                        <p class="text-xs text-slate-500">No active properties found.</p>
+                      } @else {
+                        <div class="space-y-2">
+                          @for (row of zaakiy.skills.vacancy.by_property_type; track row.property_type) {
+                            <div class="flex items-center justify-between text-xs">
+                              <span class="font-medium text-slate-700 capitalize">
+                                {{ formatSignal(row.property_type) }}
+                              </span>
+                              <span class="tabular-nums text-slate-600">
+                                <strong class="text-emerald-700">{{ row.occupied }}</strong>
+                                occupied ·
+                                <strong class="text-slate-900">{{ row.vacant }}</strong> vacant
+                              </span>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+
+                    <div class="lg:col-span-7 space-y-2.5">
+                      <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                        Longest Vacant Units
+                      </div>
+                      @if (!zaakiy.skills.vacancy.longest_vacant.length) {
+                        <p class="text-xs text-emerald-700">No vacant properties currently.</p>
+                      } @else {
+                        <div class="overflow-x-auto">
+                          <table class="w-full text-left text-xs">
+                            <thead>
+                              <tr class="border-b border-slate-100 text-slate-400 font-semibold">
+                                <th class="py-1.5 pr-3">Unit</th>
+                                <th class="py-1.5 px-2">Status</th>
+                                <th class="py-1.5 pl-2 text-right">Vacancy Days</th>
+                              </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                              @for (
+                                prop of zaakiy.skills.vacancy.longest_vacant;
+                                track prop.id + '-' + prop.property_code
+                              ) {
+                                <tr>
+                                  <td class="py-2 pr-3 font-medium text-slate-900">
+                                    {{ prop.property_code }}
+                                    @if (prop.name) {
+                                      <span class="text-slate-500 font-normal">
+                                        — {{ prop.name }}
+                                      </span>
+                                    }
+                                    @if (prop.branch) {
+                                      <span class="text-slate-400 font-normal">
+                                        · {{ prop.branch }}
+                                      </span>
+                                    }
+                                  </td>
+                                  <td class="py-2 px-2 text-slate-600">
+                                    {{ prop.available_for_leasing ? 'Leasable' : 'No owner cover' }}
+                                    @if (prop.open_work_order_count > 0) {
+                                      <span class="text-amber-700 font-semibold">
+                                        · {{ prop.open_work_order_count }} open WO
+                                      </span>
+                                    }
+                                  </td>
+                                  <td
+                                    class="py-2 pl-2 text-right font-semibold tabular-nums"
+                                    [class.text-rose-600]="(prop.vacancy_days ?? 0) >= 90"
+                                    [class.text-slate-700]="(prop.vacancy_days ?? 0) < 90"
+                                  >
+                                    {{
+                                      prop.vacancy_days !== null
+                                        ? prop.vacancy_days + 'd'
+                                        : 'New / Unleased'
+                                    }}
+                                  </td>
+                                </tr>
+                              }
+                            </tbody>
+                          </table>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+
+              <!-- SKILL 3: AGREEMENT RISK & COVERAGE -->
+              @if (activeSkill() === 'all' || activeSkill() === 'agreement_risk') {
+                <div class="space-y-4 pt-6 border-t border-slate-100 first:pt-0 first:border-t-0">
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <h3 class="text-sm font-bold text-slate-900">
+                        {{ zaakiy.skills.agreement_risk.title }}
+                      </h3>
+                      <p class="text-xs text-slate-500">
+                        Active contracts flagged for expiry, arrears, bounced cheques, or owner
+                        coverage mismatch
+                      </p>
+                    </div>
+                    <div class="flex items-center gap-4 text-xs font-semibold">
+                      <a
+                        [routerLink]="zaakiy.skills.agreement_risk.navigation"
+                        class="text-slate-600 hover:text-slate-900"
+                      >
+                        Expiry Report ↗
+                      </a>
+                      <button
+                        type="button"
+                        (click)="askZaakiy(zaakiy.skills.agreement_risk.ask_zaakiy)"
+                        class="text-emerald-700 hover:text-emerald-900 cursor-pointer"
+                      >
+                        Ask Zaakiy →
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 py-3 border-y border-slate-100">
+                    <div>
+                      <div class="text-[11px] text-slate-400">Flagged Agreements</div>
+                      <div class="text-sm font-bold text-slate-900 tabular-nums mt-0.5">
+                        {{ zaakiy.skills.agreement_risk.metrics.agreement_count_needing_attention }}
+                      </div>
+                    </div>
+                    <div>
+                      <div class="text-[11px] text-slate-400">Expiring Within 30d</div>
+                      <div class="text-sm font-bold text-amber-700 tabular-nums mt-0.5">
+                        {{ zaakiy.skills.agreement_risk.metrics.expiring_soon_count }}
+                      </div>
+                    </div>
+                    <div>
+                      <div class="text-[11px] text-slate-400">Coverage Mismatches</div>
+                      <div
+                        class="text-sm font-bold tabular-nums mt-0.5"
+                        [class.text-rose-600]="
+                          zaakiy.skills.agreement_risk.metrics.coverage_mismatch_count > 0
+                        "
+                        [class.text-slate-900]="
+                          zaakiy.skills.agreement_risk.metrics.coverage_mismatch_count === 0
+                        "
+                      >
+                        {{ zaakiy.skills.agreement_risk.metrics.coverage_mismatch_count }}
+                      </div>
+                    </div>
+                    <div>
+                      <div class="text-[11px] text-slate-400">Flagged Overdue Exposure</div>
+                      <div class="text-sm font-bold text-rose-600 tabular-nums mt-0.5">
+                        AED
+                        {{ formatMoney(zaakiy.skills.agreement_risk.metrics.total_overdue_amount) }}
+                      </div>
+                    </div>
+                  </div>
+
+                  @if (!zaakiy.skills.agreement_risk.flagged_agreements.length) {
+                    <p class="text-xs text-emerald-700">
+                      ✓ No active agreements currently flagged for risk or coverage gaps.
+                    </p>
+                  } @else {
+                    <div class="overflow-x-auto">
+                      <table class="w-full text-left text-xs">
+                        <thead>
+                          <tr class="border-b border-slate-100 text-slate-400 font-semibold">
+                            <th class="py-1.5 pr-3">Agreement</th>
+                            <th class="py-1.5 px-2">Party / Unit</th>
+                            <th class="py-1.5 px-2">Signals</th>
+                            <th class="py-1.5 px-2 text-right">Ends</th>
+                            <th class="py-1.5 pl-2 text-right">Overdue</th>
+                          </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                          @for (
+                            row of zaakiy.skills.agreement_risk.flagged_agreements;
+                            track row.type + '-' + row.id
+                          ) {
+                            <tr>
+                              <td class="py-2 pr-3 font-semibold">
+                                <a
+                                  [routerLink]="row.route"
+                                  class="text-emerald-700 hover:underline"
+                                >
+                                  {{ row.agreement_no }}
+                                </a>
+                              </td>
+                              <td class="py-2 px-2 text-slate-700">
+                                {{ row.party_name }}
+                                @if (row.properties) {
+                                  <span class="text-slate-400">· {{ row.properties }}</span>
+                                }
+                              </td>
+                              <td class="py-2 px-2 text-slate-600">
+                                {{ formatSignalsList(row.signals) }}
+                              </td>
+                              <td class="py-2 px-2 text-right tabular-nums text-slate-600">
+                                {{ row.end_date }}
+                              </td>
+                              <td
+                                class="py-2 pl-2 text-right font-semibold tabular-nums"
+                                [class.text-rose-600]="Number(row.overdue) > 0"
+                                [class.text-slate-400]="Number(row.overdue) <= 0"
+                              >
+                                AED {{ formatMoney(row.overdue) }}
+                              </td>
+                            </tr>
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- SKILL 4: RENEWAL PIPELINE (60 DAYS) -->
+              @if (activeSkill() === 'all' || activeSkill() === 'renewals') {
+                <div class="space-y-4 pt-6 border-t border-slate-100 first:pt-0 first:border-t-0">
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <h3 class="text-sm font-bold text-slate-900">
+                        {{ zaakiy.skills.renewals.title }}
+                      </h3>
+                      <p class="text-xs text-slate-500">
+                        Upcoming tenant and owner renewals with financial readiness and occupied
+                        unit impact
+                      </p>
+                    </div>
+                    <div class="flex items-center gap-4 text-xs font-semibold">
+                      <a
+                        [routerLink]="zaakiy.skills.renewals.navigation"
+                        class="text-slate-600 hover:text-slate-900"
+                      >
+                        Renewal Schedule ↗
+                      </a>
+                      <button
+                        type="button"
+                        (click)="askZaakiy(zaakiy.skills.renewals.ask_zaakiy)"
+                        class="text-emerald-700 hover:text-emerald-900 cursor-pointer"
+                      >
+                        Ask Zaakiy →
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 py-3 border-y border-slate-100">
+                    <div>
+                      <div class="text-[11px] text-slate-400">Candidates (60d)</div>
+                      <div class="text-sm font-bold text-slate-900 tabular-nums mt-0.5">
+                        {{ zaakiy.skills.renewals.metrics.renewal_candidate_count }}
+                        <span class="text-xs font-normal text-slate-400">
+                          ({{ zaakiy.skills.renewals.metrics.tenant_renewal_count }}T /
+                          {{ zaakiy.skills.renewals.metrics.owner_renewal_count }}O)
+                        </span>
+                      </div>
+                    </div>
+                    <div>
+                      <div class="text-[11px] text-slate-400">Due Within 30d</div>
+                      <div class="text-sm font-bold text-amber-700 tabular-nums mt-0.5">
+                        {{ zaakiy.skills.renewals.metrics.due_within_30_days_count }}
+                      </div>
+                    </div>
+                    <div>
+                      <div class="text-[11px] text-slate-400">Owner Renewals w/ Active Tenants</div>
+                      <div class="text-sm font-bold text-slate-900 tabular-nums mt-0.5">
+                        {{
+                          zaakiy.skills.renewals.metrics.owner_renewals_affecting_occupied_properties
+                        }}
+                      </div>
+                    </div>
+                    <div>
+                      <div class="text-[11px] text-slate-400">Renewal Arrears Exposure</div>
+                      <div class="text-sm font-bold text-rose-600 tabular-nums mt-0.5">
+                        AED {{ formatMoney(zaakiy.skills.renewals.metrics.renewal_overdue_amount) }}
+                      </div>
+                    </div>
+                  </div>
+
+                  @if (!zaakiy.skills.renewals.candidates.length) {
+                    <p class="text-xs text-slate-500">
+                      No agreements scheduled for renewal in the next 60 days.
+                    </p>
+                  } @else {
+                    <div class="overflow-x-auto">
+                      <table class="w-full text-left text-xs">
+                        <thead>
+                          <tr class="border-b border-slate-100 text-slate-400 font-semibold">
+                            <th class="py-1.5 pr-3">Agreement</th>
+                            <th class="py-1.5 px-2">Party</th>
+                            <th class="py-1.5 px-2">Signals</th>
+                            <th class="py-1.5 px-2 text-right">Days Left</th>
+                            <th class="py-1.5 pl-2 text-right">Outstanding</th>
+                          </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                          @for (
+                            row of zaakiy.skills.renewals.candidates;
+                            track row.type + '-' + row.id
+                          ) {
+                            <tr>
+                              <td class="py-2 pr-3 font-semibold">
+                                <a
+                                  [routerLink]="row.route"
+                                  class="text-emerald-700 hover:underline"
+                                >
+                                  {{ row.agreement_no }}
+                                </a>
+                              </td>
+                              <td class="py-2 px-2 text-slate-700">{{ row.party_name }}</td>
+                              <td class="py-2 px-2 text-slate-600">
+                                {{ formatSignalsList(row.renewal_signals) }}
+                              </td>
+                              <td
+                                class="py-2 px-2 text-right font-semibold tabular-nums"
+                                [class.text-rose-600]="row.days_until_expiry < 0"
+                                [class.text-amber-700]="
+                                  row.days_until_expiry >= 0 && row.days_until_expiry <= 30
+                                "
+                                [class.text-slate-700]="row.days_until_expiry > 30"
+                              >
+                                {{
+                                  row.days_until_expiry < 0
+                                    ? 'Expired ' + Math.abs(row.days_until_expiry) + 'd ago'
+                                    : row.days_until_expiry + 'd'
+                                }}
+                              </td>
+                              <td class="py-2 pl-2 text-right font-medium text-slate-700 tabular-nums">
+                                AED {{ formatMoney(row.outstanding) }}
+                              </td>
+                            </tr>
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- SKILL 5: MAINTENANCE & BACKLOG -->
+              @if (activeSkill() === 'all' || activeSkill() === 'maintenance') {
+                <div class="space-y-4 pt-6 border-t border-slate-100 first:pt-0 first:border-t-0">
+                  <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <h3 class="text-sm font-bold text-slate-900">
+                        {{ zaakiy.skills.maintenance.title }}
+                      </h3>
+                      <p class="text-xs text-slate-500">
+                        Work order backlog aging, high-priority queue, completions, and operating
+                        spend
+                      </p>
+                    </div>
+                    <div class="flex items-center gap-4 text-xs font-semibold">
+                      <a
+                        [routerLink]="zaakiy.skills.maintenance.navigation"
+                        class="text-slate-600 hover:text-slate-900"
+                      >
+                        Work Orders ↗
+                      </a>
+                      <button
+                        type="button"
+                        (click)="askZaakiy(zaakiy.skills.maintenance.ask_zaakiy)"
+                        class="text-emerald-700 hover:text-emerald-900 cursor-pointer"
+                      >
+                        Ask Zaakiy →
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 py-3 border-y border-slate-100">
+                    <div>
+                      <div class="text-[11px] text-slate-400">Open Work Orders</div>
+                      <div class="text-sm font-bold text-slate-900 tabular-nums mt-0.5">
+                        {{ zaakiy.skills.maintenance.metrics.open_work_order_count }}
+                      </div>
+                    </div>
+                    <div>
+                      <div class="text-[11px] text-slate-400">High / Urgent Open</div>
+                      <div
+                        class="text-sm font-bold tabular-nums mt-0.5"
+                        [class.text-rose-600]="
+                          zaakiy.skills.maintenance.metrics.high_priority_open_count > 0
+                        "
+                        [class.text-slate-900]="
+                          zaakiy.skills.maintenance.metrics.high_priority_open_count === 0
+                        "
+                      >
+                        {{ zaakiy.skills.maintenance.metrics.high_priority_open_count }}
+                      </div>
+                    </div>
+                    <div>
+                      <div class="text-[11px] text-slate-400">Completed in Period</div>
+                      <div class="text-sm font-bold text-emerald-700 tabular-nums mt-0.5">
+                        {{ zaakiy.skills.maintenance.metrics.completed_work_order_count }}
+                      </div>
+                    </div>
+                    <div>
+                      <div class="text-[11px] text-slate-400">Maintenance Spend</div>
+                      <div class="text-sm font-bold text-slate-900 tabular-nums mt-0.5">
+                        AED
+                        {{ formatMoney(zaakiy.skills.maintenance.metrics.maintenance_expenditure) }}
+                      </div>
+                    </div>
+                    <div>
+                      <div class="text-[11px] text-slate-400">Petty Cash Spend</div>
+                      <div class="text-sm font-bold text-slate-900 tabular-nums mt-0.5">
+                        AED
+                        {{ formatMoney(zaakiy.skills.maintenance.metrics.petty_cash_expenditure) }}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-4 space-y-2.5">
+                      <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                        Open Backlog Aging
+                      </div>
+                      @for (bucket of zaakiy.skills.maintenance.aging; track bucket.bucket) {
+                        <div class="space-y-1">
+                          <div class="flex justify-between text-xs">
+                            <span class="font-medium text-slate-600">{{ bucket.bucket }} days</span>
+                            <span class="font-semibold text-slate-900 tabular-nums">{{
+                              bucket.count
+                            }}</span>
+                          </div>
+                          <div class="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                            <div
+                              class="h-full rounded-full transition-all"
+                              [class.bg-emerald-500]="
+                                bucket.bucket === '0-7' || bucket.bucket === '8-14'
+                              "
+                              [class.bg-amber-500]="
+                                bucket.bucket === '15-30' || bucket.bucket === '31-60'
+                              "
+                              [class.bg-rose-600]="bucket.bucket === '60+'"
+                              [style.width.%]="
+                                countBarPercent(bucket.count, zaakiy.skills.maintenance.aging)
+                              "
+                            ></div>
+                          </div>
+                        </div>
+                      }
+                    </div>
+
+                    <div class="lg:col-span-8 space-y-2.5">
+                      <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                        Oldest Open Work Orders
+                      </div>
+                      @if (!zaakiy.skills.maintenance.oldest_open.length) {
+                        <p class="text-xs text-emerald-700">✓ No open maintenance work orders.</p>
+                      } @else {
+                        <div class="overflow-x-auto">
+                          <table class="w-full text-left text-xs">
+                            <thead>
+                              <tr class="border-b border-slate-100 text-slate-400 font-semibold">
+                                <th class="py-1.5 pr-3">Work Order</th>
+                                <th class="py-1.5 px-2">Unit</th>
+                                <th class="py-1.5 px-2">Priority</th>
+                                <th class="py-1.5 pl-2 text-right">Age</th>
+                              </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                              @for (
+                                wo of zaakiy.skills.maintenance.oldest_open;
+                                track wo.id + '-' + wo.work_order_no
+                              ) {
+                                <tr>
+                                  <td class="py-2 pr-3 font-medium text-slate-900">
+                                    {{ wo.work_order_no }}
+                                    <span class="text-slate-500 font-normal">— {{ wo.title }}</span>
+                                  </td>
+                                  <td class="py-2 px-2 text-slate-600">{{ wo.property_code }}</td>
+                                  <td
+                                    class="py-2 px-2 uppercase text-[10px] font-bold"
+                                    [class.text-rose-600]="
+                                      wo.priority === 'urgent' || wo.priority === 'high'
+                                    "
+                                    [class.text-slate-500]="
+                                      wo.priority !== 'urgent' && wo.priority !== 'high'
+                                    "
+                                  >
+                                    {{ wo.priority }}
+                                  </td>
+                                  <td
+                                    class="py-2 pl-2 text-right font-semibold tabular-nums"
+                                    [class.text-rose-600]="wo.age_days >= 60"
+                                    [class.text-slate-700]="wo.age_days < 60"
+                                  >
+                                    {{ wo.age_days }}d
+                                  </td>
+                                </tr>
+                              }
+                            </tbody>
+                          </table>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </section>
+        }
+
         <!-- 3. TRENDS & PROPERTY OPERATIONS BENTO SECTION -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
           <!-- Income vs Cost Trend Module (Col 7) -->
@@ -973,11 +1891,14 @@ import { BmLoadingStateComponent } from '../../shared/components/bm-loading-stat
 export class IntelligentReportComponent implements OnInit {
   private api = inject(IntelligentReportApiService);
   private auth = inject(AuthService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   report = signal<IntelligentReportData | null>(null);
   loading = signal(false);
   downloadingPdf = signal(false);
   error = signal<string | null>(null);
+  activeSkill = signal<SkillTab>('all');
 
   period: IntelligentReportPeriod = 'this_month';
   scope: IntelligentReportScope = 'branch';
@@ -986,9 +1907,96 @@ export class IntelligentReportComponent implements OnInit {
 
   readonly isSuperAdmin = this.auth.isSuperAdmin;
   readonly Number = Number;
+  readonly Math = Math;
+
+  readonly skillTabs: Array<{ key: SkillTab; label: string }> = [
+    { key: 'all', label: 'All Skills' },
+    { key: 'collections', label: 'Collections' },
+    { key: 'vacancy', label: 'Vacancy & Leasing' },
+    { key: 'agreement_risk', label: 'Agreement Risk' },
+    { key: 'renewals', label: 'Renewals (60d)' },
+    { key: 'maintenance', label: 'Maintenance' },
+  ];
+
+  private readonly validPeriods: IntelligentReportPeriod[] = [
+    'this_month',
+    'last_month',
+    'last_3_months',
+    'last_6_months',
+    'last_12_months',
+    'this_year',
+    'custom',
+  ];
 
   ngOnInit(): void {
+    const qp = this.route.snapshot.queryParamMap;
+    const requestedPeriod = qp.get('period') as IntelligentReportPeriod | null;
+    if (requestedPeriod && this.validPeriods.includes(requestedPeriod)) {
+      this.period = requestedPeriod;
+    }
+    const from = qp.get('date_from');
+    const to = qp.get('date_to');
+    if (from) this.dateFrom = from;
+    if (to) this.dateTo = to;
+    if (qp.get('scope') === 'overall' && this.isSuperAdmin()) {
+      this.scope = 'overall';
+    }
     this.load();
+  }
+
+  askZaakiy(prompt: string): void {
+    this.router.navigate(['/app/zaakiy'], { queryParams: { q: prompt } });
+  }
+
+  askPeriodBriefing(): void {
+    const current = this.report();
+    const prompt = current
+      ? `Give me a management briefing and highlight risks for ${current.period.from} to ${current.period.to}`
+      : 'Give me a management briefing for this branch';
+    this.askZaakiy(prompt);
+  }
+
+  formatDelta(item: ZaakiyPeriodComparison): string {
+    if (item.direction === 'unchanged') return '0%';
+    if (item.percentage_delta !== null) {
+      const sign = item.percentage_delta > 0 ? '+' : '';
+      return `${sign}${item.percentage_delta}%`;
+    }
+    const sign = item.absolute_delta > 0 ? '+' : '';
+    return item.unit === 'AED'
+      ? `${sign}AED ${this.formatMoney(item.absolute_delta)}`
+      : `${sign}${item.absolute_delta}`;
+  }
+
+  isPositiveDelta(item: ZaakiyPeriodComparison): boolean {
+    if (item.metric === 'financials.operating_cost') {
+      return item.direction === 'decrease';
+    }
+    return item.direction === 'increase';
+  }
+
+  formatSignal(code: string): string {
+    return code
+      .toLowerCase()
+      .replaceAll('_', ' ')
+      .replace(/\b\w/g, (ch) => ch.toUpperCase());
+  }
+
+  formatSignalsList(codes: string[]): string {
+    return codes
+      .slice(0, 3)
+      .map((code) => this.formatSignal(code))
+      .join(' · ');
+  }
+
+  agingBarPercent(amount: string, buckets: Array<{ amount: string }>): number {
+    const max = Math.max(...buckets.map((row) => Number(row.amount) || 0), 1);
+    return Math.min(100, ((Number(amount) || 0) / max) * 100);
+  }
+
+  countBarPercent(count: number, rows: Array<{ count: number }>): number {
+    const max = Math.max(...rows.map((row) => row.count), 1);
+    return Math.min(100, (count / max) * 100);
   }
 
   periodChanged(): void {

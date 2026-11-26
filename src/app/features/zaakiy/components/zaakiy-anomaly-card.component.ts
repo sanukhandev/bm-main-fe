@@ -59,19 +59,19 @@ import { CommonModule } from '@angular/common';
       </div>
 
       <!-- Verified Observation Details -->
-      @if (anomaly['observation'] || anomaly['message'] || anomaly['description']) {
+      @if (observationText) {
         <p class="text-xs leading-relaxed opacity-90 font-medium">
-          {{ anomaly['observation'] || anomaly['message'] || anomaly['description'] }}
+          {{ observationText }}
         </p>
       }
 
       <!-- Baseline & Threshold -->
       <div class="flex flex-wrap items-center gap-3 text-[11px] pt-1 opacity-80 border-t border-black/5">
-        @if (anomaly['baseline'] !== undefined && anomaly['baseline'] !== null) {
-          <span>Baseline: <strong>{{ anomaly['baseline'] }}</strong></span>
+        @if (baselineText !== null) {
+          <span>Baseline: <strong>{{ baselineText }}</strong></span>
         }
-        @if (anomaly['threshold'] !== undefined && anomaly['threshold'] !== null) {
-          <span>Threshold: <strong>{{ anomaly['threshold'] }}</strong></span>
+        @if (thresholdText !== null) {
+          <span>Threshold: <strong>{{ thresholdText }}</strong></span>
         }
         @if (anomaly['record_url']) {
           <a
@@ -94,5 +94,32 @@ export class ZaakiyAnomalyCardComponent {
     if (s === 'critical' || s === 'high') return 'critical';
     if (s === 'attention' || s === 'medium' || s === 'warning') return 'attention';
     return 'info';
+  }
+
+  get observationText(): string | null {
+    const raw =
+      this.anomaly['observation'] ??
+      this.anomaly['message'] ??
+      this.anomaly['description'] ??
+      this.anomaly['rule'];
+    return typeof raw === 'string' && raw.trim() ? raw : null;
+  }
+
+  get baselineText(): string | null {
+    const raw = this.anomaly['baseline'] ?? this.anomaly['baseline_value'];
+    if (raw === undefined || raw === null) return null;
+    return typeof raw === 'number' ? raw.toLocaleString('en-US', { maximumFractionDigits: 2 }) : String(raw);
+  }
+
+  get thresholdText(): string | null {
+    const raw = this.anomaly['threshold'];
+    if (raw === undefined || raw === null) return null;
+    if (typeof raw === 'object' && !Array.isArray(raw)) {
+      const entries = Object.entries(raw as Record<string, unknown>)
+        .filter(([, value]) => value !== undefined && value !== null)
+        .map(([key, value]) => `${key}: ${typeof value === 'number' ? value.toLocaleString('en-US') : String(value)}`);
+      return entries.length > 0 ? entries.join(', ') : null;
+    }
+    return String(raw);
   }
 }

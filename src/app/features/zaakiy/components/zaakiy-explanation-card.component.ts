@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
       <div class="flex items-center justify-between gap-2">
         <div>
           <h4 class="text-xs font-poppins font-semibold text-ink">
-            {{ explanation['title'] || 'Measured drivers' }}
+            {{ explanation['title'] || explanation['label'] || 'Measured drivers' }}
           </h4>
           <p class="text-[10px] text-slate-500 font-medium">
             Deterministic backend attribution
@@ -72,7 +72,10 @@ export class ZaakiyExplanationCardComponent {
     if (val === null || val === undefined) return '—';
     const num = Number(val);
     if (isNaN(num)) return String(val);
-    const prefix = num > 0 ? '+' : '';
-    return `${prefix}AED ${Math.abs(num).toLocaleString('en-US', { maximumFractionDigits: 2 })}`;
+    const sign = num > 0 ? '+' : num < 0 ? '-' : '';
+    const formatted = Math.abs(num).toLocaleString('en-US', { maximumFractionDigits: 2 });
+    const metric = String(this.explanation['metric'] || '').toLowerCase();
+    const isCount = metric.includes('count') || this.explanation['unit'] === 'count';
+    return isCount ? `${sign}${formatted}` : `${sign}AED ${formatted}`;
   }
 }

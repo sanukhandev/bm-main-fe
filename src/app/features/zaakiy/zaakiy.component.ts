@@ -16,6 +16,7 @@ import {
   ZaakiyApiService,
   ZaakiyConversationContext,
   ZaakiyHistoryItem,
+  ZaakiyNavigationAction,
   ZaakiyStructuredBlock,
 } from '../../core/api/zaakiy-api.service';
 
@@ -129,7 +130,7 @@ export class ZaakiyComponent implements OnInit, OnDestroy {
   loading = signal(false);
   error = signal<string | null>(null);
   messages = signal<ZaakiyMessageModel[]>([]);
-  actions = signal<Array<{ label: string; url: string }>>([]);
+  actions = signal<ZaakiyNavigationAction[]>([]);
 
   readonly activeBranch = this.branchContext.activeBranch;
 
@@ -189,7 +190,7 @@ export class ZaakiyComponent implements OnInit, OnDestroy {
     this.messages.update((items) => [
       ...items,
       { role: 'user', text: message, blocks: [] },
-      { role: 'model', text: '', blocks: [] },
+      { role: 'model', text: '', blocks: [], actions: [], statusLabel: 'Analyzing branch data...' },
     ]);
 
     this.scrollToBottom();
@@ -197,20 +198,50 @@ export class ZaakiyComponent implements OnInit, OnDestroy {
     this.stream?.unsubscribe();
     this.stream = this.zaakiy.stream(message, history, this.conversationContext()).subscribe({
       next: (event) => {
+        if (event.type === 'status' && event.label) {
+          this.messages.update((items) =>
+            items.map((item, index) =>
+              index === items.length - 1 ? { ...item, statusLabel: event.label } : item,
+            ),
+          );
+        }
         if (event.type === 'done') {
           this.conversationContext.set(event.context ?? null);
-        }
-        if (event.type === 'navigation' && event.label && event.url) {
-          this.actions.update((items) =>
-            items.some((item) => item.url === event.url)
-              ? items
-              : [...items, { label: event.label!, url: event.url! }],
+          this.messages.update((items) =>
+            items.map((item, index) =>
+              index === items.length - 1 ? { ...item, statusLabel: undefined } : item,
+            ),
           );
+        }
+        if (event.type === 'navigation') {
+          const incoming: ZaakiyNavigationAction[] = event.items?.length
+            ? event.items
+            : event.label && event.url
+              ? [{ label: event.label, url: event.url, ...(event.query ? { query: event.query } : {}) }]
+              : [];
+          if (incoming.length > 0) {
+            const actionKey = (a: ZaakiyNavigationAction) => `${a.url}|${JSON.stringify(a.query ?? {})}`;
+            this.messages.update((items) =>
+              items.map((item, index) => {
+                if (index !== items.length - 1) return item;
+                const existing = item.actions ?? [];
+                const merged = [...existing];
+                for (const action of incoming) {
+                  if (!merged.some((a) => actionKey(a) === actionKey(action))) {
+                    merged.push(action);
+                  }
+                }
+                return { ...item, actions: merged };
+              }),
+            );
+          }
         }
         if (event.type === 'token' && event.text) {
           this.messages.update((items) =>
             items.map((item, index) =>
-              index === items.length - 1 ? { ...item, text: item.text + event.text } : item,
+              index === items.length - 1
+                ? { ...item, text: item.text + event.text, statusLabel: undefined }
+                : item,
             ),
           );
           this.scrollToBottom();

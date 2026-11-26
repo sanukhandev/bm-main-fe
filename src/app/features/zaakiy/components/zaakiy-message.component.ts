@@ -1,18 +1,36 @@
 import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ZaakiyOrbComponent } from './zaakiy-orb.component';
-import { ZaakiyMetricCard, ZaakiyStructuredBlock, ZaakiyStructuredRecord } from '../../../core/api/zaakiy-api.service';
+import { ZaakiyComparisonCardComponent } from './zaakiy-comparison-card.component';
+import { ZaakiyTrendCardComponent } from './zaakiy-trend-card.component';
+import { ZaakiyExplanationCardComponent } from './zaakiy-explanation-card.component';
+import { ZaakiyAnomalyCardComponent } from './zaakiy-anomaly-card.component';
+import {
+  ZaakiyMetricCard,
+  ZaakiyNavigationAction,
+  ZaakiyStructuredBlock,
+  ZaakiyStructuredRecord,
+} from '../../../core/api/zaakiy-api.service';
 
 export interface ZaakiyMessageModel {
   role: 'user' | 'model';
   text: string;
   blocks: ZaakiyStructuredBlock[];
+  actions?: ZaakiyNavigationAction[];
+  statusLabel?: string;
 }
 
 @Component({
   selector: 'bm-zaakiy-message',
   standalone: true,
-  imports: [CommonModule, ZaakiyOrbComponent],
+  imports: [
+    CommonModule,
+    ZaakiyOrbComponent,
+    ZaakiyComparisonCardComponent,
+    ZaakiyTrendCardComponent,
+    ZaakiyExplanationCardComponent,
+    ZaakiyAnomalyCardComponent,
+  ],
   template: `
     <div
       class="flex gap-3 sm:gap-4 transition-all duration-200"
@@ -68,7 +86,7 @@ export interface ZaakiyMessageModel {
             } @else if (isLoading && isLast) {
               <div class="flex items-center gap-2 text-slate-400 py-2">
                 <span class="w-2 h-2 rounded-full bg-brand-500 animate-ping"></span>
-                <span class="text-xs italic font-medium">Zaakiy is thinking...</span>
+                <span class="text-xs italic font-medium">{{ message.statusLabel || 'Zaakiy is thinking...' }}</span>
               </div>
             }
           }
@@ -130,65 +148,38 @@ export interface ZaakiyMessageModel {
                 </div>
               }
 
-              <!-- Trends & Comparisons: Structured Text Highlights -->
-              @if ((block.type === 'trend' && block.trends?.length) || (block.type === 'comparison' && block.comparisons?.length)) {
-                <div class="my-3 space-y-2 text-xs font-poppins">
-                  @for (item of (block.trends || block.comparisons); track $index) {
-                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/70 space-y-1">
-                      <div class="flex items-center justify-between font-semibold text-slate-900">
-                        <span>{{ item['title'] || item['label'] || item['metric'] || 'Analysis Item' }}</span>
-                        @if (item['change'] || item['value']) {
-                          <span class="font-bold font-mono text-emerald-700">
-                            {{ item['change'] || item['value'] }}
-                          </span>
-                        }
-                      </div>
-                      @if (item['description'] || item['detail'] || item['summary']) {
-                        <p class="text-slate-600 italic text-[11px] leading-relaxed">
-                          {{ item['description'] || item['detail'] || item['summary'] }}
-                        </p>
-                      }
-                    </div>
+              <!-- Metric Comparisons -->
+              @if (block.type === 'comparison' && block.comparisons?.length) {
+                <div class="my-3 space-y-2">
+                  @for (comparison of block.comparisons; track $index) {
+                    <bm-zaakiy-comparison-card [comparison]="comparison" />
                   }
                 </div>
               }
 
-              <!-- Explanations: Bullet List Rich Text -->
+              <!-- Time-Series Trends -->
+              @if (block.type === 'trend' && block.trends?.length) {
+                <div class="my-3 space-y-2">
+                  @for (trend of block.trends; track $index) {
+                    <bm-zaakiy-trend-card [trend]="trend" />
+                  }
+                </div>
+              }
+
+              <!-- Driver Explanations -->
               @if (block.type === 'explanation' && block.explanations?.length) {
-                <div class="my-3 p-3 rounded-xl bg-slate-50 border border-slate-200/70 space-y-2 text-xs font-poppins">
+                <div class="my-3 space-y-2">
                   @for (exp of block.explanations; track $index) {
-                    <div class="space-y-0.5">
-                      <div class="font-semibold text-slate-900 flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
-                        <span>{{ exp['title'] || exp['factor'] || 'Key Driver' }}</span>
-                      </div>
-                      @if (exp['impact'] || exp['description']) {
-                        <p class="text-slate-600 pl-3 text-[11px] leading-relaxed">
-                          {{ exp['impact'] || exp['description'] }}
-                        </p>
-                      }
-                    </div>
+                    <bm-zaakiy-explanation-card [explanation]="exp" />
                   }
                 </div>
               }
 
-              <!-- Anomalies / Attention Items Callout -->
+              <!-- Anomalies / Attention Items -->
               @if (block.type === 'anomalies' && block.anomalies?.length) {
-                <div class="my-3 space-y-2 text-xs font-poppins">
+                <div class="my-3 space-y-2">
                   @for (anomaly of block.anomalies; track $index) {
-                    <div class="p-3 rounded-xl bg-amber-50/80 border border-amber-200/80 text-amber-900 space-y-1">
-                      <div class="font-semibold flex items-center gap-2 text-amber-900">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                        <span>{{ anomaly['title'] || anomaly['type'] || anomaly['label'] || 'Attention Required' }}</span>
-                      </div>
-                      @if (anomaly['description'] || anomaly['message'] || anomaly['detail']) {
-                        <p class="text-amber-800/90 text-xs pl-6 leading-relaxed">
-                          {{ anomaly['description'] || anomaly['message'] || anomaly['detail'] }}
-                        </p>
-                      }
-                    </div>
+                    <bm-zaakiy-anomaly-card [anomaly]="anomaly" />
                   }
                 </div>
               }
@@ -241,14 +232,14 @@ export interface ZaakiyMessageModel {
           </div>
         }
 
-        <!-- Next CTA Action Navigation Buttons (Shown with response) -->
-        @if (message.role === 'model' && isLast && actions.length > 0) {
+        <!-- Next CTA Action Navigation Buttons (Preserved per message) -->
+        @if (message.role === 'model' && resolvedActions.length > 0) {
           <div class="flex flex-wrap items-center gap-2 mt-4 pt-1">
             <span class="text-[11px] font-semibold text-slate-400 shrink-0 w-full sm:w-auto">Suggested Actions:</span>
-            @for (action of actions; track action.url) {
+            @for (action of resolvedActions; track formatActionUrl(action)) {
               <button
                 type="button"
-                (click)="onNavigate.emit(action.url)"
+                (click)="onNavigate.emit(formatActionUrl(action))"
                 class="inline-flex items-center gap-2 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-full px-4 py-2 transition cursor-pointer shadow-xs"
               >
                 <span>{{ action.label }}</span>
@@ -317,11 +308,33 @@ export class ZaakiyMessageComponent {
   @Input({ required: true }) message!: ZaakiyMessageModel;
   @Input() isLoading = false;
   @Input() isLast = false;
-  @Input() actions: Array<{ label: string; url: string }> = [];
+  @Input() actions: ZaakiyNavigationAction[] = [];
   @Output() onSelectPrompt = new EventEmitter<string>();
   @Output() onNavigate = new EventEmitter<string>();
 
   copied = signal(false);
+
+  get resolvedActions(): ZaakiyNavigationAction[] {
+    if (this.message.actions && this.message.actions.length > 0) {
+      return this.message.actions;
+    }
+    return this.isLast ? this.actions : [];
+  }
+
+  formatActionUrl(action: ZaakiyNavigationAction): string {
+    if (!action.query || Object.keys(action.query).length === 0) {
+      return action.url;
+    }
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(action.query)) {
+      if (value !== null && value !== undefined && value !== '') {
+        params.set(key, String(value));
+      }
+    }
+    const qs = params.toString();
+    if (!qs) return action.url;
+    return `${action.url}${action.url.includes('?') ? '&' : '?'}${qs}`;
+  }
 
   copyMessageText(): void {
     if (!this.message.text) return;
@@ -334,11 +347,21 @@ export class ZaakiyMessageComponent {
   recordRoute(record: ZaakiyStructuredRecord): string | null {
     if (!record.id) return null;
     const type = (record.type || '').toLowerCase();
+    if (
+      type === 'tenant' ||
+      type === 'owner' ||
+      type === 'customer' ||
+      type === 'vendor' ||
+      type === 'tenant_profile'
+    ) {
+      return `/app/customers/${record.id}`;
+    }
     if (type.includes('property')) return `/app/properties/${record.id}`;
-    if (type.includes('tenant') || type.includes('lease')) return `/app/tenant-agreements/${record.id}`;
-    if (type.includes('owner') || type.includes('management')) return `/app/owner-agreements/${record.id}`;
-    if (type.includes('customer') || type.includes('tenant_profile')) return `/app/customers/${record.id}`;
+    if (type.includes('tenant_agreement') || type.includes('lease')) return `/app/tenant-agreements/${record.id}`;
+    if (type.includes('owner_agreement') || type.includes('management')) return `/app/owner-agreements/${record.id}`;
     if (type.includes('work_order') || type.includes('maintenance')) return `/app/maintenance/work-orders/${record.id}`;
+    if (type === 'invoice') return `/app/billing/invoices/${record.id}`;
+    if (type === 'quotation') return `/app/billing/quotations/${record.id}`;
     return null;
   }
 

@@ -41,8 +41,25 @@ export interface ZaakiyStructuredRecord {
   fields?: Record<string, unknown>;
 }
 
+export interface ZaakiyNavigationAction {
+  label: string;
+  url: string;
+  query?: Record<string, unknown>;
+}
+
 export interface ZaakiyStructuredBlock {
-  type: 'summary' | 'records' | 'comparison' | 'trend' | 'explanation' | 'anomalies' | 'sections' | 'warnings' | 'suggestions';
+  type:
+    | 'summary'
+    | 'records'
+    | 'comparison'
+    | 'trend'
+    | 'explanation'
+    | 'anomalies'
+    | 'sections'
+    | 'warnings'
+    | 'suggestions'
+    | 'disambiguation'
+    | 'action_proposal';
   metrics?: ZaakiyMetricCard[];
   records?: ZaakiyStructuredRecord[];
   comparisons?: Array<Record<string, unknown>>;
@@ -52,15 +69,19 @@ export interface ZaakiyStructuredBlock {
   sections?: Array<Record<string, unknown>>;
   warnings?: Array<Record<string, unknown>>;
   suggestions?: string[];
+  candidates?: Array<Record<string, unknown>>;
+  proposal?: Record<string, unknown>;
 }
 
 export type ZaakiyStructuredEventType = ZaakiyStructuredBlock['type'];
 
 export interface ZaakiyStreamEvent {
-  type: 'token' | 'done' | 'navigation' | 'error' | ZaakiyStructuredEventType;
+  type: 'token' | 'done' | 'navigation' | 'status' | 'error' | ZaakiyStructuredEventType;
   text?: string;
   label?: string;
   url?: string;
+  query?: Record<string, unknown>;
+  items?: ZaakiyNavigationAction[];
   context?: ZaakiyConversationContext | null;
   block?: ZaakiyStructuredBlock;
 }
@@ -69,14 +90,27 @@ export function normalizeZaakiyEvent(type: string | undefined, payload: Record<s
   if (type === 'error') {
     throw new Error((payload['message'] as string | undefined) || 'Zaakiy is temporarily unavailable.');
   }
-  if (type === 'done' || type === 'navigation' || type === 'token') {
+  if (type === 'status') {
     return {
+      type: 'status',
+      label: (payload['label'] as string | undefined) || 'Analyzing branch data...',
+    };
+  }
+  if (type === 'done' || type === 'navigation' || type === 'token') {
+    const event: ZaakiyStreamEvent = {
       type,
       text: payload['text'] as string | undefined,
       label: payload['label'] as string | undefined,
       url: payload['url'] as string | undefined,
       context: payload['context'] as ZaakiyConversationContext | null | undefined,
     };
+    if (payload['query'] && typeof payload['query'] === 'object') {
+      event.query = payload['query'] as Record<string, unknown>;
+    }
+    if (Array.isArray(payload['items'])) {
+      event.items = payload['items'] as ZaakiyNavigationAction[];
+    }
+    return event;
   }
   const structuredTypes: ZaakiyStructuredEventType[] = [
     'summary',
@@ -88,6 +122,8 @@ export function normalizeZaakiyEvent(type: string | undefined, payload: Record<s
     'sections',
     'warnings',
     'suggestions',
+    'disambiguation',
+    'action_proposal',
   ];
   if (!type || !structuredTypes.includes(type as ZaakiyStructuredEventType)) return null;
 
